@@ -1,0 +1,140 @@
+* {
+    box-sizing: border-box;
+}
+
+body {
+    font-family:'Trebuchet MS', 'Lucida Sans Unicode', 'Lucida Grande', 'Lucida Sans', Arial, sans-serif;
+    background-color: #f4f4f4;
+    margin: 0;
+    padding: 0;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100%;
+}
+
+.container {
+    background-color: #fff;
+    padding: 20px;
+    margin: 10px 0;
+    border-radius: 8px;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+    min-width: 350px;
+    width: 40%;
+    height: 100%;
+    border-top: 3px solid #70cbeb;
+    border-bottom: 3px solid #70cbeb;
+}
+
+h2 {
+    margin-bottom: 20px;
+    color: #333;
+}
+
+label {
+    display: block;
+    margin-bottom: 8px;
+    color: #555;
+}
+
+input[type="text"],input[type="password"],  input[type="email"], input[type="tel"],input[type="date"], textarea, select, button {
+    width: 100%;
+    padding: 10px;
+    margin-bottom: 15px;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    resize: none;
+}
+
+input[type="file"] {
+    width: 27%;
+    height: 100%;
+}
+
+button {
+    background-color: #72c6e5;
+    color: #fff;
+    border: none;
+    cursor: pointer;
+    margin: 10px 0;
+    transition: all 1s;
+}
+
+button:hover {
+    background-color: #536bc9;
+}
+
+fieldset {
+    border: none;
+    padding: 0;
+    margin-bottom: 15px;
+}
+
+legend {
+    color: #555;
+    margin-bottom: 8px;
+}
+
+.radio-group {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin: 10px 0;
+}
+
+.file-input {
+    position: relative;
+    overflow: hidden;
+    margin-bottom: 15px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.file-input input[type="file"] {
+    position: absolute;
+    font-size: 100px;
+    opacity: 0;
+    right: 0;
+    top: 0;
+
+    
+}
+
+.file-input-text {
+    display: inline-block;
+    background-color: #70cbeb;
+    padding: 10px;
+    border-radius: 4px;
+    cursor: pointer;
+    width: fit-content;
+    box-sizing: border-box;
+    color: #000;
+    text-align: center;
+
+}
+
+.radio-group label {
+    margin-right: 10px;
+}
+
+@media (max-width: 600px) {
+    .container {
+        padding: 15px;
+    }
+
+    input, textarea, select, button {
+        padding: 8px;
+    }
+
+    .radio-group label {
+        margin-bottom: 5px;
+    }
+}
+
+.boletin__container {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    margin: 10px 0;
+}
