@@ -11,15 +11,7 @@
         <form id="contactForm" onsubmit="return validateForm()" method="post" action="../scripts/guardar_personal.php">
             <h2>Asignación</h2>
             <label for="rol">Rol</label>
-            <?php include "conectar.php"; 
-            
-            $sql = "select m.nom_modulo from modulo"
-            $resultado = $con->query($sql);
-            if ($resultado->num_rows > 0) {
-                $usuario = $resultado->fetch_assoc();
-                foreach 
-            }
-            ?>
+            <?php include "asig.php"; ?> 
             <select id="tipo_doc" name="tipo_doc" required>
                 <option value="CC">Cedula</option>
                 <option value="TI">Tarjeta de identidad</option>
