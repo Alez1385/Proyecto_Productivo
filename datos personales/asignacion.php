@@ -5,7 +5,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Formulario de Contacto</title>
-    <link rel="stylesheet" href="styles.css">
+    <link rel="stylesheet" href="../styles/asignacion.css">
 </head>
 
 <body>
@@ -13,7 +13,7 @@
         <form id="contactForm" onsubmit="return validateForm()" method="post" action="../scripts/asig_modulo.php">
             <h2>Asignación</h2>
             
-
+            <div>
             <label for="rol">Rol</label>
             <select id="rol" name="rol">
             <?php
@@ -31,25 +31,32 @@
             }
             ?>
             </select>
+            </div>
 
+            <div>
             <label for="mod">Modulos</label>
-            <select id="mod" name="mod">
+            <div class="checkbox-group">
             <?php
 
             include "../scripts/conexion.php";
 
             $sql = "select m.* from modulos m";
             $resultado = $conn->query($sql);
+            
             if ($resultado->num_rows > 0) {
-                while ($row = $resultado->fetch_assoc()) {
-                    echo '<option value="' . $row["id_modulo"] . '">' . $row["nom_modulo"] . '</option>';
+                while ($row = $resultado->fetch_assoc() ) {
+                    echo '<div class="checkbox-container">' .  $row["nom_modulo"] .' </label>' .  '<input type="checkbox" name="' . $row["id_modulo"] . '"> </div>' ;
+                    
+                    
+                    
                 }
             } else {
-                echo '<option value"">no hay opciones disponibles</value>';
+                echo '<p>No hay modulos disponibles</p>';
             }
             ?>
-            </select>
+            </div>
 
+            </div>
 
             <button type="submit">Enviar</button>
         </form>
