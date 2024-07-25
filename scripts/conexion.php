@@ -3,7 +3,7 @@
 $servername = "localhost";
 $username = "root"; 
 $password = ""; 
-$dbname = "mercho";
+$dbname = "db_gestion";
 
 
 $conn = new mysqli($servername, $username, $password, $dbname);
