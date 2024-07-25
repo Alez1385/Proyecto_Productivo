@@ -35,7 +35,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
             $stmt_insert->close();
         
     }
-
+}
     // Cerrar la conexión
     $conn->close();
 
@@ -44,5 +44,5 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
             alert('Se han asignado $count_success módulos correctamente.');
             window.location.href = '../datos personales/asignacion.php';
           </script>";
-}
+
 }
