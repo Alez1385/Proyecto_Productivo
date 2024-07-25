@@ -74,7 +74,7 @@
         </div>
     </div>
 
-    <script src="script.js"></script>
+    <script src="modulos.js"></script>
 </body>
 
 </html>
