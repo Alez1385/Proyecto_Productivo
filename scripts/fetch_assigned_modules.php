@@ -4,7 +4,7 @@ include "conexion.php";
 if (isset($_GET['user_id'])) {
     $user_id = intval($_GET['user_id']);
 
-    $sql = "SELECT m.nombre_modulo 
+    $sql = "SELECT m.nom_modulo 
             FROM modulos m 
             JOIN asig_modulo am ON m.id_modulo = am.id_modulo 
             WHERE am.id_usuario = ?";

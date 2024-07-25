@@ -6,14 +6,14 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Formulario de Contacto</title>
     <link rel="stylesheet" href="../styles/asignacion.css">
-    
+
 </head>
 
 <body>
     <div class="container">
         <form id="contactForm" method="post" action="../scripts/asig_modulo.php">
             <h2>Asignación</h2>
-            
+
             <div>
                 <label for="user">User</label>
                 <select id="user" name="user" onchange="fetchAssignedModules(this.value)">
@@ -44,7 +44,7 @@
 
                     $sql = "SELECT * FROM modulos";
                     $resultado = $conn->query($sql);
-                    
+
                     if ($resultado->num_rows > 0) {
                         while ($row = $resultado->fetch_assoc()) {
                             echo '<div class="checkbox-container">';
@@ -69,12 +69,12 @@
     <div class="mod_asign_container">
         <h2>Módulos Asignados</h2>
         <div id="assignedModules">
-            <p>Los módulos asignados de <span id="userName"></span>:</p>
+            <p><span id="userName"></span></p>
             <ul id="assignedModulesList"></ul>
         </div>
     </div>
 
-    <script src="modulos.js"></script>
+    <script src="../scripts/modulos.js"></script>
 </body>
 
 </html>
