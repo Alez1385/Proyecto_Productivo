@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Register</title>
+    <link rel="stylesheet" href="/login/css/register.css">
+</head>
+<body>
+    <div class="register-container">
+        <form class="register-form" action="scripts/register.php" method="post" enctype="multipart/form-data">
+            <h2>Sign up</h2>
+        
+            <div class="input-group">
+                <input type="text" placeholder="First Name" name="nombre" required>
+            </div>
+        
+            <div class="input-group">
+                <input type="text" placeholder="Last Name" name="apellido" required>
+            </div>
+        
+            <div class="input-group">
+                <select name="tipo_doc" required>
+                    <option value="" disabled selected>Document Type</option>
+                    <option value="ID">ID</option>
+                    <option value="Passport">Passport</option>
+                </select>
+            </div>
+        
+            <div class="input-group">
+                <input type="text" placeholder="Document Number" name="documento" required>
+            </div>
+        
+            <div class="input-group">
+                <input type="date" placeholder="Birth Date" name="fecha_nac" required>
+            </div>
+        
+            <div class="input-group">
+                <input type="file" name="foto" accept="image/*" required>
+            </div>
+        
+            <div class="input-group">
+                <input type="email" placeholder="Email" name="mail" required>
+            </div>
+        
+            <div class="input-group">
+                <input type="tel" placeholder="Phone Number" name="telefono" required>
+            </div>
+        
+            <div class="input-group">
+                <input type="text" placeholder="Address" name="direccion" required>
+            </div>
+        
+            <div class="input-group">
+                <select name="id_tipo_usuario" required>
+                    <option value="" disabled selected>User Type</option>
+                    <option value="1">Admin</option>
+                    <option value="2">User</option>
+                </select>
+            </div>
+        
+            <div class="input-group">
+                <input type="text" placeholder="Username" name="login" required>
+            </div>
+        
+            <div class="input-group">
+                <input type="password" placeholder="Password" name="clave" id="password" required>
+                <img src="img/eye-open.svg" alt="Toggle Lock" class="lock-icon" id="toggleLock" onclick="togglePassword()">
+            </div>
+        
+            <button type="submit" class="btn-register">REGISTER</button>
+        
+            <p>Already have an account? <a href="login.php">Sign in</a></p>
+        </form>
+        
+    </div>
+
+    <script src="scripts/script_register.js"></script>
+    </body>
+</html>

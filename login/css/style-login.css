@@ -1,0 +1,219 @@
+body {
+    font-family: 'Arial', sans-serif;
+    background-color: #f7f7f7;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+    margin: 0;
+}
+
+.login-container {
+    background-color: white;
+    padding: 40px 30px;
+    border-radius: 10px;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+    width: 360px;
+    text-align: center;
+    position: relative;
+    z-index: 10;
+}
+
+.login-form h2 {
+    margin-bottom: 20px;
+    font-size: 24px;
+    color: #333;
+}
+
+.input-group {
+    position: relative;
+    margin-bottom: 20px;
+    text-align: left;
+}
+
+.input-group .icon {
+    position: absolute;
+    left: 10px;
+    top: 50%;
+    transform: translateY(-50%);
+    width: 20px;
+    height: 20px;
+}
+
+.input-group input {
+    width: 100%;
+    padding: 10px 40px 10px 40px; /* Deja espacio suficiente para los íconos */
+    border: 1px solid #ddd;
+    border-radius: 5px;
+    font-size: 16px;
+    box-sizing: border-box;
+}
+
+.lock-icon {
+    position: absolute;
+    right: 10px;
+    top: 50%;
+    transform: translateY(-50%);
+    width: 20px;
+    height: 20px;
+    cursor: pointer;
+    transition: transform 0.3s ease;
+}
+
+.lock-icon.rotate {
+    transform: translateY(-50%) rotate(180deg);
+}
+
+.options {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 20px;
+    font-size: 14px;
+}
+
+.options a {
+    color: #007bff;
+    text-decoration: none;
+}
+
+.btn-login {
+    width: 100%;
+    padding: 10px;
+    background-color: #007bff;
+    border: none;
+    border-radius: 5px;
+    color: white;
+    font-size: 16px;
+    cursor: pointer;
+    transition: background-color 0.3s;
+}
+
+.btn-login:hover {
+    background-color: #0056b3;
+}
+
+.social-container {
+    margin-top: 20px;
+    display: flex;
+    justify-content: center; /* Centra el único botón social */
+}
+
+.social-container a img {
+    width: 30px;
+    height: 30px;
+}
+
+.google-login img {
+    width: 40px; /* Aumenta un poco el tamaño del ícono de Google */
+    height: 40px;
+}
+
+p {
+    font-size: 14px;
+    color: #333;
+}
+
+body {
+  font-family: 'Arial', sans-serif;
+  background: linear-gradient(135deg, #00c6ff, #0072ff);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 100vh;
+  margin: 0;
+}
+
+.login-container {
+  background-color: white;
+  padding: 50px 40px;
+  border-radius: 20px;
+  box-shadow: 0 0 15px rgba(0, 0, 0, 0.2);
+  width: 400px;
+  text-align: center;
+  position: relative;
+  z-index: 10;
+}
+
+.login-form h2 {
+  margin-bottom: 30px;
+  font-size: 28px;
+  color: #333;
+}
+
+.input-group input {
+  padding: 12px 50px 12px 50px; /* Más espacio para los íconos */
+  border-radius: 10px;
+  font-size: 18px;
+}
+
+.lock-icon {
+  width: 25px;
+  height: 25px;
+}
+
+.btn-login {
+  padding: 12px;
+  background-color: #007bff;
+  border-radius: 10px;
+  font-size: 18px;
+}
+
+.btn-login:hover {
+  background-color: #0056b3;
+}
+
+.social-container {
+  margin-top: 30px;
+}
+
+.google-login img {
+  width: 50px; /* Ícono más grande de Google */
+  height: 50px;
+}
+
+.options a {
+  color: #0056b3; /* Color más oscuro para los enlaces */
+}
+
+.options label {
+  font-size: 16px; /* Aumenta el tamaño del texto */
+}
+
+p {
+  font-size: 16px; /* Aumenta el tamaño del texto de las indicaciones */
+  color: #333;
+}
+
+/* Estilo adicional para formas geométricas de fondo */
+body::before {
+  content: '';
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(135deg, #fff, rgba(255, 255, 255, 0));
+  clip-path: circle(25% at right 70%);
+  z-index: 1;
+}
+
+body::after {
+  content: '';
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(135deg, rgba(255, 255, 255, 0), #fff);
+  clip-path: circle(20% at left 30%);
+  z-index: 1;
+}
+
+@media (max-width: 600px) {
+ .login-container {
+    height: 100%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    width: 100%;
+  
+
+  }
+  }
