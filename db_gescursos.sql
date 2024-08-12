@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Servidor: 127.0.0.1
--- Tiempo de generación: 10-08-2024 a las 23:17:26
+-- Tiempo de generación: 13-08-2024 a las 00:27:55
 -- Versión del servidor: 10.4.32-MariaDB
 -- Versión de PHP: 8.2.12
 
@@ -130,6 +130,28 @@ CREATE TABLE `pagos` (
 -- --------------------------------------------------------
 
 --
+-- Estructura de tabla para la tabla `password_resets`
+--
+
+CREATE TABLE `password_resets` (
+  `id` int(11) NOT NULL,
+  `email` varchar(255) NOT NULL,
+  `token` varchar(255) NOT NULL,
+  `created_at` datetime DEFAULT current_timestamp()
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+--
+-- Volcado de datos para la tabla `password_resets`
+--
+
+INSERT INTO `password_resets` (`id`, `email`, `token`, `created_at`) VALUES
+(1, 'santiagocaponf@gmail.com', 'b89ce83759bfba4539f00c03dd29b567ce1b80625dba05aedfa3069130883188df1c10957db55f30d9b1de8106c0e6515cf4', '2024-08-12 16:46:52'),
+(2, 'santiagocaponf@gmail.com', '722dc5225e0cc91a979aeb71f26e1eec8a55ed7b26376e81ff470e393ba06b3d2c54e5d9e022cdd411054f1aa387e929af5d', '2024-08-12 16:47:36'),
+(3, 'santiagocaponf@gmail.com', '0a973fc0d5e034899e245410db613bb496151c137d903e0ed1751b2348371bc9dc8fddd211753c413d079cbd1d36bdf9d43e', '2024-08-12 16:48:07');
+
+-- --------------------------------------------------------
+
+--
 -- Estructura de tabla para la tabla `profesor`
 --
 
@@ -173,14 +195,14 @@ CREATE TABLE `usuario` (
   `nombre` varchar(50) DEFAULT NULL,
   `apellido` varchar(50) DEFAULT NULL,
   `tipo_doc` varchar(10) DEFAULT NULL,
-  `documento` int(12) DEFAULT NULL,
+  `documento` varchar(200) DEFAULT NULL,
   `fecha_nac` date DEFAULT NULL,
   `foto` varchar(50) DEFAULT NULL,
   `mail` varchar(50) DEFAULT NULL,
   `telefono` varchar(25) DEFAULT NULL,
   `direccion` varchar(100) NOT NULL,
   `id_tipo_usuario` int(11) DEFAULT NULL,
-  `login` varchar(50) DEFAULT NULL,
+  `username` varchar(50) DEFAULT NULL,
   `clave` varchar(255) DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
@@ -188,20 +210,10 @@ CREATE TABLE `usuario` (
 -- Volcado de datos para la tabla `usuario`
 --
 
-INSERT INTO `usuario` (`id_usuario`, `nombre`, `apellido`, `tipo_doc`, `documento`, `fecha_nac`, `foto`, `mail`, `telefono`, `direccion`, `id_tipo_usuario`, `login`, `clave`) VALUES
-(6, 'Santiago', 'Capon', 'Passport', 2147483647, '2024-08-08', 'cedula edison.tiff', 'santiagocaponf@gmail.com', '4253452345', 'sfdgsdfgsdfgsdfg', 1, '8', '$2y$10$5QuVgdDu.GdTEaV4dDzyju/A3mCNR7zCOCiqXZt2XTirpFXFyG3K6'),
-(7, 'asdfasdf', 'asdfasdf', 'ID', 0, '0004-03-12', 'tarjeta santiago.tiff', '1234123412@4234523', '341234123', '412341234', 1, '12341234123', '$2y$10$8N3N1rSA/YhthLcsWLbY1uHlsH5nnO0lg..8H8w9bPJalAQMWLTUe'),
-(8, 'asdfasdf', 'asdfasdf', 'ID', 0, '0004-03-12', 'tarjeta santiago.tiff', '1234123412@4234523', '341234123', '412341234', 1, '12341234123', '$2y$10$YrY58biVAPdMYc9l2K0wMuwNG/C5IGxKIJ/KQrLLRnJYG0pLJ6fl2'),
-(9, 'asdfasdf', 'asdfasdf', 'ID', 0, '0005-04-23', 'Captura de pantalla 2024-04-17 a las 20.52.55.png', 'santiagocaponf@gmail.com', '123423452345', '234523452345', 1, '0', '$2y$10$pV9M0N7kqo79gnbLZss9V.A.hkVzyGr0mPQm1wlkRM0RLCzUHGPrC'),
-(10, 'asdfasdf', 'asdfasdf', 'ID', 0, '0005-04-23', 'Captura de pantalla 2024-04-17 a las 20.52.55.png', 'santiagocaponf@gmail.com', '123423452345', '234523452345', 1, '0', '$2y$10$yVMS5xWR6GUZsF3/0fT6Kem2IaTJz8oCk6dXGTaZzn6BwVORNMkr2'),
-(11, 'asdfasdf', 'asdfasdf', 'ID', 0, '0005-04-23', 'Captura de pantalla 2024-04-17 a las 20.52.55.png', 'santiagocaponf@gmail.com', '123423452345', '234523452345', 1, '0', '$2y$10$iJQC0l5my9CeLJPG9a2.meCLmsx/an5hZvzFxRIkH84TclsBxKW1a'),
-(12, 'asdfasdf', 'asdfasdf', 'ID', 0, '0005-04-23', 'Captura de pantalla 2024-04-17 a las 20.52.55.png', 'santiagocaponf@gmail.com', '123423452345', '234523452345', 1, '0', '$2y$10$mzisJKYhOtUtGmHIdtNDH.kJ4.NkE2vExpPhqMFOSChFJcyEE6cCC'),
-(13, 'asdfasdf', 'asdfasdf', 'ID', 0, '0005-04-23', 'Captura de pantalla 2024-04-17 a las 20.52.55.png', 'santiagocaponf@gmail.com', '123423452345', '234523452345', 1, '0', '$2y$10$CWFuE8TZ3mEOGpXcvONRyuo3INgXk950W5DMehj/eWXNlXZpk/wYW'),
-(14, 'asdfasdf', 'asdfasdf', 'ID', 0, '0005-04-23', 'Captura de pantalla 2024-04-17 a las 20.52.55.png', 'santiagocaponf@gmail.com', '123423452345', '234523452345', 1, '0', '$2y$10$BoTIlKatgroA3xuVc52p0OoNXcW1u2lsb4Nu78K5wnG.qqnQ/0Z4q'),
-(15, 'asdfasdf', 'asdfasdf', 'ID', 0, '0005-04-23', 'Captura de pantalla 2024-04-17 a las 20.52.55.png', 'santiagocaponf@gmail.com', '123423452345', '234523452345', 1, '0', '$2y$10$Zl3.WaqWGly94zFmqwLIuuihkVFAMlrb6g4TYJFSHNnJNK8hWFufy'),
-(16, 'asdfasdf', 'asdfasdf', 'ID', 0, '0034-02-02', '../../uploads/declaracion extrajuicio.tiff', '41231234@4123412', '124312341234', '124312431243', 1, '0', '$2y$10$0D6OJB7BGPxBFQk4.ZhKauytH7VQYhxlyMtnsMMilZF4fYDTn6ne6'),
-(17, 'asdfasdf', 'asdfasdf', 'ID', 0, '0034-02-02', '../../uploads/declaracion extrajuicio.tiff', '41231234@4123412', '124312341234', '124312431243', 1, '0', '$2y$10$9kiLy2.FWtmxP.bop7GxOuCW72KXfOYcyvDmdwjop3Rjs8R0K7ODm'),
-(18, 'asdfasdf', 'asdfasdf', 'ID', 0, '0034-02-02', '../../uploads/declaracion extrajuicio.tiff', '41231234@4123412', '124312341234', '124312431243', 1, '0', '$2y$10$jLrPaSqlyEE4EVTzAhV5duJOhh2696Fu3yfSb1z7dwbDlZARQQWiW');
+INSERT INTO `usuario` (`id_usuario`, `nombre`, `apellido`, `tipo_doc`, `documento`, `fecha_nac`, `foto`, `mail`, `telefono`, `direccion`, `id_tipo_usuario`, `username`, `clave`) VALUES
+(27, 'Santiago', 'Capon', 'ID', '1093297500', '2024-08-14', '../../uploads/WhatsApp Image 2024-07-23 at 4.49.07', 'santiagocaponf@gmail.com', '4253452345', 'CL 18 A NORTE 2 72', 1, 'alez', '$2y$10$749K7f81m9Hw1z6d/oTzi.nvteioORWKhxPioqUo9qY3FyjpG6/YO'),
+(28, 'asdfasd', 'asdfasd', 'ID', 'dfasdfasfd', '2024-08-07', '../../uploads/rifa silvana.png', 'santiagocaponf@gmail.com', '341234123', 'CL 18 A NORTE 2 72', 1, 'alez', '$2y$10$41kcIBfVt.PBiph8LSfP8.heNnR/qwiNXTn5eEvbw3EUKt2AMYwEG'),
+(29, 'Santiago', 'Capon', 'ID', '1093297500', '2024-08-15', '../../uploads/tarjeta santiago.tiff', 'santiagocaponf@gmail.com', '123423452345', '124312431243', 1, 'alez', '$2y$10$lmdqx7N.FqDCe7zk0ZbT1e20id2scTC1ccGHUYFxAKRf2AwAcIl7m');
 
 --
 -- Índices para tablas volcadas
@@ -265,6 +277,12 @@ ALTER TABLE `modulos`
 ALTER TABLE `pagos`
   ADD PRIMARY KEY (`id_pago`),
   ADD KEY `id_estudiante` (`id_estudiante`);
+
+--
+-- Indices de la tabla `password_resets`
+--
+ALTER TABLE `password_resets`
+  ADD PRIMARY KEY (`id`);
 
 --
 -- Indices de la tabla `profesor`
@@ -339,6 +357,12 @@ ALTER TABLE `pagos`
   MODIFY `id_pago` int(11) NOT NULL AUTO_INCREMENT;
 
 --
+-- AUTO_INCREMENT de la tabla `password_resets`
+--
+ALTER TABLE `password_resets`
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=4;
+
+--
 -- AUTO_INCREMENT de la tabla `profesor`
 --
 ALTER TABLE `profesor`
@@ -354,7 +378,7 @@ ALTER TABLE `tipo_usuario`
 -- AUTO_INCREMENT de la tabla `usuario`
 --
 ALTER TABLE `usuario`
-  MODIFY `id_usuario` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=19;
+  MODIFY `id_usuario` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=30;
 
 --
 -- Restricciones para tablas volcadas
