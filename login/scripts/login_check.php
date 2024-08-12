@@ -9,7 +9,7 @@ $username = $_POST['username'];
 $password = $_POST['password'];
 
 // Consulta para obtener el usuario
-$sql = "SELECT * FROM tipo_usuario WHERE nombre = ?";
+$sql = "SELECT * FROM usuario WHERE username = ?";
 $stmt = $conn->prepare($sql);
 $stmt->bind_param("s", $username);
 $stmt->execute();
@@ -22,7 +22,16 @@ if ($result->num_rows > 0) {
     if (password_verify($password, $user['clave'])) {
         // Autenticación exitosa
         $_SESSION['user_id'] = $user['id_usuario'];
-        $_SESSION['user_name'] = $user['nombre'];
+        $_SESSION['user_name'] = $user['username'];
+        
+        // Recordar el usuario si la opción está marcada
+        if (isset($_POST['remember'])) {
+            setcookie('username', $username, time() + (86400 * 30), "/"); // 30 días
+        } else {
+            if (isset($_COOKIE['username'])) {
+                setcookie('username', '', time() - 3600, "/"); // Eliminar cookie
+            }
+        }
         
         // Redirigir al usuario al dashboard o página principal
         header("Location: dashboard.php");
@@ -34,20 +43,6 @@ if ($result->num_rows > 0) {
     echo "Usuario o contraseña incorrectos.";
 }
 
-// Recordar el usuario si la opción está marcada
-if (isset($_POST['remember'])) {
-    setcookie('username', $username, time() + (86400 * 30), "/"); // 30 días
-} else {
-    if (isset($_COOKIE['username'])) {
-        setcookie('username', '', time() - 3600, "/"); // Eliminar cookie
-    }
-}
-
 // Cerrar la conexión
 $stmt->close();
 $conn->close();
-
-// Añadir código al final del archivo login.php
-
-
-

@@ -1,7 +1,6 @@
 <?php
 // Configuración
 require_once '../../scripts/conexion.php';
- // Archivo para funciones auxiliares
 
 // Verificar si el formulario ha sido enviado
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
@@ -16,18 +15,18 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     $telefono = sanitizeInput($_POST['telefono']);
     $direccion = sanitizeInput($_POST['direccion']);
     $id_tipo_usuario = sanitizeInput($_POST['id_tipo_usuario']);
-    $login = sanitizeInput($_POST['login']);
+    $login = sanitizeInput($_POST['username']);
     $clave = password_hash($_POST['clave'], PASSWORD_DEFAULT); // Hash de la contraseña
 
     // Manejo de archivo de imagen
     $foto = handleFileUpload($_FILES['foto']);
 
     // Preparar y ejecutar la consulta
-    $sql = "INSERT INTO usuario (nombre, apellido, tipo_doc, documento, fecha_nac, foto, mail, telefono, direccion, id_tipo_usuario, login, clave)
+    $sql = "INSERT INTO usuario (nombre, apellido, tipo_doc, documento, fecha_nac, foto, mail, telefono, direccion, id_tipo_usuario, username, clave)
             VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
 
     if ($stmt = $conn->prepare($sql)) {
-        $stmt->bind_param('ssssssssssis', $nombre, $apellido, $tipo_doc, $documento, $fecha_nac, $foto, $mail, $telefono, $direccion, $id_tipo_usuario, $login, $clave);
+        $stmt->bind_param('ssssssssssss', $nombre, $apellido, $tipo_doc, $documento, $fecha_nac, $foto, $mail, $telefono, $direccion, $id_tipo_usuario, $login, $clave);
 
         if ($stmt->execute()) {
             // Redirigir a la página de inicio de sesión con un mensaje de éxito
@@ -82,4 +81,3 @@ function showError($message) {
           </script>";
     exit();
 }
-?>

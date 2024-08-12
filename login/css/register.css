@@ -187,3 +187,16 @@ body::after {
         padding: 10px;
     }
 }
+
+/* Estilo para el mensaje de error o disponibilidad del username */
+.error-message {
+    font-size: 14px;
+    margin-top: 5px;
+    display: block;
+    transition: color 0.3s ease;
+}
+
+/* Agregar algo de margen debajo del input para que el mensaje no se vea pegado */
+.input-group input {
+    margin-bottom: 5px;
+}

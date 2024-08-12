@@ -5,6 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Register</title>
     <link rel="stylesheet" href="/login/css/register.css">
+    
 </head>
 <body>
     <div class="register-container">
@@ -28,7 +29,7 @@
             </div>
         
             <div class="input-group">
-                <input type="text" placeholder="Document Number" name="documento" required>
+                <input type="text" placeholder="Document Number" name="documento" onkeypress='return event.charCode >= 48 && event.charCode <= 57' required>
             </div>
         
             <div class="input-group">
@@ -44,7 +45,7 @@
             </div>
         
             <div class="input-group">
-                <input type="tel" placeholder="Phone Number" name="telefono" required>
+                <input type="tel" placeholder="Phone Number" name="telefono" onkeypress='return event.charCode >= 48 && event.charCode <= 57' required>
             </div>
         
             <div class="input-group">
@@ -60,21 +61,55 @@
             </div>
         
             <div class="input-group">
-                <input type="text" placeholder="Username" name="login" required>
+                <input type="text" placeholder="Username" name="username" id="username" required>
+                <span id="usernameError" class="error-message"></span>
             </div>
         
             <div class="input-group">
                 <input type="password" placeholder="Password" name="clave" id="password" required>
-                <img src="img/eye-open.svg" alt="Toggle Lock" class="lock-icon" id="toggleLock" onclick="togglePassword()">
+                <img src="img/eye-open.svg" alt="Toggle Lock" class="lock-icon" id="toggleLock" onclick="togglePassword('password', 'toggleLock')">
             </div>
-        
-            <button type="submit" class="btn-register">REGISTER</button>
+            
+            <button type="submit" class="btn-register" id="submitBtn">REGISTRO</button>
         
             <p>Already have an account? <a href="login.php">Sign in</a></p>
         </form>
         
     </div>
 
-    <script src="scripts/script_register.js"></script>
+    <script src="scripts/password.js"></script>
+    <script>
+        document.getElementById('username').addEventListener('input', function () {
+                const username = this.value;
+                const usernameError = document.getElementById('usernameError');
+                const submitBtn = document.getElementById('submitBtn');
+
+                if (username.length > 0) {
+                    const xhr = new XMLHttpRequest();
+                    xhr.open('POST', 'scripts/check_username.php', true);
+                    xhr.setRequestHeader('Content-type', 'application/x-www-form-urlencoded');
+
+                    xhr.onreadystatechange = function () {
+                        if (this.readyState === 4 && this.status === 200) {
+                            if (this.responseText === 'taken') {
+                                usernameError.textContent = 'El nombre de usuario ya está en uso. Elige otro.';
+                                usernameError.style.color = '#c12646';
+                                submitBtn.disabled = true; // Desactivar el botón de envío
+                            } else {
+                                usernameError.textContent = 'El nombre de usuario está disponible.';
+                                usernameError.style.color = '#00bcff';
+                                submitBtn.disabled = false; // Activar el botón de envío
+                            }
+                        }
+                    };
+
+                    xhr.send('username=' + encodeURIComponent(username));
+                } else {
+                    usernameError.textContent = '';
+                    submitBtn.disabled = false; // Activar el botón de envío si el campo está vacío
+                }
+            });
+
+    </script>
     </body>
 </html>
