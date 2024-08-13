@@ -34,7 +34,7 @@ if ($result->num_rows > 0) {
         }
         
         // Redirigir al usuario al dashboard o página principal
-        header("Location: dashboard.php");
+        header("Location: ../../dashboard/dashboard.php");
         exit();
     } else {
         echo "Usuario o contraseña incorrectos.";

@@ -5,7 +5,7 @@ session_start();
 if (isset($_COOKIE['username'])) {
     $_SESSION['username'] = $_COOKIE['username'];
     // Opcionalmente, puedes redirigir al usuario al dashboard aquí si se ha autenticado previamente
-    header("Location: dashboard.php");
+    header("Location: ../dashboard/dashboard.php");
     exit();
 }
 ?>
