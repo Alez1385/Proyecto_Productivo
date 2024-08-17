@@ -1,12 +1,35 @@
 <?php
 session_start();
+include('../scripts/conexion.php');
 
-// Verificar si las cookies existen y establecer las variables de sesión
 if (isset($_COOKIE['username'])) {
     $_SESSION['username'] = $_COOKIE['username'];
-    // Opcionalmente, puedes redirigir al usuario al dashboard aquí si se ha autenticado previamente
     header("Location: ../dashboard/dashboard.php");
     exit();
+}
+
+if ($_SERVER["REQUEST_METHOD"] == "POST") {
+    $username = $_POST['username'];
+    $password = $_POST['password'];
+
+    $sql = "SELECT * FROM usuario WHERE username='$username'";
+    $result = $conn->query($sql);
+
+    if ($result->num_rows > 0) {
+        $row = $result->fetch_assoc();
+        if (password_verify($password, $row['clave'])) {
+            $_SESSION['username'] = $username;
+            if (isset($_POST['remember'])) {
+                setcookie('username', $username, time() + (86400 * 30), "/");
+            }
+            header("Location: dashboard.php");
+            exit();
+        } else {
+            $error = "Contraseña incorrecta.";
+        }
+    } else {
+        $error = "Usuario no encontrado.";
+    }
 }
 ?>
 

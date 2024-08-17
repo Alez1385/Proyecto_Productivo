@@ -20,7 +20,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
         $stmt->execute();
 
         // Enviar el enlace de restablecimiento de contraseña por correo electrónico
-        $resetLink = "http://tu-dominio.com/reset_password.php?token=$token";  //cambiar al desplegar
+        $resetLink = "localhost/proyecto_Productivo/login/reset_password.php?token=$token";  //cambiar al desplegar
         $subject = "Password Reset Request";
         $message = "Click the following link to reset your password: $resetLink";
         $headers = "From: no-reply@tu-dominio.com"; //cambiar al desplegar

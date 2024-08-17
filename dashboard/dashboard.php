@@ -1,3 +1,30 @@
+<?php
+session_start();
+include('../scripts/conexion.php');
+
+if (!isset($_SESSION['username'])) {
+    header("Location: ../login/login.php");
+    exit();
+}
+
+$username = $_SESSION['username'];
+
+$sql = "SELECT * FROM usuario WHERE username='$username'";
+$result = $conn->query($sql);
+$user = $result->fetch_assoc();
+
+$sqlUsers = "SELECT * FROM usuario";
+$usersResult = $conn->query($sqlUsers);
+
+function logout()
+{
+    session_unset();
+    session_destroy();
+    header("Location: ../login/login.php");
+}
+
+?>
+
 <!DOCTYPE html>
 <html lang="en">
 
@@ -82,7 +109,9 @@
                     </span>
                     <h3>New Login</h3>
                 </a>
-                <a href="#">
+                <a href="<?php
+                            logout();
+                            ?>">
                     <span class="material-icons-sharp">
                         logout
                     </span>
@@ -151,6 +180,16 @@
             <!-- New Users Section -->
             <div class="new-users">
                 <h2>New Users</h2>
+                <div class="user-list">
+                    <?php while ($row = $usersResult->fetch_assoc()) { ?>
+                        <div class="user">
+                            <h2><?php echo $row['nombre'] . " " . $row['apellido']; ?></h2>
+                            <p><?php echo $row['mail']; ?></p>
+                        </div>
+                    <?php } ?>
+                </div>
+
+
                 <div class="user-list">
                     <div class="user">
                         <img src="images/profile-2.jpg">
