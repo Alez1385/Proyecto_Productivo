@@ -45,7 +45,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 
     $conn->close();
 } else {
-    header("Location: register.html");
+    header("Location: ../register.html");
     exit();
 }
 
@@ -66,7 +66,7 @@ function handleFileUpload($file) {
             showError("Error al subir la imagen. Inténtelo de nuevo.");
         }
     }
-    return $foto_ruta;
+    return $foto_nombre;
 }
 
 function logError($error) {
@@ -77,7 +77,7 @@ function logError($error) {
 function showError($message) {
     echo "<script>
             alert('$message');
-            window.location.href = 'register.html';
+            window.location.href = '../register.html';
           </script>";
     exit();
 }

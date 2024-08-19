@@ -1,5 +1,9 @@
 <?php
 require '../../scripts/conexion.php';
+require '../../vendor/autoload.php';
+
+use PHPMailer\PHPMailer\PHPMailer;
+use PHPMailer\PHPMailer\Exception;
 
 if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     $email = $_POST['email'];
@@ -19,16 +23,37 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
         $stmt->bind_param("ss", $email, $token);
         $stmt->execute();
 
-        // Enviar el enlace de restablecimiento de contraseña por correo electrónico
-        $resetLink = "localhost/proyecto_Productivo/login/reset_password.php?token=$token";  //cambiar al desplegar
+        // Enviar el enlace de restablecimiento de contraseña por correo electrónico usando PHPMailer
+        $resetLink = "http://localhost/proyecto_Productivo/login/reset_password.php?token=$token";  //cambiar al desplegar
         $subject = "Password Reset Request";
         $message = "Click the following link to reset your password: $resetLink";
-        $headers = "From: no-reply@tu-dominio.com"; //cambiar al desplegar
 
-        if (mail($email, $subject, $message, $headers)) {
+        $mail = new PHPMailer(true);
+
+        try {
+            // Configuración del servidor SMTP
+            $mail->isSMTP();
+            $mail->Host = 'smtp.gmail.com';
+            $mail->SMTPAuth = true;
+            $mail->Username = 'alejo13852@gmail.com'; // Cambia a tu dirección de correo
+            $mail->Password = 'Santi/08'; // Cambia a tu contraseña de correo
+            $mail->SMTPSecure = PHPMailer::ENCRYPTION_STARTTLS;
+            $mail->Port = 587;
+
+            // Configuración de los destinatarios
+            $mail->setFrom('alejo13852@gmail.com', 'Tu Nombre o Empresa'); //cambiar al desplegar
+            $mail->addAddress($email); // Destinatario
+
+            // Contenido del correo
+            $mail->isHTML(true);
+            $mail->Subject = $subject;
+            $mail->Body    = $message;
+            $mail->AltBody = strip_tags($message);
+
+            $mail->send();
             echo "Se ha enviado un enlace de restablecimiento a tu correo electrónico.";
-        } else {
-            echo "Error al enviar el correo electrónico.";
+        } catch (Exception $e) {
+            echo "Error al enviar el correo electrónico: {$mail->ErrorInfo}";
         }
     } else {
         echo "No existe una cuenta asociada con este correo electrónico.";

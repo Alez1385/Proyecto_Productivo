@@ -9,20 +9,26 @@ if (isset($_COOKIE['username'])) {
 }
 
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
-    $username = $_POST['username'];
+    $username = filter_var($_POST['username'], FILTER_SANITIZE_STRING);
     $password = $_POST['password'];
 
-    $sql = "SELECT * FROM usuario WHERE username='$username'";
-    $result = $conn->query($sql);
+    $stmt = $conn->prepare("SELECT clave FROM usuario WHERE username = ?");
+    $stmt->bind_param("s", $username);
+    $stmt->execute();
+    $stmt->store_result();
 
-    if ($result->num_rows > 0) {
-        $row = $result->fetch_assoc();
-        if (password_verify($password, $row['clave'])) {
+    if ($stmt->num_rows > 0) {
+        $stmt->bind_result($hashed_password);
+        $stmt->fetch();
+
+        if (password_verify($password, $hashed_password)) {
             $_SESSION['username'] = $username;
+
             if (isset($_POST['remember'])) {
-                setcookie('username', $username, time() + (86400 * 30), "/");
+                setcookie('username', $username, time() + (86400 * 30), "/", "", true, true);
             }
-            header("Location: dashboard.php");
+
+            header("Location: ../dashboard/dashboard.php");
             exit();
         } else {
             $error = "Contraseña incorrecta.";
@@ -30,6 +36,9 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     } else {
         $error = "Usuario no encontrado.";
     }
+
+    $stmt->close();
+    $conn->close();
 }
 ?>
 
@@ -41,6 +50,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Login</title>
     <link rel="stylesheet" href="css/style-login.css">
+    <link rel="icon" href="img/favicon.ico" type="image/x-icon">
     <script src="scripts/password.js"></script>
     <script>
         function showSuccessModal() {
@@ -64,15 +74,11 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         }
 
         function removeURLParameter(param) {
-            // Obtener la URL actual
             let url = new URL(window.location.href);
-
-            // Eliminar el parámetro
             url.searchParams.delete(param);
-
-            // Actualizar la URL en el navegador sin recargar la página
-            window.history.replaceState({}, document.title, url.toString());
+            window.history.replaceState(null, '', url);
         }
+
 
 
         document.addEventListener('DOMContentLoaded', showSuccessModal);
@@ -81,7 +87,8 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 
 <body>
     <div class="login-container">
-        <form class="login-form" action="scripts/login_check.php" method="POST" enctype="application/x-www-form-urlencoded">
+        <form class="login-form" action="" method="POST" enctype="application/x-www-form-urlencoded">
+
             <h2>Sign in</h2>
 
             <div class="input-group">
