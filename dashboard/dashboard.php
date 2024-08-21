@@ -30,6 +30,11 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['logout'])) {
 
 ?>
 
+<?php
+
+
+?>
+
 <!DOCTYPE html>
 <html lang="en">
 
@@ -128,56 +133,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['logout'])) {
         <main>
             <h1>Analytics</h1>
             <!-- Analyses -->
-            <div class="analyse">
-                <div class="sales">
-                    <div class="status">
-                        <div class="info">
-                            <h3>Total Sales</h3>
-                            <h1>$65,024</h1>
-                        </div>
-                        <div class="progresss">
-                            <svg>
-                                <circle cx="38" cy="38" r="36"></circle>
-                            </svg>
-                            <div class="percentage">
-                                <p>+81%</p>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-                <div class="visits">
-                    <div class="status">
-                        <div class="info">
-                            <h3>Site Visit</h3>
-                            <h1>24,981</h1>
-                        </div>
-                        <div class="progresss">
-                            <svg>
-                                <circle cx="38" cy="38" r="36"></circle>
-                            </svg>
-                            <div class="percentage">
-                                <p>-48%</p>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-                <div class="searches">
-                    <div class="status">
-                        <div class="info">
-                            <h3>Searches</h3>
-                            <h1>14,147</h1>
-                        </div>
-                        <div class="progresss">
-                            <svg>
-                                <circle cx="38" cy="38" r="36"></circle>
-                            </svg>
-                            <div class="percentage">
-                                <p>+21%</p>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
+
             <!-- End of Analyses -->
 
             <!-- New Users Section -->
@@ -204,6 +160,30 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['logout'])) {
                
    
     <!-- End of New Users Section -->
+                    <?php
+                    include "../scripts/conexion.php";
+
+                    $sql = "SELECT * FROM usuario";
+                    $resultado = $conn->query($sql);
+
+                    if ($resultado->num_rows > 0) {
+                        while ($row = $resultado->fetch_assoc()) {
+                            echo '<div class="user">';
+                            echo '<img src="../uploads/'. $row['foto'] .'">';
+                            echo '<h2>'. $row['nombre'] .'</h2>';
+                            echo '<p>'. $row['mail'] .'</p>';
+
+                        }
+                    } else {
+                        echo '<p style="margin:auto;">No hay usuarios registrados</p>';
+                    }
+                    $conn->close();
+                    ?>
+                    
+                    
+                </div>
+            </div>
+            <!-- End of New Users Section -->
 
     <!-- Recent Orders Table -->
     <div class="recent-orders">

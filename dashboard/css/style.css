@@ -315,7 +315,7 @@ main .new-users .user-list{
     box-shadow: var(--box-shadow);
     display: flex;
     justify-content: space-around;
-    flex-wrap: wrap;
+    flex-wrap: nowrap;
     gap: 1.4rem;
     cursor: pointer;
     transition: all 0.3s ease;
