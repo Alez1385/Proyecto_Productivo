@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Servidor: 127.0.0.1
--- Tiempo de generación: 13-08-2024 a las 00:27:55
+-- Tiempo de generación: 22-08-2024 a las 00:43:24
 -- Versión del servidor: 10.4.32-MariaDB
 -- Versión de PHP: 8.2.12
 
@@ -32,7 +32,9 @@ CREATE TABLE `asignacion_curso` (
   `id_curso` int(11) DEFAULT NULL,
   `id_profesor` int(11) DEFAULT NULL,
   `id_estudiante` int(11) DEFAULT NULL,
-  `fecha_asignacion` date DEFAULT NULL
+  `fecha_asignacion` date DEFAULT NULL,
+  `comentarios` text DEFAULT NULL,
+  `estado` enum('activo','inactivo') NOT NULL DEFAULT 'activo'
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 -- --------------------------------------------------------
@@ -59,7 +61,35 @@ CREATE TABLE `asistencia` (
   `id_estudiante` int(11) DEFAULT NULL,
   `id_curso` int(11) DEFAULT NULL,
   `fecha` date DEFAULT NULL,
-  `presente` tinyint(1) DEFAULT NULL
+  `presente` tinyint(1) DEFAULT NULL,
+  `justificacion` text DEFAULT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+-- --------------------------------------------------------
+
+--
+-- Estructura de tabla para la tabla `aulas`
+--
+
+CREATE TABLE `aulas` (
+  `id_aula` int(11) NOT NULL,
+  `nombre_aula` varchar(100) NOT NULL,
+  `capacidad` int(3) NOT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+-- --------------------------------------------------------
+
+--
+-- Estructura de tabla para la tabla `calificaciones`
+--
+
+CREATE TABLE `calificaciones` (
+  `id_calificacion` int(11) NOT NULL,
+  `id_estudiante` int(11) NOT NULL,
+  `id_curso` int(11) NOT NULL,
+  `id_materia` int(11) NOT NULL,
+  `calificacion` decimal(5,2) NOT NULL,
+  `fecha_calificacion` date NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 -- --------------------------------------------------------
@@ -71,7 +101,10 @@ CREATE TABLE `asistencia` (
 CREATE TABLE `cursos` (
   `id_curso` int(11) NOT NULL,
   `nombre_curso` varchar(100) DEFAULT NULL,
-  `descripcion` text DEFAULT NULL
+  `descripcion` text DEFAULT NULL,
+  `nivel_educativo` enum('primaria','secundaria','terciaria') NOT NULL,
+  `duracion` int(3) NOT NULL COMMENT 'Duración en semanas',
+  `estado` enum('activo','inactivo') NOT NULL DEFAULT 'activo'
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 -- --------------------------------------------------------
@@ -86,7 +119,30 @@ CREATE TABLE `estudiante` (
   `nombre` varchar(50) DEFAULT NULL,
   `apellido` varchar(50) DEFAULT NULL,
   `correo` varchar(100) DEFAULT NULL,
-  `telefono` varchar(20) DEFAULT NULL
+  `telefono` varchar(20) DEFAULT NULL,
+  `fecha_nacimiento` date DEFAULT NULL,
+  `direccion` varchar(100) DEFAULT NULL,
+  `genero` varchar(10) DEFAULT NULL,
+  `fecha_registro` date DEFAULT curdate(),
+  `estado` enum('activo','inactivo') DEFAULT 'activo',
+  `documento_identidad` varchar(50) DEFAULT NULL,
+  `nivel_educativo` varchar(50) DEFAULT NULL,
+  `observaciones` text DEFAULT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+-- --------------------------------------------------------
+
+--
+-- Estructura de tabla para la tabla `horarios`
+--
+
+CREATE TABLE `horarios` (
+  `id_horario` int(11) NOT NULL,
+  `id_curso` int(11) NOT NULL,
+  `dia_semana` enum('lunes','martes','miércoles','jueves','viernes','sábado') NOT NULL,
+  `hora_inicio` time NOT NULL,
+  `hora_fin` time NOT NULL,
+  `id_aula` int(11) NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 -- --------------------------------------------------------
@@ -100,6 +156,19 @@ CREATE TABLE `inscripciones` (
   `id_curso` int(11) DEFAULT NULL,
   `id_estudiante` int(11) DEFAULT NULL,
   `fecha_inscripcion` date DEFAULT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+-- --------------------------------------------------------
+
+--
+-- Estructura de tabla para la tabla `materias`
+--
+
+CREATE TABLE `materias` (
+  `id_materia` int(11) NOT NULL,
+  `nombre_materia` varchar(100) NOT NULL,
+  `descripcion` text NOT NULL,
+  `id_curso` int(11) NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 -- --------------------------------------------------------
@@ -203,17 +272,19 @@ CREATE TABLE `usuario` (
   `direccion` varchar(100) NOT NULL,
   `id_tipo_usuario` int(11) DEFAULT NULL,
   `username` varchar(50) DEFAULT NULL,
-  `clave` varchar(255) DEFAULT NULL
+  `clave` varchar(255) DEFAULT NULL,
+  `fecha_registro` datetime NOT NULL DEFAULT current_timestamp(),
+  `estado` enum('activo','inactivo') NOT NULL DEFAULT 'activo',
+  `rol` enum('admin','profesor','estudiante') NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 --
 -- Volcado de datos para la tabla `usuario`
 --
 
-INSERT INTO `usuario` (`id_usuario`, `nombre`, `apellido`, `tipo_doc`, `documento`, `fecha_nac`, `foto`, `mail`, `telefono`, `direccion`, `id_tipo_usuario`, `username`, `clave`) VALUES
-(27, 'Santiago', 'Capon', 'ID', '1093297500', '2024-08-14', '../../uploads/WhatsApp Image 2024-07-23 at 4.49.07', 'santiagocaponf@gmail.com', '4253452345', 'CL 18 A NORTE 2 72', 1, 'alez', '$2y$10$749K7f81m9Hw1z6d/oTzi.nvteioORWKhxPioqUo9qY3FyjpG6/YO'),
-(28, 'asdfasd', 'asdfasd', 'ID', 'dfasdfasfd', '2024-08-07', '../../uploads/rifa silvana.png', 'santiagocaponf@gmail.com', '341234123', 'CL 18 A NORTE 2 72', 1, 'alez', '$2y$10$41kcIBfVt.PBiph8LSfP8.heNnR/qwiNXTn5eEvbw3EUKt2AMYwEG'),
-(29, 'Santiago', 'Capon', 'ID', '1093297500', '2024-08-15', '../../uploads/tarjeta santiago.tiff', 'santiagocaponf@gmail.com', '123423452345', '124312431243', 1, 'alez', '$2y$10$lmdqx7N.FqDCe7zk0ZbT1e20id2scTC1ccGHUYFxAKRf2AwAcIl7m');
+INSERT INTO `usuario` (`id_usuario`, `nombre`, `apellido`, `tipo_doc`, `documento`, `fecha_nac`, `foto`, `mail`, `telefono`, `direccion`, `id_tipo_usuario`, `username`, `clave`, `fecha_registro`, `estado`, `rol`) VALUES
+(30, 'Santiago', 'Capon', 'ID', '12341234', '5234-03-12', 'WhatsApp Image 2024-07-23 at 4.49.07 PM.jpeg', 'scapon@misena.edu.co', '412341234', 'CL 18 A NORTE 2 72', 1, 'alez123', '$2y$10$kWqAbVv/ArFAwqOxU2JEyulZLmYT5worJZlSkh8Ukz9lqrh41MeqW', '2024-08-21 17:41:38', 'activo', 'admin'),
+(31, 'Santiago', 'Capon', 'ID', '23412341234', '1234-03-12', 'Captura de pantalla 2024-04-17 a las 20.52.55.png', 'santiagocaponf@gmail.com', '12341234123', 'CL 18 A NORTE 2 72', 1, 'cami', '$2y$10$H3JmBbiK2fjcphru3xYxKuXUfDMCY0IWD/K40ltSdgBKZAmzkdqju', '2024-08-21 17:41:38', 'activo', 'admin');
 
 --
 -- Índices para tablas volcadas
@@ -245,6 +316,21 @@ ALTER TABLE `asistencia`
   ADD KEY `id_curso` (`id_curso`);
 
 --
+-- Indices de la tabla `aulas`
+--
+ALTER TABLE `aulas`
+  ADD PRIMARY KEY (`id_aula`);
+
+--
+-- Indices de la tabla `calificaciones`
+--
+ALTER TABLE `calificaciones`
+  ADD PRIMARY KEY (`id_calificacion`),
+  ADD KEY `id_estudiante` (`id_estudiante`),
+  ADD KEY `id_curso` (`id_curso`),
+  ADD KEY `id_materia` (`id_materia`);
+
+--
 -- Indices de la tabla `cursos`
 --
 ALTER TABLE `cursos`
@@ -258,12 +344,27 @@ ALTER TABLE `estudiante`
   ADD KEY `id_usuario` (`id_usuario`);
 
 --
+-- Indices de la tabla `horarios`
+--
+ALTER TABLE `horarios`
+  ADD PRIMARY KEY (`id_horario`),
+  ADD KEY `id_curso` (`id_curso`),
+  ADD KEY `id_aula` (`id_aula`);
+
+--
 -- Indices de la tabla `inscripciones`
 --
 ALTER TABLE `inscripciones`
   ADD PRIMARY KEY (`id_inscripcion`),
   ADD KEY `id_curso` (`id_curso`),
   ADD KEY `id_estudiante` (`id_estudiante`);
+
+--
+-- Indices de la tabla `materias`
+--
+ALTER TABLE `materias`
+  ADD PRIMARY KEY (`id_materia`),
+  ADD KEY `id_curso` (`id_curso`);
 
 --
 -- Indices de la tabla `modulos`
@@ -327,6 +428,18 @@ ALTER TABLE `asistencia`
   MODIFY `id_asistencia` int(11) NOT NULL AUTO_INCREMENT;
 
 --
+-- AUTO_INCREMENT de la tabla `aulas`
+--
+ALTER TABLE `aulas`
+  MODIFY `id_aula` int(11) NOT NULL AUTO_INCREMENT;
+
+--
+-- AUTO_INCREMENT de la tabla `calificaciones`
+--
+ALTER TABLE `calificaciones`
+  MODIFY `id_calificacion` int(11) NOT NULL AUTO_INCREMENT;
+
+--
 -- AUTO_INCREMENT de la tabla `cursos`
 --
 ALTER TABLE `cursos`
@@ -339,10 +452,22 @@ ALTER TABLE `estudiante`
   MODIFY `id_estudiante` int(11) NOT NULL AUTO_INCREMENT;
 
 --
+-- AUTO_INCREMENT de la tabla `horarios`
+--
+ALTER TABLE `horarios`
+  MODIFY `id_horario` int(11) NOT NULL AUTO_INCREMENT;
+
+--
 -- AUTO_INCREMENT de la tabla `inscripciones`
 --
 ALTER TABLE `inscripciones`
   MODIFY `id_inscripcion` int(11) NOT NULL AUTO_INCREMENT;
+
+--
+-- AUTO_INCREMENT de la tabla `materias`
+--
+ALTER TABLE `materias`
+  MODIFY `id_materia` int(11) NOT NULL AUTO_INCREMENT;
 
 --
 -- AUTO_INCREMENT de la tabla `modulos`
@@ -378,7 +503,7 @@ ALTER TABLE `tipo_usuario`
 -- AUTO_INCREMENT de la tabla `usuario`
 --
 ALTER TABLE `usuario`
-  MODIFY `id_usuario` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=30;
+  MODIFY `id_usuario` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=32;
 
 --
 -- Restricciones para tablas volcadas
@@ -407,10 +532,25 @@ ALTER TABLE `asistencia`
   ADD CONSTRAINT `asistencia_ibfk_2` FOREIGN KEY (`id_curso`) REFERENCES `cursos` (`id_curso`);
 
 --
+-- Filtros para la tabla `calificaciones`
+--
+ALTER TABLE `calificaciones`
+  ADD CONSTRAINT `calificaciones_ibfk_1` FOREIGN KEY (`id_estudiante`) REFERENCES `usuario` (`id_usuario`),
+  ADD CONSTRAINT `calificaciones_ibfk_2` FOREIGN KEY (`id_curso`) REFERENCES `cursos` (`id_curso`),
+  ADD CONSTRAINT `calificaciones_ibfk_3` FOREIGN KEY (`id_materia`) REFERENCES `materias` (`id_materia`);
+
+--
 -- Filtros para la tabla `estudiante`
 --
 ALTER TABLE `estudiante`
   ADD CONSTRAINT `estudiante_ibfk_1` FOREIGN KEY (`id_usuario`) REFERENCES `tipo_usuario` (`id_tipo_usuario`);
+
+--
+-- Filtros para la tabla `horarios`
+--
+ALTER TABLE `horarios`
+  ADD CONSTRAINT `horarios_ibfk_1` FOREIGN KEY (`id_curso`) REFERENCES `cursos` (`id_curso`),
+  ADD CONSTRAINT `horarios_ibfk_2` FOREIGN KEY (`id_aula`) REFERENCES `aulas` (`id_aula`);
 
 --
 -- Filtros para la tabla `inscripciones`
@@ -418,6 +558,12 @@ ALTER TABLE `estudiante`
 ALTER TABLE `inscripciones`
   ADD CONSTRAINT `inscripciones_ibfk_1` FOREIGN KEY (`id_curso`) REFERENCES `cursos` (`id_curso`),
   ADD CONSTRAINT `inscripciones_ibfk_2` FOREIGN KEY (`id_estudiante`) REFERENCES `estudiante` (`id_estudiante`);
+
+--
+-- Filtros para la tabla `materias`
+--
+ALTER TABLE `materias`
+  ADD CONSTRAINT `materias_ibfk_1` FOREIGN KEY (`id_curso`) REFERENCES `cursos` (`id_curso`);
 
 --
 -- Filtros para la tabla `pagos`

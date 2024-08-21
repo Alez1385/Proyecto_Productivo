@@ -119,7 +119,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['logout'])) {
                     </span>
                     <h3>New Login</h3>
                 </a>
-                
+                <a href="#">
                     <span class="material-icons-sharp">
                         logout
                     </span>
@@ -155,35 +155,6 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['logout'])) {
                 </div>
             </div>
 
-
-            
-               
-   
-    <!-- End of New Users Section -->
-                    <?php
-                    include "../scripts/conexion.php";
-
-                    $sql = "SELECT * FROM usuario";
-                    $resultado = $conn->query($sql);
-
-                    if ($resultado->num_rows > 0) {
-                        while ($row = $resultado->fetch_assoc()) {
-                            echo '<div class="user">';
-                            echo '<img src="../uploads/'. $row['foto'] .'">';
-                            echo '<h2>'. $row['nombre'] .'</h2>';
-                            echo '<p>'. $row['mail'] .'</p>';
-
-                        }
-                    } else {
-                        echo '<p style="margin:auto;">No hay usuarios registrados</p>';
-                    }
-                    $conn->close();
-                    ?>
-                    
-                    
-                </div>
-            </div>
-            <!-- End of New Users Section -->
 
     <!-- Recent Orders Table -->
     <div class="recent-orders">

@@ -1,0 +1,174 @@
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+html{
+    min-height: 100vh;
+    
+}
+
+body {
+    font-family: 'Arial', sans-serif;
+    background: linear-gradient(135deg, #00c6ff, #0072ff);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100%;
+    min-height: 100vh;
+    
+}
+
+.form-container {
+    background-color: white;
+    padding: 50px 40px;
+    border-radius: 20px;
+    box-shadow: 0 0 15px rgba(0, 0, 0, 0.2);
+    text-align: center;
+    position: relative;
+    z-index: 10;
+    width: 550px;
+    margin: 20px 0;
+}
+
+.form-container h2 {
+    margin-bottom: 30px;
+    font-size: 28px;
+    color: #333;
+}
+
+.form-group {
+    position: relative;
+    margin-bottom: 20px;
+    text-align: left;
+}
+
+.form-group input,
+.form-group select,
+.form-group textarea {
+    width: 100%;
+    padding: 12px 20px;
+    border: 1px solid #ddd;
+    border-radius: 10px;
+    font-size: 16px;
+    display: block;
+    cursor: pointer;
+    resize: none;
+}
+
+.form-group input[type="file"] {
+    padding: 0;
+    border: none;
+    background: #f8f9fa;
+}
+
+.form-group input[type="file"]::file-selector-button {
+    padding: 12px 20px;
+    border: 1px solid #007bff;
+    border-radius: 10px;
+    background-color: #007bff;
+    color: white;
+    font-size: 16px;
+    cursor: pointer;
+    transition: background-color 0.3s;
+}
+
+.form-group input[type="file"]::file-selector-button:hover {
+    background-color: #0056b3;
+}
+
+.lock-icon {
+    position: absolute;
+    right: 10px;
+    top: 50%;
+    transform: translateY(-50%);
+    width: 25px;
+    height: 25px;
+    cursor: pointer;
+    transition: transform 0.3s ease;
+}
+
+.lock-icon.rotate {
+    transform: translateY(-50%) rotate(180deg);
+}
+
+.btn {
+    width: 100%;
+    padding: 12px;
+    border: none;
+    border-radius: 10px;
+    color: white;
+    font-size: 18px;
+    cursor: pointer;
+    transition: background-color 0.3s;
+}
+
+.btn-primary {
+    background-color: #007bff;
+}
+
+.btn-primary:hover {
+    background-color: #0056b3;
+}
+
+p {
+    font-size: 16px;
+    color: #333;
+    margin-top: 20px;
+}
+
+p a {
+    color: #007bff;
+    text-decoration: none;
+}
+
+body::before,
+body::after {
+    content: '';
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    z-index: 1;
+}
+
+body::before {
+    background: linear-gradient(135deg, #fff, rgba(255, 255, 255, 0));
+    clip-path: circle(25% at right 70%);
+}
+
+body::after {
+    background: linear-gradient(135deg, rgba(255, 255, 255, 0), #fff);
+    clip-path: circle(20% at left 30%);
+}
+
+@media (max-width: 600px) {
+    .form-container {
+        width: 90%;
+        padding: 20px;
+    }
+
+    .form-group input,
+    .form-group select,
+    .form-group textarea {
+        padding: 10px;
+        font-size: 14px;
+    }
+
+    .form-group input[type="file"]::file-selector-button {
+        font-size: 14px;
+        padding: 10px;
+    }
+}
+
+.error-message {
+    font-size: 14px;
+    margin-top: 5px;
+    color: #ff0000;
+    display: block;
+    transition: color 0.3s ease;
+}
+
+.form-group input {
+    margin-bottom: 5px;
+}
