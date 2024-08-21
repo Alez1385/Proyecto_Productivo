@@ -17,7 +17,7 @@ $user = $result->fetch_assoc();
 $stmt->close();
 
 // Consulta para obtener todos los usuarios
-$sql_users = "SELECT nombre, apellido, mail FROM usuario";
+$sql_users = "SELECT * FROM usuario";
 $usersResult = $conn->query($sql_users);
 
 if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['logout'])) {
@@ -186,23 +186,23 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['logout'])) {
                 <div class="user-list">
                     <?php while ($row = $usersResult->fetch_assoc()) { ?>
                         <div class="user">
-                            <img src="<?php echo $row['foto']; ?>" alt="User Image">
+                        <img src="../uploads/<?php echo htmlspecialchars(basename($row['foto'])); ?>" alt="User Image">
                             <h2><?php echo $row['nombre'] . " " . $row['apellido']; ?></h2>
                             <p><?php echo $row['mail']; ?></p>
                         </div>
                     <?php } ?>
+                    <div class="user">
+                    <img src="images/plus.png">
+                    <h2>More</h2>
+                    <p>New User</p>
+                </div>
                 </div>
             </div>
 
 
             
-                <div class="user">
-                    <img src="images/plus.png">
-                    <h2>More</h2>
-                    <p>New User</p>
-                </div>
-            </>
-    </div>
+               
+   
     <!-- End of New Users Section -->
 
     <!-- Recent Orders Table -->
