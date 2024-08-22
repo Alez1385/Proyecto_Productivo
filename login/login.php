@@ -116,7 +116,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                 <a href="scripts/google_login.php" class="google-login"><img src="img/google-icon.svg" alt="Google"></a>
             </div>
 
-            <p>¿No tienes una cuenta? <a href="register.html" class="register-link">Regístrate aquí</a>.</p>
+            <p>¿No tienes una cuenta? <a href="register.php" class="register-link">Regístrate aquí</a>.</p>
         </form>
     </div>
 

@@ -5,8 +5,7 @@
 }
 
 html{
-    min-height: 100vh;
-    
+    min-height: 100vh;  
 }
 
 body {
@@ -16,8 +15,7 @@ body {
     justify-content: center;
     align-items: center;
     height: 100%;
-    min-height: 100vh;
-    
+    min-height: 100vh; 
 }
 
 .form-container {

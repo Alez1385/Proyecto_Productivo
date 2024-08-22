@@ -12,15 +12,13 @@ require_once '../../scripts/conexion.php';
 </head>
 <body>
     <div class="form-container">
-        <form class="assign-course-form" action="scripts/register_assignment.php" method="post">
+        <form class="assign-course-form" action="register_assignment.php" method="post">
             <h2>Asignación de Curso</h2>
 
             <div class="form-group">
-                <label for="id_curso">Curso</label>
                 <select id="id_curso" name="id_curso" required>
                     <option value="" disabled selected>Seleccione un Curso</option>
                     <?php
-
                     $query = "SELECT id_curso, nombre_curso FROM cursos WHERE estado = 'activo'";
                     $result = $conn->query($query);
 
@@ -36,7 +34,6 @@ require_once '../../scripts/conexion.php';
             </div>
 
             <div class="form-group">
-                <label for="id_profesor">Profesor</label>
                 <select id="id_profesor" name="id_profesor" required>
                     <option value="" disabled selected>Seleccione un Profesor</option>
                     <?php
@@ -55,7 +52,6 @@ require_once '../../scripts/conexion.php';
             </div>
 
             <div class="form-group">
-                <label for="id_estudiante">Estudiante</label>
                 <select id="id_estudiante" name="id_estudiante" required>
                     <option value="" disabled selected>Seleccione un Estudiante</option>
                     <?php
@@ -74,17 +70,14 @@ require_once '../../scripts/conexion.php';
             </div>
 
             <div class="form-group">
-                <label for="fecha_asignacion">Fecha de Asignación</label>
-                <input type="date" id="fecha_asignacion" name="fecha_asignacion" required>
+                <input type="date" id="fecha_asignacion" name="fecha_asignacion" required placeholder="Fecha de Asignación">
             </div>
 
             <div class="form-group">
-                <label for="comentarios">Comentarios</label>
                 <textarea id="comentarios" name="comentarios" placeholder="Comentarios opcionales" rows="4"></textarea>
             </div>
 
             <div class="form-group">
-                <label for="estado">Estado</label>
                 <select id="estado" name="estado" required>
                     <option value="" disabled selected>Seleccione el Estado</option>
                     <option value="activo">Activo</option>

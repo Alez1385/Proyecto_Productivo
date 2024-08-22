@@ -1,3 +1,6 @@
+<?php
+require_once "../scripts/conexion.php"; 
+?>
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -55,10 +58,21 @@
             <div class="form-group">
                 <select name="id_tipo_usuario" required>
                     <option value="" disabled selected>User Type</option>
-                    <option value="1">Admin</option>
-                    <option value="2">User</option>
+                    <?php
+                    $query = "SELECT id_tipo_usuario, tipo FROM tipo_usuario";
+                    $result = $conn->query($query);
+            
+                    if ($result->num_rows > 0) {
+                        while ($row = $result->fetch_assoc()) {
+                            echo "<option value='" . $row['id_tipo_usuario'] . "'>" . $row['tipo'] . "</option>";
+                        }
+                    } else {
+                        echo "<option value='' disabled>No hay tipos de usuario disponibles</option>";
+                    }
+                    ?>
                 </select>
             </div>
+            
         
             <div class="form-group">
                 <input type="text" placeholder="Username" name="username" id="username" required>
@@ -80,35 +94,47 @@
     <script src="scripts/password.js"></script>
     <script>
         document.getElementById('username').addEventListener('input', function () {
-                const username = this.value;
-                const usernameError = document.getElementById('usernameError');
-                const submitBtn = document.getElementById('submitBtn');
+    const username = this.value;
+    const usernameError = document.getElementById('usernameError');
+    const submitBtn = document.getElementById('submitBtn');
 
-                if (username.length > 0) {
-                    const xhr = new XMLHttpRequest();
-                    xhr.open('POST', 'scripts/check_username.php', true);
-                    xhr.setRequestHeader('Content-type', 'application/x-www-form-urlencoded');
+    if (username.length > 0) {
+        const xhr = new XMLHttpRequest();
+        xhr.open('POST', 'scripts/check_username.php', true);
+        xhr.setRequestHeader('Content-type', 'application/x-www-form-urlencoded');
 
-                    xhr.onreadystatechange = function () {
-                        if (this.readyState === 4 && this.status === 200) {
-                            if (this.responseText === 'taken') {
-                                usernameError.textContent = 'El nombre de usuario ya está en uso. Elige otro.';
-                                usernameError.style.color = '#c12646';
-                                submitBtn.disabled = true; // Desactivar el botón de envío
-                            } else {
-                                usernameError.textContent = 'El nombre de usuario está disponible.';
-                                usernameError.style.color = '#00bcff';
-                                submitBtn.disabled = false; // Activar el botón de envío
-                            }
-                        }
-                    };
-
-                    xhr.send('username=' + encodeURIComponent(username));
+        xhr.onreadystatechange = function () {
+            if (this.readyState === 4) {
+                if (this.status === 200) {
+                    if (this.responseText === 'taken') {
+                        usernameError.textContent = 'El nombre de usuario ya está en uso. Elige otro.';
+                        usernameError.style.color = '#c12646';
+                        submitBtn.disabled = true;
+                    } else {
+                        usernameError.textContent = 'El nombre de usuario está disponible.';
+                        usernameError.style.color = '#00bcff';
+                        submitBtn.disabled = false;
+                    }
                 } else {
-                    usernameError.textContent = '';
-                    submitBtn.disabled = false; // Activar el botón de envío si el campo está vacío
+                    usernameError.textContent = 'Error al verificar el nombre de usuario. Inténtalo más tarde.';
+                    usernameError.style.color = '#c12646';
+                    submitBtn.disabled = true;
                 }
-            });
+            }
+        };
+
+        xhr.onerror = function () {
+            usernameError.textContent = 'Error al conectar con el servidor. Inténtalo más tarde.';
+            usernameError.style.color = '#c12646';
+            submitBtn.disabled = true;
+        };
+
+        xhr.send('username=' + encodeURIComponent(username));
+    } else {
+        usernameError.textContent = '';
+        submitBtn.disabled = false;
+    }
+});
 
     </script>
     </body>
