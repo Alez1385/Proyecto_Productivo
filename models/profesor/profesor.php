@@ -1,3 +1,20 @@
+<?php
+include '../../scripts/conexion.php'; 
+
+function getUserIds($conn) {
+    $sql = "SELECT id_usuario, CONCAT(nombre, ' ', apellido) AS nombre_completo FROM usuario ORDER BY id_usuario";
+    $result = $conn->query($sql);
+
+    $ids = [];
+    if ($result->num_rows > 0) {
+        while($row = $result->fetch_assoc()) {
+            $ids[] = $row; // Guardamos el array completo para usar tanto el ID como el nombre completo
+        }
+    }
+    return $ids;
+}
+?>
+
 <!DOCTYPE html>
 <html lang="es">
 <head>
@@ -10,44 +27,30 @@
     <div class="form-container">
         <h2>Registrar Profesor</h2>
         <form action="procesar_profesor.php" method="POST" enctype="multipart/form-data">
+            <?php
+            $userIds = getUserIds($conn); 
+            ?>
+
+            <!-- Campo id_usuario (cuadro combinado) -->
             <div class="form-group">
-                <input type="text" id="nombre" name="nombre" placeholder="Nombre" required>
+                <select name="id_usuario" required>
+                    <option value="" disabled selected>Selecciona el Usuario</option>
+                    <?php foreach ($userIds as $user): ?>
+                        <option value="<?php echo htmlspecialchars($user['id_usuario']); ?>">
+                            <?php echo htmlspecialchars($user['nombre_completo']); ?>
+                        </option>
+                    <?php endforeach; ?>
+                </select>
             </div>
 
+            <!-- Campo especialidad -->
             <div class="form-group">
-                <input type="text" id="apellido" name="apellido" placeholder="Apellido" required>
+                <input type="text" id="especialidad" name="especialidad" placeholder="Especialidad" required>
             </div>
 
+            <!-- Campo experiencia -->
             <div class="form-group">
-                <input type="email" id="correo" name="correo" placeholder="Correo" required>
-            </div>
-
-            <div class="form-group">
-                <input type="tel" id="telefono" name="telefono" placeholder="Teléfono" required>
-            </div>
-
-            <div class="form-group">
-                <input type="date" id="fecha_nacimiento" name="fecha_nacimiento" placeholder="Fecha de Nacimiento" required>
-            </div>
-
-            <div class="form-group">
-                <input type="text" id="direccion" name="direccion" placeholder="Dirección" required>
-            </div>
-
-            <div class="form-group">
-                <input type="file" id="foto" name="foto" accept="image/*" placeholder="Foto">
-            </div>
-
-            <div class="form-group">
-                <input type="text" id="documento_identidad" name="documento_identidad" placeholder="Documento de Identidad" required>
-            </div>
-
-            <div class="form-group">
-                <input type="text" id="nivel_educativo" name="nivel_educativo" placeholder="Nivel Educativo" required>
-            </div>
-
-            <div class="form-group">
-                <textarea id="observaciones" name="observaciones" placeholder="Observaciones"></textarea>
+                <input type="text" id="experiencia" name="experiencia" placeholder="Experiencia" required>
             </div>
 
             <div class="form-group">

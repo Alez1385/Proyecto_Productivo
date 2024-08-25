@@ -9,14 +9,14 @@ html{
 }
 
 body {
-    font-family: 'Arial', sans-serif;
+    font-family: 'Poppins', sans-serif;
     background: linear-gradient(135deg, #00c6ff, #0072ff);
     display: flex;
     justify-content: center;
     align-items: center;
     height: 100%;
     min-height: 100vh; 
-}
+}   
 
 .form-container {
     background-color: white;

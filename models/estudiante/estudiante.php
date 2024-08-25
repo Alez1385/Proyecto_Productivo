@@ -1,3 +1,18 @@
+<?php
+include '../../scripts/conexion.php';
+function getUserIds($conn) {
+    $sql = "SELECT id_usuario, CONCAT(nombre,' ', apellido) as nombre_completo FROM usuario ORDER BY id_usuario";
+    $result = $conn->query($sql);
+
+    $ids = [];
+    if ($result->num_rows > 0) {
+        while($row = $result->fetch_assoc()) {
+            $ids[] = $row['nombre_completo'];
+        }
+    }
+    return $ids;
+}
+?>
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -10,31 +25,21 @@
     <div class="form-container">
         <form class="course-form" action="scripts/register_student.php" method="post">
             <h2>Student Registration</h2>
+            <?php
+            $userIds = getUserIds($conn); // Pasar la conexión a la función
+            ?>
 
+            <!-- Campo id_usuario (cuadro combinado) -->
             <div class="form-group">
-                <input type="text" placeholder="First Name" name="nombre" required>
+                <select name="id_usuario" required>
+                    <option value="" disabled selected>Select User</option>
+                    <?php foreach ($userIds as $id): ?>
+                        <option value="<?php echo htmlspecialchars($id); ?>"><?php echo htmlspecialchars($id); ?></option>
+                    <?php endforeach; ?>
+                </select>
             </div>
 
-            <div class="form-group">
-                <input type="text" placeholder="Last Name" name="apellido" required>
-            </div>
-
-            <div class="form-group">
-                <input type="email" placeholder="Email" name="correo" required>
-            </div>
-
-            <div class="form-group">
-                <input type="tel" placeholder="Phone Number" name="telefono" onkeypress='return event.charCode >= 48 && event.charCode <= 57' required>
-            </div>
-
-            <div class="form-group">
-                <input type="date" placeholder="Birth Date" name="fecha_nacimiento" required>
-            </div>
-
-            <div class="form-group">
-                <input type="text" placeholder="Address" name="direccion" required>
-            </div>
-
+            <!-- Campo genero -->
             <div class="form-group">
                 <select name="genero" required>
                     <option value="" disabled selected>Gender</option>
@@ -44,37 +49,36 @@
                 </select>
             </div>
 
+            <!-- Campo fecha_registro -->
             <div class="form-group">
-                <input type="date" placeholder="Registration Date" name="fecha_registro" required>
+                <input type="date" placeholder="Registration Date" name="fecha_registro" value="<?php echo date('Y-m-d'); ?>" required>
             </div>
 
+            <!-- Campo estado -->
             <div class="form-group">
                 <select name="estado" required>
-                    <option value="" disabled selected>Status</option>
-                    <option value="active">Active</option>
-                    <option value="inactive">Inactive</option>
+                    <option value="activo">Active</option>
+                    <option value="inactivo">Inactive</option>
+                </select>
+            </div>
+                                
+            <!-- Campo nivel_educativo -->
+            <div class="form-group">
+                <select id="nivel_educativo" name="nivel_educativo" required>
+                    <option value="" disabled selected>Seleccione el Nivel Educativo</option>
+                    <option value="primaria">Primaria</option>
+                    <option value="secundaria">Secundaria</option>
+                    <option value="terciaria">Terciaria</option>
                 </select>
             </div>
 
-            <div class="form-group">
-                <input type="text" placeholder="ID Document" name="documento_identidad" required>
-            </div>
-
-            <div class="form-group">
-                <select name="nivel_educativo" required>
-                    <option value="" disabled selected>Education Level</option>
-                    <option value="primary">Primary</option>
-                    <option value="secondary">Secondary</option>
-                    <option value="tertiary">Tertiary</option>
-                    <option value="other">Other</option>
-                </select>
-            </div>
-
+            <!-- Campo observaciones -->
             <div class="form-group">
                 <textarea placeholder="Observations" name="observaciones" rows="4"></textarea>
             </div>
 
-            <button type="submit" class="btn btn-primary">Register Course</button>
+
+            <button type="submit" class="btn btn-primary">Register Student</button>
         </form>
     </div>
 </body>

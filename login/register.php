@@ -59,12 +59,12 @@ require_once "../scripts/conexion.php";
                 <select name="id_tipo_usuario" required>
                     <option value="" disabled selected>User Type</option>
                     <?php
-                    $query = "SELECT id_tipo_usuario, tipo FROM tipo_usuario";
+                    $query = "SELECT id_tipo_usuario, nombre FROM tipo_usuario";
                     $result = $conn->query($query);
             
                     if ($result->num_rows > 0) {
                         while ($row = $result->fetch_assoc()) {
-                            echo "<option value='" . $row['id_tipo_usuario'] . "'>" . $row['tipo'] . "</option>";
+                            echo "<option value='" . $row['id_tipo_usuario'] . "'>" . $row['nombre'] . "</option>";
                         }
                     } else {
                         echo "<option value='' disabled>No hay tipos de usuario disponibles</option>";

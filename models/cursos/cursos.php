@@ -16,17 +16,17 @@
             </div>
 
             <div class="form-group">
-                <label for="nombre_curso">Nombre del Curso</label>
+                
                 <input type="text" id="nombre_curso" name="nombre_curso" placeholder="Nombre del Curso" required>
             </div>
 
             <div class="form-group">
-                <label for="descripcion">Descripción</label>
+                
                 <textarea id="descripcion" name="descripcion" placeholder="Descripción del Curso" rows="4" required></textarea>
             </div>
 
             <div class="form-group">
-                <label for="nivel_educativo">Nivel Educativo</label>
+                
                 <select id="nivel_educativo" name="nivel_educativo" required>
                     <option value="" disabled selected>Seleccione el Nivel Educativo</option>
                     <option value="primaria">Primaria</option>
@@ -36,12 +36,12 @@
             </div>
 
             <div class="form-group">
-                <label for="duracion">Duración (semanas)</label>
+                
                 <input type="number" id="duracion" name="duracion" placeholder="Duración en semanas" min="1" required>
             </div>
 
             <div class="form-group">
-                <label for="estado">Estado</label>
+                
                 <select id="estado" name="estado" required>
                     <option value="" disabled selected>Seleccione el Estado</option>
                     <option value="activo">Activo</option>
