@@ -1,7 +1,7 @@
 <?php
 
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
-    include "conexion.php";
+    include "../../../scripts/conexion.php";
     
     $count_success = 0;
 

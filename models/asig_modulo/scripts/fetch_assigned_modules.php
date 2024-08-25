@@ -1,5 +1,5 @@
 <?php
-include "conexion.php";
+include "../../../scripts/conexion.php";
 
 if (isset($_GET['user_id'])) {
     $user_id = intval($_GET['user_id']);
