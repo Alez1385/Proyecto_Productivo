@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Servidor: 127.0.0.1
--- Tiempo de generación: 25-08-2024 a las 19:15:02
+-- Tiempo de generación: 29-08-2024 a las 23:38:43
 -- Versión del servidor: 10.4.32-MariaDB
 -- Versión de PHP: 8.2.12
 
@@ -46,9 +46,21 @@ CREATE TABLE `asignacion_curso` (
 CREATE TABLE `asig_modulo` (
   `id_asig_modulo` int(11) NOT NULL,
   `id_modulo` int(11) DEFAULT NULL,
-  `id_usuario` int(11) DEFAULT NULL,
+  `id_tipo_usuario` int(11) DEFAULT NULL,
   `fecha_asig` date DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+--
+-- Volcado de datos para la tabla `asig_modulo`
+--
+
+INSERT INTO `asig_modulo` (`id_asig_modulo`, `id_modulo`, `id_tipo_usuario`, `fecha_asig`) VALUES
+(11, 2, 37, NULL),
+(12, 2, 2, NULL),
+(13, 2, 1, NULL),
+(14, 3, 1, NULL),
+(15, 3, 2, NULL),
+(16, 4, 1, '2024-08-29');
 
 -- --------------------------------------------------------
 
@@ -139,8 +151,18 @@ CREATE TABLE `inscripciones` (
 CREATE TABLE `modulos` (
   `id_modulo` int(11) NOT NULL,
   `nom_modulo` varchar(30) DEFAULT NULL,
-  `desc_modulo` varchar(50) DEFAULT NULL
+  `url` varchar(255) NOT NULL,
+  `icono` varchar(255) NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+--
+-- Volcado de datos para la tabla `modulos`
+--
+
+INSERT INTO `modulos` (`id_modulo`, `nom_modulo`, `url`, `icono`) VALUES
+(2, 'Profesor', '../profesor/profesor.php', 'person'),
+(3, 'Estudiante', '../estudiante/estudiante.php', 'account_circle\r\n'),
+(4, 'Pagos', '', 'shopping_cart');
 
 -- --------------------------------------------------------
 
@@ -230,7 +252,12 @@ CREATE TABLE `usuario` (
 --
 
 INSERT INTO `usuario` (`id_usuario`, `nombre`, `apellido`, `tipo_doc`, `documento`, `fecha_nac`, `foto`, `mail`, `telefono`, `direccion`, `id_tipo_usuario`, `username`, `clave`, `fecha_registro`, `estado`) VALUES
-(34, 'Santiago', 'Capon', 'ID', '1093297500', '2007-07-11', 'registro santiago.tiff', 'santiagocaponf@gmail.com', '3242655883', 'CL 18 A NORTE 2 72', 2, 'alez', '$2y$10$cNG5PvtdSarhIhJuAUE0oeAevLH8CJYVV3Lb6NTTJiYZdU4VbS3sW', '2024-08-25 11:14:27', 'activo');
+(36, 'Santiago', 'Capon', 'ID', '12341235234', '2345-03-12', 'WhatsApp Image 2024-07-23 at 4.49.07 PM.jpeg', 'santiagocaponf@gmail.com', '32452345', 'CL 18 A NORTE 2 72', 1, 'alez', '$2y$10$cCIaWsXSHC1OWcRBpDQU.uhrDuxWP0j4IMUTxNNojuHeT3Sq.uYkq', '2024-08-25 17:43:54', 'activo'),
+(37, 'camilo', 'florez', 'ID', '23452353245', '4253-04-23', 'Captura de pantalla 2024-04-17 a las 20.52.55.png', 'scapon@misena.edu.co', '3042134311', 'CL 18 A NORTE 2 72', 3, 'alez34', '$2y$10$LHNPJC8kdCT1FdoyVD7Ry.lIghhOnQN6V6RhjJRmSa3EMqHOipw2y', '2024-08-25 18:07:15', 'activo'),
+(40, 'alejandra', 'sepulveda', 'ID', '342352345', '0005-04-23', 'Captura de pantalla 2024-04-17 a las 20.52.55.png', 'scflorez@corsaje.edu.co', '42352345', 'CL 18 A NORTE 2 72', 1, 'mientras', '$2y$10$aoefIKerqMzeAKAUn.k/B.ihYSLc3/vveKskxgvTKEOCGb5TbAbbK', '2024-08-29 09:54:39', 'activo'),
+(41, 'juan', 'sepulveda', 'Passport', '5423452345', '4345-04-23', 'RobloxScreenShot20231202_191516430.png', 'scapon@misena.edu.co', '523564356345', 'CL 18 A NORTE 2 72', 3, 'alejandro', '$2y$10$D.32MmQZECgkex2h1exujed0mXifEkJpqkTiUQ0pWEe4nQ//peG0a', '2024-08-29 16:24:47', 'activo'),
+(42, 'chad', 'sexteto', 'ID', '523456346', '3654-04-23', 'e34ac480-ce44-439a-b28b-1845bd195afe.webp', 'luisillo@gmail.com', '4563475674', 'CL 18 A NORTE 2 72', 1, 'alez23', '$2y$10$FrpZXvgI3WrL22y9MxNtfuQsyQSgCJ7Jm4VPUv3Aa4qEn2HCKdxsK', '2024-08-29 16:26:44', 'activo'),
+(43, 'fasdfasdfasdf', 'asdfasdfasdf', 'ID', '4523452346', '3315-04-23', 'Rayquaza_Ilustracion.png', '534523452@523452345', '534563456345', 'CL 18 A NORTE 2 72', 2, 'alez123', '$2y$10$Z.6i8NTXu.DE6.sziN9Tl.e30MnpgRUCQJYWfMBWGNCvJLJu4Xas6', '2024-08-29 16:27:35', 'activo');
 
 --
 -- Índices para tablas volcadas
@@ -251,7 +278,7 @@ ALTER TABLE `asignacion_curso`
 ALTER TABLE `asig_modulo`
   ADD PRIMARY KEY (`id_asig_modulo`),
   ADD KEY `id_modulo` (`id_modulo`),
-  ADD KEY `id_usuario` (`id_usuario`);
+  ADD KEY `id_usuario` (`id_tipo_usuario`);
 
 --
 -- Indices de la tabla `asistencia`
@@ -336,7 +363,7 @@ ALTER TABLE `asignacion_curso`
 -- AUTO_INCREMENT de la tabla `asig_modulo`
 --
 ALTER TABLE `asig_modulo`
-  MODIFY `id_asig_modulo` int(11) NOT NULL AUTO_INCREMENT;
+  MODIFY `id_asig_modulo` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=17;
 
 --
 -- AUTO_INCREMENT de la tabla `asistencia`
@@ -372,7 +399,7 @@ ALTER TABLE `inscripciones`
 -- AUTO_INCREMENT de la tabla `modulos`
 --
 ALTER TABLE `modulos`
-  MODIFY `id_modulo` int(11) NOT NULL AUTO_INCREMENT;
+  MODIFY `id_modulo` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=5;
 
 --
 -- AUTO_INCREMENT de la tabla `pagos`
@@ -396,7 +423,7 @@ ALTER TABLE `tipo_usuario`
 -- AUTO_INCREMENT de la tabla `usuario`
 --
 ALTER TABLE `usuario`
-  MODIFY `id_usuario` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=35;
+  MODIFY `id_usuario` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=44;
 
 --
 -- Restricciones para tablas volcadas
@@ -414,8 +441,7 @@ ALTER TABLE `asignacion_curso`
 -- Filtros para la tabla `asig_modulo`
 --
 ALTER TABLE `asig_modulo`
-  ADD CONSTRAINT `asig_modulo_ibfk_1` FOREIGN KEY (`id_modulo`) REFERENCES `modulos` (`id_modulo`),
-  ADD CONSTRAINT `asig_modulo_ibfk_2` FOREIGN KEY (`id_usuario`) REFERENCES `tipo_usuario` (`id_tipo_usuario`);
+  ADD CONSTRAINT `asig_modulo_ibfk_1` FOREIGN KEY (`id_modulo`) REFERENCES `modulos` (`id_modulo`);
 
 --
 -- Filtros para la tabla `asistencia`

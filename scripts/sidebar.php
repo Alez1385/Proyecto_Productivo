@@ -3,7 +3,7 @@ session_start();
 include('conexion.php');
 
 if (!isset($_SESSION['username'])) {
-    header("Location: ../login/login.php");
+    header("Location: ../../../login/login.php");
     exit();
 }
 
@@ -51,27 +51,37 @@ while ($row = $modulosResult->fetch_assoc()) {
 }
 
 // Ahora, $modulos contiene los módulos asignados al tipo de usuario autenticado
-$conn->close();
+
 ?>
 
 
 
 <!-- sidebar.php -->
 
-
-
 <aside>
-    <div class="toggle">
-        <div class="logo">
-            <img src="https://corsaje.gnosoft.com.co/general-ws/imgGeneral?imagen=2" alt="Logo">
-            <h2>Corsa<span style="color: #3498db;">Cor</span></h2>
-        </div>
-        <div class="close" id="close-btn">
-            <span class="material-icons-sharp">close</span>
-        </div>
-    </div>
-
     <div class="sidebar">
+        <div class="profile">
+            <div class="info">
+                <p>Hey, <b><?php echo htmlspecialchars($user['nombre']); ?></b></p>
+                <small class="text-muted">
+                    <?php
+                    $tipo_usuario_id = $user['id_tipo_usuario'];
+                    $sql_tipo_usuario = "SELECT nombre FROM tipo_usuario WHERE id_tipo_usuario = ?";
+                    $stmt_tipo_usuario = $conn->prepare($sql_tipo_usuario);
+                    $stmt_tipo_usuario->bind_param("i", $tipo_usuario_id);
+                    $stmt_tipo_usuario->execute();
+                    $result_tipo_usuario = $stmt_tipo_usuario->get_result();
+                    $tipo_usuario = $result_tipo_usuario->fetch_assoc();
+                    echo htmlspecialchars($tipo_usuario['nombre']);
+                    $stmt_tipo_usuario->close();
+                    ?>
+                </small>
+            </div>
+            <div class="profile-photo">
+                <img src="../../uploads/<?php echo htmlspecialchars(basename($user['foto'])); ?>" alt="User Image">
+            </div>
+        </div>
+
         <?php if (!empty($modulos)): ?>
             <?php foreach ($modulos as $modulo): ?>
                 <a href="<?= htmlspecialchars($modulo['url'], ENT_QUOTES, 'UTF-8'); ?>"> <!-- url del modulo -->
@@ -82,6 +92,16 @@ $conn->close();
         <?php else: ?>
             <p>No hay módulos disponibles para este tipo de usuario.</p>
         <?php endif; ?>
+
+        <div class="toggle">
+            <div class="logo">
+                <img src="https://corsaje.gnosoft.com.co/general-ws/imgGeneral?imagen=2" alt="Logo">
+                <h2>Corsa<span style="color: #3498db;">Cor</span></h2>
+            </div>
+            <div class="close" id="close-btn">
+                <span class="material-icons-sharp">close</span>
+            </div>
+        </div>
     </div>
 </aside>
 
