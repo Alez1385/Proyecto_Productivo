@@ -1,22 +1,16 @@
-
-var mySelect = document.getElementById('user');
-    mySelect.value ="";
-
-
-
-function fetchAssignedModules(userId) {
-    if (userId) {
+function fetchAssignedModules(userTypeId) {
+    if (userTypeId) {
         const xhr = new XMLHttpRequest();
-        xhr.open('GET', '../scripts/fetch_assigned_modules.php?user_id=' + userId, true);
+        xhr.open('GET', '../scripts/fetch_assigned_modules.php?user_type_id=' + userTypeId, true);
         xhr.onload = function () {
             if (this.status === 200) {
                 console.log(this.responseText); // Agregar esto para ver la respuesta en la consola
                 try {
                     const response = JSON.parse(this.responseText);
                     
-                    const userName = document.getElementById('user');
-                    const selectedOption = userName.options[userName.selectedIndex].text;
-                    document.getElementById('userName').textContent = selectedOption;
+                    const userTypeSelect = document.getElementById('userType');
+                    const selectedOption = userTypeSelect.options[userTypeSelect.selectedIndex].text;
+                    document.getElementById('userTypeName').textContent = selectedOption;
 
                     const assignedModulesList = document.getElementById('assignedModulesList');
                     assignedModulesList.innerHTML = '';
@@ -37,7 +31,7 @@ function fetchAssignedModules(userId) {
         };
         xhr.send();
     } else {
-        document.getElementById('userName').textContent = 'No se cargo';
+        document.getElementById('userTypeName').textContent = 'No se cargó';
         document.getElementById('assignedModulesList').innerHTML = '<li>No hay módulos asignados</li>';
     }
 }

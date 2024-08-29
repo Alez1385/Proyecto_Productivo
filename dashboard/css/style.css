@@ -130,6 +130,7 @@ aside .toggle{
     align-items: center;
     justify-content: space-between;
     margin-top: 1.4rem;
+    flex-direction: column;
 }
 
 aside .toggle .logo{
@@ -179,11 +180,7 @@ aside .sidebar a span{
     transition: all 0.3s ease;
 }
 
-aside .sidebar a:last-child{
-    position: absolute;
-    bottom: 2rem;
-    width: 100%;
-}
+
 
 aside .sidebar a.active{
     width: 100%;
