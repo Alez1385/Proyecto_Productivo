@@ -14,7 +14,7 @@ require_once "../../scripts/conexion.php";
 
 <body>
     <div class="form-container">
-        <form class="register-form" action="../../login/scripts/register.php" method="post" enctype="multipart/form-data">
+        <form class="register-form" action="scripts/save_user.php" method="post" enctype="multipart/form-data">
             <h2>New user</h2>
 
             <div class="form-group">

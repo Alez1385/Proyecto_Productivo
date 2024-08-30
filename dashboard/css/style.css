@@ -95,6 +95,7 @@ b{
 
 .text-muted{
     color: var(--color-info-dark);
+    margin: auto;
 }
 
 .primary{
@@ -125,6 +126,11 @@ aside{
     height: 100vh;
     width: 15%;
     margin-left: 1rem;
+    transition: transform.3s;
+    position: sticky;
+    top: 0;
+    left: 0;
+    transition: transform 0.3s;
 }
 
 aside .toggle {
@@ -167,13 +173,14 @@ aside .sidebar{
     top: 1.5rem;
     transition: all 0.3s ease;
     padding: 10px;
+    overflow-y: auto;
 }
 
 aside .sidebar:hover{
     box-shadow: none;
 }
 
-aside .sidebar a{
+aside .sidebar a:not(:last-child) {
     display: flex;
     align-items: center;
     color: var(--color-info-dark);
@@ -184,6 +191,7 @@ aside .sidebar a{
     margin-top: 1rem;
     transition: all 0.3s ease;
 }
+
 
 aside .sidebar a span{
     font-size: 2rem;
@@ -435,7 +443,7 @@ main .recent-orders a{
     display: flex;
     gap: 2rem;
     text-align: right;
-    justify-content: space-between;
+    justify-content: space-evenly;
     margin: 10px;
 }
 
@@ -444,6 +452,12 @@ main .recent-orders a{
     height: 2.8rem;
     border-radius: 50%;
     overflow: hidden;
+}
+
+.profile .info{
+    display: flex;
+    flex-direction: column;
+    align-items: center;
 }
 
 .user-profile{
@@ -608,7 +622,7 @@ main .recent-orders a{
         padding: 0 var(--padding-1);
     }
 
-    aside{
+    aside {
         position: fixed;
         background-color: var(--color-white);
         width: 15rem;

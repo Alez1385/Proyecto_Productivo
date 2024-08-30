@@ -31,7 +31,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         // Redirigir o mostrar un mensaje de éxito
         echo "<script>
                 alert('Módulo registrado exitosamente.');
-                window.location.href = 'modulos.php.php'; // Redirigir al formulario o a la lista de módulos
+                window.location.href = 'modulos.php'; // Redirigir al formulario o a la lista de módulos
               </script>";
     } else {
         die('Error al guardar el módulo: ' . $stmt->error);

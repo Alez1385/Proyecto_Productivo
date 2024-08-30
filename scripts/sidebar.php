@@ -1,9 +1,11 @@
+<!-- Incluir siempre el sidebar despues de un div clase dashboard-container -->
 <?php
 session_start();
 include('conexion.php');
+include('config.php'); // Incluye el archivo de configuración donde está definida la ruta base
 
 if (!isset($_SESSION['username'])) {
-    header("Location: ../../../login/login.php");
+    header("Location: " . BASE_URL . "login/login.php");
     exit();
 }
 
@@ -55,45 +57,45 @@ while ($row = $modulosResult->fetch_assoc()) {
 ?>
 
 
-
+<head>
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons+Sharp" rel="stylesheet">
+    <link rel="stylesheet" href="../../dashboard/css/style.css">
+</head>
 <!-- sidebar.php -->
 
 <aside>
     <div class="sidebar">
+        <!-- Información del usuario -->
         <div class="profile">
             <div class="info">
-                <p>Hey, <b><?php echo htmlspecialchars($user['nombre']); ?></b></p>
-                <small class="text-muted">
-                    <?php
-                    $tipo_usuario_id = $user['id_tipo_usuario'];
-                    $sql_tipo_usuario = "SELECT nombre FROM tipo_usuario WHERE id_tipo_usuario = ?";
-                    $stmt_tipo_usuario = $conn->prepare($sql_tipo_usuario);
-                    $stmt_tipo_usuario->bind_param("i", $tipo_usuario_id);
-                    $stmt_tipo_usuario->execute();
-                    $result_tipo_usuario = $stmt_tipo_usuario->get_result();
-                    $tipo_usuario = $result_tipo_usuario->fetch_assoc();
-                    echo htmlspecialchars($tipo_usuario['nombre']);
-                    $stmt_tipo_usuario->close();
-                    ?>
-                </small>
+                <p><b><?php echo htmlspecialchars($user['nombre']); ?></b></p>
+                <small class="text-muted"><?php echo htmlspecialchars($user['tipo_nombre']); ?></small>
             </div>
             <div class="profile-photo">
-                <img src="../../uploads/<?php echo htmlspecialchars(basename($user['foto'])); ?>" alt="User Image">
+                <img src="<?php echo BASE_URL . 'uploads/' . htmlspecialchars($user['foto']); ?>" alt="User Image">
             </div>
         </div>
 
+        <!-- Listado de módulos -->
         <?php if (!empty($modulos)): ?>
             <?php foreach ($modulos as $modulo): ?>
-                <a href="<?= htmlspecialchars($modulo['url'], ENT_QUOTES, 'UTF-8'); ?>"> <!-- url del modulo -->
-                    <span class="material-icons-sharp"><?= htmlspecialchars($modulo['icono'], ENT_QUOTES, 'UTF-8'); ?></span> <!-- Icono del modulo -->
-                    <h3><?= htmlspecialchars($modulo['nom_modulo'], ENT_QUOTES, 'UTF-8'); ?></h3> <!-- Nombre del modulo -->
+                <a href="<?php echo BASE_URL . htmlspecialchars($modulo['url'], ENT_QUOTES, 'UTF-8'); ?>">
+                    <span class="material-icons-sharp"><?php echo htmlspecialchars($modulo['icono'], ENT_QUOTES, 'UTF-8'); ?></span>
+                    <h3><?php echo htmlspecialchars($modulo['nom_modulo'], ENT_QUOTES, 'UTF-8'); ?></h3>
                 </a>
             <?php endforeach; ?>
         <?php else: ?>
             <p>No hay módulos disponibles para este tipo de usuario.</p>
         <?php endif; ?>
 
+        <a href="<?php echo BASE_URL . 'login/logout.php'; ?>" class="logout">
+            <span class="material-icons-sharp">logout</span>
+            <h3>Salir</h3>
+        </a>
+        </a>
+
         <div class="toggle">
+            <a href="/dashboard/dashboard.php">
             <div class="logo">
                 <img src="https://corsaje.gnosoft.com.co/general-ws/imgGeneral?imagen=2" alt="Logo">
                 <h2>Corsa<span style="color: #3498db;">Cor</span></h2>
@@ -101,6 +103,7 @@ while ($row = $modulosResult->fetch_assoc()) {
             <div class="close" id="close-btn">
                 <span class="material-icons-sharp">close</span>
             </div>
+            </a>
         </div>
     </div>
 </aside>

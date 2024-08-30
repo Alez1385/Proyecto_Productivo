@@ -1,0 +1,261 @@
+:root {
+    --color-primary: #3498db;
+    --color-secondary: #e74c3c;
+    --color-text: #333333;
+    --color-text-light: #666666;
+    --color-background: #f4f7f9;
+    --color-card: #ffffff;
+    --color-shadow: rgba(0, 0, 0, 0.1);
+    --border-radius: 8px;
+    --transition: all 0.3s ease;
+}
+
+body {
+    line-height: 1.6;
+    color: var(--color-text);
+    background-color: var(--color-background);
+    margin: 0;
+    padding: 0;
+}
+
+.dashboard-container {
+    display: flex;
+    min-height: 100vh;
+}
+
+.main-content {
+    flex-grow: 1;
+    padding: 2rem;
+}
+
+.header {
+    margin-bottom: 2rem;
+}
+
+.header h1 {
+    font-size: 2.5rem;
+    color: var(--color-primary);
+    margin-bottom: 0.5rem;
+}
+
+.header p {
+    font-size: 1.2rem;
+    color: var(--color-text-light);
+}
+
+.dashboard-summary {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+    gap: 1.5rem;
+    margin-bottom: 2rem;
+}
+
+.summary-card {
+    background-color: var(--color-card);
+    border-radius: var(--border-radius);
+    padding: 1.5rem;
+    text-align: center;
+    box-shadow: 0 4px 6px var(--color-shadow);
+    transition: var(--transition);
+}
+
+.summary-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 6px 12px var(--color-shadow);
+}
+
+.summary-card i {
+    font-size: 2.5rem;
+    color: var(--color-primary);
+    margin-bottom: 1rem;
+}
+
+.summary-card h3 {
+    font-size: 1.2rem;
+    margin-bottom: 0.5rem;
+    color: var(--color-text);
+}
+
+.summary-card p {
+    font-size: 1.8rem;
+    font-weight: bold;
+    color: var(--color-primary);
+}
+
+
+.dashboard-charts {
+    background-color: var(--color-card);
+    border-radius: var(--border-radius);
+    padding: 1.5rem;
+    box-shadow: 0 4px 6px var(--color-shadow);
+    margin-bottom: 2rem;
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    gap: 1.5rem;
+}
+
+
+.chart-container {
+    height: 400px;
+    width: 100%;
+}
+
+.chart-container h3 {
+    font-size: 1.2rem;
+    margin-bottom: 1rem;
+    color: var(--color-primary);
+    text-align: center;
+}
+
+
+/* Estilos para gráficas específicas */
+#popularCoursesChart,
+#studentProgressChart {
+    max-width: 100%;
+    height: 250px;
+}
+
+.user-info {
+    background-color: var(--color-card);
+    border-radius: var(--border-radius);
+    padding: 1.5rem;
+    box-shadow: 0 4px 6px var(--color-shadow);
+}
+
+.user-info h2 {
+    font-size: 1.5rem;
+    color: var(--color-primary);
+    margin-bottom: 1rem;
+}
+
+.user-details {
+    display: flex;
+    align-items: center;
+}
+
+.user-details img {
+    width: 100px;
+    height: 100px;
+    border-radius: 50%;
+    margin-right: 1.5rem;
+    object-fit: cover;
+    border: 3px solid var(--color-primary);
+}
+
+.user-details p {
+    margin: 0.5rem 0;
+    color: var(--color-text-light);
+}
+
+.user-details strong {
+    color: var(--color-text);
+}
+
+@media (max-width: 768px) {
+    .dashboard-charts {
+        grid-template-columns: 1fr;
+    }
+
+    .main-content {
+        padding: 1rem;
+    }
+
+    .dashboard-summary {
+        grid-template-columns: 1fr;
+    }
+
+    .user-details {
+        flex-direction: column;
+        text-align: center;
+    }
+
+    .user-details img {
+        margin-right: 0;
+        margin-bottom: 1rem;
+    }
+}
+
+@media (max-width: 480px) {
+    .chart-container {
+        height: 250px;
+    }
+
+    .header h1 {
+        font-size: 2rem;
+    }
+
+    .summary-card {
+        padding: 1rem;
+    }
+
+    .summary-card i {
+        font-size: 2rem;
+    }
+
+    .summary-card p {
+        font-size: 1.5rem;
+    }
+}
+
+
+/* Estilo para el gráfico circular de ancho completo */
+.chart-full-width {
+    grid-column: 1 / -1;
+}
+
+/* Estilos para la tabla de pagos recientes */
+.recent-payments {
+    background-color: var(--color-card);
+    border-radius: var(--border-radius);
+    padding: 1.5rem;
+    box-shadow: 0 4px 6px var(--color-shadow);
+    margin-top: 2rem;
+}
+
+.recent-payments h3 {
+    font-size: 1.2rem;
+    color: var(--color-primary);
+    margin-bottom: 1rem;
+}
+
+.recent-payments table {
+    width: 100%;
+    border-collapse: collapse;
+}
+
+.recent-payments th,
+.recent-payments td {
+    padding: 0.75rem;
+    text-align: left;
+    border-bottom: 1px solid var(--color-background);
+}
+
+.recent-payments th {
+    background-color: var(--color-primary);
+    color: var(--color-card);
+}
+
+.recent-payments tr:nth-child(even) {
+    background-color: rgba(52, 152, 219, 0.1);
+}
+
+.recent-payments tr:hover {
+    background-color: rgba(52, 152, 219, 0.2);
+}
+
+/* Ajustes responsivos */
+@media (max-width: 768px) {
+    .recent-payments {
+        overflow-x: auto;
+    }
+    
+    .recent-payments table {
+        min-width: 500px;
+    }
+}
+
+/* Ajuste para el gráfico circular */
+#educationLevelsChart {
+    max-height: 300px;
+    margin: 0 auto;
+}

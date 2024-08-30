@@ -1,18 +1,25 @@
 <?php
 include '../../scripts/conexion.php';
+
 function getUserIds($conn) {
-    $sql = "SELECT id_usuario, CONCAT(nombre,' ', apellido) as nombre_completo FROM usuario ORDER BY id_usuario";
+    $sql = "SELECT u.id_usuario, CONCAT(u.nombre, ' ', u.apellido) AS nombre_completo, tu.nombre AS tipo_usuario
+            FROM usuario u
+            JOIN tipo_usuario tu ON u.id_tipo_usuario = tu.id_tipo_usuario
+            WHERE u.estado = 'activo' AND u.id_tipo_usuario like 3  -- Filtrar solo estudiantes y profesores
+            ORDER BY u.id_usuario";
     $result = $conn->query($sql);
 
-    $ids = [];
+    $users = [];
     if ($result->num_rows > 0) {
         while($row = $result->fetch_assoc()) {
-            $ids[] = $row['nombre_completo'];
+            $users[] = $row;
         }
     }
-    return $ids;
+    $conn->close(); // Cerrar la conexión a la base de datos
+    return $users;
 }
 ?>
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -26,15 +33,17 @@ function getUserIds($conn) {
         <form class="course-form" action="scripts/register_student.php" method="post">
             <h2>Student Registration</h2>
             <?php
-            $userIds = getUserIds($conn); // Pasar la conexión a la función
+            $users = getUserIds($conn); // Obtener la lista de usuarios con tipo
             ?>
 
             <!-- Campo id_usuario (cuadro combinado) -->
             <div class="form-group">
                 <select name="id_usuario" required>
                     <option value="" disabled selected>Select User</option>
-                    <?php foreach ($userIds as $id): ?>
-                        <option value="<?php echo htmlspecialchars($id); ?>"><?php echo htmlspecialchars($id); ?></option>
+                    <?php foreach ($users as $user): ?>
+                        <option value="<?php echo htmlspecialchars($user['id_usuario']); ?>">
+                            <?php echo htmlspecialchars($user['nombre_completo']) . ' (' . htmlspecialchars($user['tipo_usuario']) . ')'; ?>
+                        </option>
                     <?php endforeach; ?>
                 </select>
             </div>
@@ -65,7 +74,7 @@ function getUserIds($conn) {
             <!-- Campo nivel_educativo -->
             <div class="form-group">
                 <select id="nivel_educativo" name="nivel_educativo" required>
-                    <option value="" disabled selected>Seleccione el Nivel Educativo</option>
+                    <option value="" disabled selected>Select Educational Level</option>
                     <option value="primaria">Primaria</option>
                     <option value="secundaria">Secundaria</option>
                     <option value="terciaria">Terciaria</option>
@@ -76,7 +85,6 @@ function getUserIds($conn) {
             <div class="form-group">
                 <textarea placeholder="Observations" name="observaciones" rows="4"></textarea>
             </div>
-
 
             <button type="submit" class="btn btn-primary">Register Student</button>
         </form>

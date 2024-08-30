@@ -170,3 +170,58 @@ body::after {
 .form-group input {
     margin-bottom: 5px;
 }
+
+/* icon-selector.css */
+
+.icon-preview {
+    font-size: 2rem;
+    color: #4a4a4a;
+    margin-bottom: 1rem;
+    text-align: center;
+    padding: 10px;
+    border: 2px dashed #ccc;
+    border-radius: 8px;
+    background-color: #f9f9f9;
+    transition: border-color 0.3s ease, background-color 0.3s ease;
+}
+
+.icon-preview:hover {
+    border-color: #007bff;
+    background-color: #f0f8ff;
+}
+
+.icon-selector {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(50px, 1fr));
+    gap: 10px;
+    max-height: 250px;
+    overflow-y: auto;
+    border: 1px solid #ccc;
+    border-radius: 8px;
+    padding: 10px;
+    background-color: #fff;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.icon-item {
+    font-size: 24px;
+    color: #555;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 10px;
+    border-radius: 8px;
+    transition: background-color 0.3s ease, transform 0.3s ease;
+}
+
+.icon-item:hover {
+    background-color: #e6f7ff;
+    transform: scale(1.1);
+}
+
+.icon-item.selected {
+    background-color: #007bff;
+    color: #fff;
+    transform: scale(1.1);
+}

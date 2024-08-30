@@ -9,9 +9,19 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     $email = $_POST['email'];
     $token = bin2hex(random_bytes(50)); // Generar un token seguro
 
+    // Validar el correo electrónico
+    if (!filter_var($email, FILTER_VALIDATE_EMAIL)) {
+        echo "El correo electrónico proporcionado no es válido.";
+        exit;
+    }
+
     // Verificar si el email existe en la base de datos
     $sql = "SELECT * FROM usuario WHERE mail = ?";
     $stmt = $conn->prepare($sql);
+    if ($stmt === false) {
+        echo "Error en la preparación de la consulta: " . $conn->error;
+        exit;
+    }
     $stmt->bind_param("s", $email);
     $stmt->execute();
     $result = $stmt->get_result();
@@ -20,6 +30,10 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
         // Guardar el token en la base de datos
         $sql = "INSERT INTO password_resets (email, token) VALUES (?, ?)";
         $stmt = $conn->prepare($sql);
+        if ($stmt === false) {
+            echo "Error en la preparación de la consulta: " . $conn->error;
+            exit;
+        }
         $stmt->bind_param("ss", $email, $token);
         $stmt->execute();
 
@@ -33,15 +47,15 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
         try {
             // Configuración del servidor SMTP
             $mail->isSMTP();
-            $mail->Host = 'smtp.gmail.com';
-            $mail->SMTPAuth = true;
-            $mail->Username = 'alejo13852@gmail.com'; // Cambia a tu dirección de correo
-            $mail->Password = 'Santi/08'; // Cambia a tu contraseña de correo
-            $mail->SMTPSecure = PHPMailer::ENCRYPTION_STARTTLS;
-            $mail->Port = 587;
+            $mail->Host = 'smtp.gmail.com'; // Servidor SMTP de Gmail
+            $mail->SMTPAuth = true; // Activar autenticación SMTP
+            $mail->Username = 'santiagocaponf@gmail.com'; // Tu dirección de correo electrónico
+            $mail->Password = 'Santiago/08@'; // Tu contraseña o contraseña de aplicación
+            $mail->SMTPSecure = PHPMailer::ENCRYPTION_STARTTLS; // Activar cifrado TLS
+            $mail->Port = 587; // Puerto TCP para TLS
 
             // Configuración de los destinatarios
-            $mail->setFrom('alejo13852@gmail.com', 'Tu Nombre o Empresa'); //cambiar al desplegar
+            $mail->setFrom('santiagocaponf@gmail.com', 'CorsaCor'); // Cambia al desplegar
             $mail->addAddress($email); // Destinatario
 
             // Contenido del correo
