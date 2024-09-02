@@ -63,7 +63,8 @@ $user = $result->fetch_assoc();
             </div>
 
             <div class="form-group">
-                <input type="email" placeholder="Email" name="mail" value="<?php echo $user['mail']; ?>" required>
+                <input type="email" placeholder="Email" name="mail" id="email" value="<?php echo $user['mail']; ?>" required>
+                <span id="emailError" class="error-message"></span>
             </div>
 
             <div class="form-group">
@@ -141,7 +142,6 @@ $user = $result->fetch_assoc();
             }
         }
 
-
         // Aquí se incluye la función para alternar la visibilidad de la contraseña
         function togglePassword(passwordId, toggleId) {
             const passwordField = document.getElementById(passwordId);
@@ -202,6 +202,73 @@ $user = $result->fetch_assoc();
                 submitBtn.disabled = false;
             }
         });
+
+        // Verificación de correo electrónico
+        document.getElementById('email').addEventListener('input', function() {
+            const email = this.value;
+            const currentEmail = '<?php echo $user['mail']; ?>'; // Obtener el email actual
+            const emailError = document.getElementById('emailError');
+            const submitBtn = document.getElementById('submitBtn');
+
+            // Expresión regular para validar el formato del correo electrónico
+            const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+
+            if (email.length > 0 && email !== currentEmail && !emailPattern.test(email)) {
+                emailError.textContent = 'Formato de correo electrónico inválido.';
+                emailError.style.color = '#c12646';
+                submitBtn.disabled = true;
+            } else if (email.length > 0 && email !== currentEmail) {
+                const xhr = new XMLHttpRequest();
+                xhr.open('POST', '../../login/scripts/check_email.php', true);
+                xhr.setRequestHeader('Content-type', 'application/x-www-form-urlencoded');
+
+                xhr.onreadystatechange = function() {
+                    if (this.readyState === 4) {
+                        if (this.status === 200) {
+                            if (this.responseText === 'taken') {
+                                emailError.textContent = 'El correo electrónico ya está en uso. Elige otro.';
+                                emailError.style.color = '#c12646';
+                                submitBtn.disabled = true;
+                            } else {
+                                emailError.textContent = 'El correo electrónico está disponible.';
+                                emailError.style.color = '#00bcff';
+                                checkFormValidity(); // Verifica si el botón de envío debe habilitarse
+                            }
+                        } else {
+                            emailError.textContent = 'Error al verificar el correo electrónico. Inténtalo más tarde.';
+                            emailError.style.color = '#c12646';
+                            submitBtn.disabled = true;
+                        }
+                    }
+                };
+
+                xhr.onerror = function() {
+                    emailError.textContent = 'Error al conectar con el servidor. Inténtalo más tarde.';
+                    emailError.style.color = '#c12646';
+                    submitBtn.disabled = true;
+                };
+
+                xhr.send('email=' + encodeURIComponent(email));
+            } else {
+                emailError.textContent = '';
+                checkFormValidity(); // Verifica si el botón de envío debe habilitarse
+            }
+        });
+
+        // Verifica si el formulario es válido
+        function checkFormValidity() {
+            const username = document.getElementById('username').value;
+            const email = document.getElementById('email').value;
+            const usernameError = document.getElementById('usernameError').textContent;
+            const emailError = document.getElementById('emailError').textContent;
+            const submitBtn = document.getElementById('submitBtn');
+
+            if (usernameError === '' && emailError === '') {
+                submitBtn.disabled = false;
+            } else {
+                submitBtn.disabled = true;
+            }
+        }
     </script>
 </body>
 

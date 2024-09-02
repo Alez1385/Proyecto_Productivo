@@ -17,7 +17,7 @@
         include "../../scripts/conexion.php";
 
         // Consulta para obtener los usuarios
-        $sql = "SELECT id_usuario, nombre, mail, foto FROM usuario";
+        $sql = "SELECT id_usuario, nombre, apellido, mail, foto FROM usuario";
         $result = $conn->query($sql);
         ?>
 
@@ -49,7 +49,7 @@
                             echo '<div class="user-item" data-user-id="' . $row["id_usuario"] . '">';
                             echo '<img src="../../uploads/' . $row["foto"] . '" alt="User Image">';
                             echo '<div class="user-details">';
-                            echo '<h2>' . $row["nombre"] . '</h2>';
+                            echo '<h2>' . $row["nombre"] . " " . $row['apellido']  . '</h2>';
                             echo '<p>' . $row["mail"] . '</p>';
                             echo '</div>';
                             echo '<div class="user-actions">';

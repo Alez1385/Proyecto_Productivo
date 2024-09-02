@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Servidor: 127.0.0.1
--- Tiempo de generación: 31-08-2024 a las 02:32:50
+-- Tiempo de generación: 03-09-2024 a las 01:52:46
 -- Versión del servidor: 10.4.32-MariaDB
 -- Versión de PHP: 8.2.12
 
@@ -61,7 +61,8 @@ INSERT INTO `asig_modulo` (`id_asig_modulo`, `id_modulo`, `id_tipo_usuario`, `fe
 (14, 3, 1, NULL),
 (15, 3, 2, NULL),
 (16, 4, 1, '2024-08-29'),
-(17, 5, 1, NULL);
+(17, 5, 1, NULL),
+(18, 6, 1, NULL);
 
 -- --------------------------------------------------------
 
@@ -107,10 +108,10 @@ CREATE TABLE `cursos` (
 --
 
 INSERT INTO `cursos` (`id_curso`, `nombre_curso`, `descripcion`, `nivel_educativo`, `duracion`, `estado`) VALUES
-(1, 'danzas', 'curso de danzas', 'primaria', 3, 'activo'),
+(1, 'Danzas', 'curso de danzas', 'primaria', 3, 'activo'),
 (2, 'Ajedrez', 'Curso de ajedrez', 'terciaria', 3, 'activo'),
 (3, 'Natacion', 'Curso de natacion', 'secundaria', 6, 'activo'),
-(4, 'Basquet', 'Curso de \r\nbásquet', 'secundaria', 4, 'activo');
+(5, 'Banda', 'Banda marcial del colegio', 'terciaria', 14, 'activo');
 
 -- --------------------------------------------------------
 
@@ -189,9 +190,10 @@ CREATE TABLE `modulos` (
 
 INSERT INTO `modulos` (`id_modulo`, `nom_modulo`, `url`, `icono`) VALUES
 (2, 'Profesor', '../models/profesor/profesor.php', 'school'),
-(3, 'Estudiante', '../models/estudiante/estudiante.php', 'account_circle\r\n'),
+(3, 'Estudiante', '../models/estudiante/estudiante.php', 'face\r\n'),
 (4, 'Pagos', '', 'shopping_cart'),
-(5, 'Usuarios', '../models/usuarios/users.php', 'person');
+(5, 'Usuarios', '../models/usuarios/users.php', 'person'),
+(6, 'Cursos', 'models/cursos/cursos.php', 'assignment');
 
 -- --------------------------------------------------------
 
@@ -293,21 +295,20 @@ CREATE TABLE `usuario` (
   `username` varchar(50) DEFAULT NULL,
   `clave` varchar(255) DEFAULT NULL,
   `fecha_registro` datetime NOT NULL DEFAULT current_timestamp(),
-  `estado` enum('activo','inactivo') NOT NULL DEFAULT 'activo'
+  `estado` enum('activo','inactivo') NOT NULL DEFAULT 'activo',
+  `ultimo_acceso` datetime DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 --
 -- Volcado de datos para la tabla `usuario`
 --
 
-INSERT INTO `usuario` (`id_usuario`, `nombre`, `apellido`, `tipo_doc`, `documento`, `fecha_nac`, `foto`, `mail`, `telefono`, `direccion`, `id_tipo_usuario`, `username`, `clave`, `fecha_registro`, `estado`) VALUES
-(36, 'Santiago', 'Capon', 'ID', '12341235234', '2345-03-12', 'WhatsApp Image 2024-07-23 at 4.49.07 PM.jpeg', 'santiagocaponf@gmail.com', '32452345', 'CL 18 A NORTE 2 72', 1, 'alez', '$2y$10$cCIaWsXSHC1OWcRBpDQU.uhrDuxWP0j4IMUTxNNojuHeT3Sq.uYkq', '2024-08-25 17:43:54', 'activo'),
-(42, 'chad', 'sexteto', 'ID', '523456346', '3654-04-23', 'e34ac480-ce44-439a-b28b-1845bd195afe.webp', 'luisillo@gmail.com', '4563475674', 'CL 18 A NORTE 2 72', 1, 'alez23', '$2y$10$FrpZXvgI3WrL22y9MxNtfuQsyQSgCJ7Jm4VPUv3Aa4qEn2HCKdxsK', '2024-08-29 16:26:44', 'activo'),
-(43, 'fasdfasdfasdf', 'asdfasdfasdf', 'ID', '4523452346', '3315-04-23', 'Rayquaza_Ilustracion.png', '534523452@523452345', '534563456345', 'CL 18 A NORTE 2 72', 2, 'alez123', '$2y$10$Z.6i8NTXu.DE6.sziN9Tl.e30MnpgRUCQJYWfMBWGNCvJLJu4Xas6', '2024-08-29 16:27:35', 'activo'),
-(44, 'Natalia', 'Fernandez', 'ID', '1341252345', '5745-04-23', '66d2387c58b61_pngwing.com.png', 'miamor123@gmail.com', '4534634563456', 'CL 18 A NORTE 2 72', 1, 'hola', '$2y$10$.GmaRHPCP/4M4IXVw0bdve7NHH5OhK94fj/DAlQ6WKenM2UXZBZCa', '2024-08-30 16:24:12', 'activo'),
-(50, 'alejandraa', 'sepulveda', 'ID', '342352345', '0005-04-23', '66d23a576778c_pokeball1665483271.png', 'scflorez@corsaje.edu.co', '42352345', 'CL 18 A NORTE 2 72', 1, 'mientras', '$2y$10$.yTDGMmVjdEsW2c/dvGy1uDLIt4IbDCG.qh2bgeYJhxMj0su.NYqG', '2024-08-30 16:32:07', 'activo'),
-(51, 'antonela', 'sepulveda', 'ID', '342352345', '0005-04-23', '66d23c1021bab_f7c0528d915ec3b38dd89bf7beb2a194.jpg', 'scflorez@corsaje.edu.co', '42352345', 'CL 18 A NORTE 2 72', 1, 'mientras', '$2y$10$KJU2liHj854T1T9M.6/EK.xDYy4sfLf2XEwCldj230rdreZmC.3KC', '2024-08-30 16:39:28', 'activo'),
-(53, 'Juanito', 'Alimaña', 'ID', '43523634', '0634-06-02', '66d2441faa705_pngwing.com.png', 'juanit@gmail.com', '5233456345', 'CL 18 A NORTE 2 72', 3, 'alez123123', '$2y$10$p.bJhCL9d2VM1IjUCnC63.Edj5Pg87KZgKGTFyedUHPusUd.QSDAK', '2024-08-30 17:13:51', 'activo');
+INSERT INTO `usuario` (`id_usuario`, `nombre`, `apellido`, `tipo_doc`, `documento`, `fecha_nac`, `foto`, `mail`, `telefono`, `direccion`, `id_tipo_usuario`, `username`, `clave`, `fecha_registro`, `estado`, `ultimo_acceso`) VALUES
+(36, 'Santiago', 'Capon', 'ID', '12341235234', '2345-03-12', 'WhatsApp Image 2024-07-23 at 4.49.07 PM.jpeg', 'santiagocaponf@gmail.com', '32452345', 'CL 18 A NORTE 2 72', 1, 'alez', '$2y$10$cCIaWsXSHC1OWcRBpDQU.uhrDuxWP0j4IMUTxNNojuHeT3Sq.uYkq', '2024-08-25 17:43:54', 'activo', '2024-09-02 18:32:22'),
+(42, 'chad', 'sexteto', 'ID', '523456346', '3654-04-23', '66d273c33d474_Recurso 9europe.jpg', 'luisillo@gmail.com', '4563475674', 'CL 18 A NORTE 2 72', 1, 'alez23', '$2y$10$FrpZXvgI3WrL22y9MxNtfuQsyQSgCJ7Jm4VPUv3Aa4qEn2HCKdxsK', '2024-08-29 16:26:44', 'activo', NULL),
+(44, 'Natalia', 'Fernandez', 'ID', '1341252345', '5745-04-23', '66d64d0780665_pokeball1665483271.png', 'miamor123@gmail.com', '4534634563456', 'CL 18 A NORTE 2 72', 1, 'hola', '$2y$10$.GmaRHPCP/4M4IXVw0bdve7NHH5OhK94fj/DAlQ6WKenM2UXZBZCa', '2024-08-30 16:24:12', 'activo', NULL),
+(51, 'antonela', 'sepulveda', 'ID', '342352345', '0005-04-23', '66d23c1021bab_f7c0528d915ec3b38dd89bf7beb2a194.jpg', 'scflorez@corsaje.edu.co', '42352345', 'CL 18 A NORTE 2 72', 1, 'mientras', '$2y$10$KJU2liHj854T1T9M.6/EK.xDYy4sfLf2XEwCldj230rdreZmC.3KC', '2024-08-30 16:39:28', 'activo', NULL),
+(53, 'Juanito', 'Alimaña', 'ID', '43523634', '0634-06-02', '66d2441faa705_pngwing.com.png', 'juanit@gmail.com', '5233456345', 'CL 18 A NORTE 2 72', 3, 'alez123123', '$2y$10$p.bJhCL9d2VM1IjUCnC63.Edj5Pg87KZgKGTFyedUHPusUd.QSDAK', '2024-08-30 17:13:51', 'activo', NULL);
 
 --
 -- Índices para tablas volcadas
@@ -413,7 +414,7 @@ ALTER TABLE `asignacion_curso`
 -- AUTO_INCREMENT de la tabla `asig_modulo`
 --
 ALTER TABLE `asig_modulo`
-  MODIFY `id_asig_modulo` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=18;
+  MODIFY `id_asig_modulo` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=19;
 
 --
 -- AUTO_INCREMENT de la tabla `asistencia`
@@ -425,7 +426,7 @@ ALTER TABLE `asistencia`
 -- AUTO_INCREMENT de la tabla `cursos`
 --
 ALTER TABLE `cursos`
-  MODIFY `id_curso` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=5;
+  MODIFY `id_curso` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=6;
 
 --
 -- AUTO_INCREMENT de la tabla `estudiante`
@@ -449,7 +450,7 @@ ALTER TABLE `inscripciones`
 -- AUTO_INCREMENT de la tabla `modulos`
 --
 ALTER TABLE `modulos`
-  MODIFY `id_modulo` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=6;
+  MODIFY `id_modulo` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=7;
 
 --
 -- AUTO_INCREMENT de la tabla `pagos`
@@ -473,7 +474,7 @@ ALTER TABLE `tipo_usuario`
 -- AUTO_INCREMENT de la tabla `usuario`
 --
 ALTER TABLE `usuario`
-  MODIFY `id_usuario` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=54;
+  MODIFY `id_usuario` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=55;
 
 --
 -- Restricciones para tablas volcadas

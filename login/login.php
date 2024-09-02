@@ -17,6 +17,17 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     $stmt->execute();
     $stmt->store_result();
 
+    // Asumiendo que ya tienes el código para manejar el inicio de sesión
+
+    // Actualizar la fecha y hora del último acceso
+    $update_sql = "UPDATE usuario SET ultimo_acceso = NOW() WHERE username = ?";
+    $update_stmt = $conn->prepare($update_sql);
+    $update_stmt->bind_param("s", $username);
+    $update_stmt->execute();
+
+    // Resto del código para iniciar sesión y redirigir al dashboard
+
+
     if ($stmt->num_rows > 0) {
         $stmt->bind_result($hashed_password);
         $stmt->fetch();

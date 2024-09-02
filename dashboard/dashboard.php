@@ -150,7 +150,7 @@
                                 <p><strong>Nombre:</strong> <?php echo htmlspecialchars($user['nombre'] . ' ' . $user['apellido']); ?></p>
                                 <p><strong>Email:</strong> <?php echo htmlspecialchars($user['mail']); ?></p>
                                 <p><strong>Tipo de Usuario:</strong> <?php echo htmlspecialchars($user['tipo_usuario']); ?></p>
-                                <p><strong>Último Acceso:</strong> <?php echo date('d/m/Y H:i:s'); ?></p>
+                                <p><strong>Último Acceso:</strong> <?php echo htmlspecialchars(date('d/m/Y H:i:s', strtotime($user['ultimo_acceso']))); ?></p>
                             </div>
                         </div>
                     </section>
