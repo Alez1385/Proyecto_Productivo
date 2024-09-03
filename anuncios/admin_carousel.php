@@ -16,10 +16,13 @@ if (isset($_POST['add_slid_carrousele'])) {
 }
 
 // Eliminar slid_carrousele
-if (isset($_GET['delete'])) {
-    $id_carrousel = $_GET['delete'];
+if (isset($_POST['delete_confirmed'])) {
+    $id_carrousel = $_POST['id_carrousel'];
     $query = "DELETE FROM carousel WHERE id_carrousel = $id_carrousel";
-    $conn->query($query);
+    if ($conn->query($query) === TRUE) {
+        header("Location: " . $_SERVER['PHP_SELF'] . "?deleted=true");
+        exit();
+    }
 }
 
 $result = $conn->query("SELECT * FROM carousel ORDER BY order_index ASC");
@@ -81,15 +84,31 @@ $result = $conn->query("SELECT * FROM carousel ORDER BY order_index ASC");
                     <td><?= $row['id_carrousel'] ?></td>
                     <td><?= $row['title'] ?></td>
                     <td><?= $row['description'] ?></td>
-                    <td><img src="../uploads/<?= $row['image'] ?>" alt="<?= $row['title'] ?>"></td>
+                    <td><img src="../uploads/<?= $row['image'] ?>" alt="<?= $row['title'] ?>" width="100"></td>
                     <td>Inicio: <?= $row['fecha_curso_inicio'] ?> <br> Fin: <?= $row['fecha_curso_fin'] ?></td>
                     <td>
-                        <a href="admin_carousel.php?delete=<?= $row['id_carrousel'] ?>" class="btn delete-btn" onclick="return confirmDelete();">Eliminar</a>
+                        <button onclick="openDeleteModal(<?= $row['id_carrousel'] ?>)" class="btn delete-btn">Eliminar</button>
                     </td>
                 </tr>
                 <?php endwhile; ?>
             </tbody>
         </table>
+    </div>
+
+    <!-- Modal de confirmación -->
+    <div id="deleteModal" class="modal">
+        <div class="modal-content">
+            <p>¿Estás seguro de que deseas eliminar este anuncio?</p>
+            <div class="modal-buttons">
+                <button onclick="confirmDelete()">Sí, eliminar</button>
+                <button onclick="closeModal()">Cancelar</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Notificación de éxito -->
+    <div id="notification" class="notification">
+        Anuncio eliminado exitosamente.
     </div>
 
     <script>
@@ -109,10 +128,52 @@ $result = $conn->query("SELECT * FROM carousel ORDER BY order_index ASC");
             descriptionCount.textContent = descriptionInput.value.length;
         });
 
-        // Confirmación antes de eliminar
-        function confirmDelete() {
-            return confirm("¿Estás seguro de que deseas eliminar este anuncio?");
+        // Funcionalidad del modal
+        const modal = document.getElementById('deleteModal');
+        const modalContent = modal.querySelector('.modal-content');
+        let currentIdToDelete;
+
+        function openDeleteModal(id) {
+            currentIdToDelete = id;
+            modal.style.display = "block";
+            setTimeout(() => {
+                modalContent.classList.add('show');
+            }, 10);
         }
+
+        function closeModal() {
+            modalContent.classList.remove('show');
+            setTimeout(() => {
+                modal.style.display = "none";
+            }, 300);
+        }
+
+        function confirmDelete() {
+            const form = document.createElement('form');
+            form.method = 'post';
+            form.innerHTML = `
+                <input type="hidden" name="delete_confirmed" value="1">
+                <input type="hidden" name="id_carrousel" value="${currentIdToDelete}">
+            `;
+            document.body.appendChild(form);
+            form.submit();
+        }
+
+        // Cerrar el modal si se hace clic fuera de él
+        window.onclick = function(event) {
+            if (event.target == modal) {
+                closeModal();
+            }
+        }
+
+        // Mostrar notificación si se ha eliminado un anuncio
+        <?php if (isset($_GET['deleted']) && $_GET['deleted'] == 'true'): ?>
+        const notification = document.getElementById('notification');
+        notification.classList.add('show');
+        setTimeout(() => {
+            notification.classList.remove('show');
+        }, 3000);
+        <?php endif; ?>
     </script>
 </body>
 </html>
