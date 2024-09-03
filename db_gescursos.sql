@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Servidor: 127.0.0.1
--- Tiempo de generación: 03-09-2024 a las 19:00:23
+-- Tiempo de generación: 03-09-2024 a las 19:22:23
 -- Versión del servidor: 10.4.32-MariaDB
 -- Versión de PHP: 8.2.12
 
@@ -88,6 +88,34 @@ INSERT INTO `asistencia` (`id_asistencia`, `id_estudiante`, `id_curso`, `fecha`,
 (1, 1, 1, '2024-08-14', 'si', NULL),
 (2, 1, 1, '2024-08-29', 'si', NULL),
 (3, 1, 1, '2024-08-31', 'no', NULL);
+
+-- --------------------------------------------------------
+
+--
+-- Estructura de tabla para la tabla `carousel`
+--
+
+CREATE TABLE `carousel` (
+  `id_carrousel` int(11) NOT NULL,
+  `title` varchar(255) NOT NULL,
+  `description` text NOT NULL,
+  `image` varchar(255) NOT NULL,
+  `order_index` int(11) NOT NULL,
+  `fecha_curso_inicio` date NOT NULL,
+  `fecha_curso_fin` date NOT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+--
+-- Volcado de datos para la tabla `carousel`
+--
+
+INSERT INTO `carousel` (`id_carrousel`, `title`, `description`, `image`, `order_index`, `fecha_curso_inicio`, `fecha_curso_fin`) VALUES
+(40, 'Curso De Natacion', 'El mejor curso del mundo sin palabras, me encanta cuando no hablas y te quedas mirando.', 'chica-sola-en-la-ciudad-ilustracion_3840x2160_xtrafondos.com.jpg', 0, '2024-08-14', '2024-08-20'),
+(42, 'Curso De Natacion', 'El mejor curso del mundo sin palabras, me encanta cuando no hablas y te quedas mirando.', 'chica-sola-en-la-ciudad-ilustracion_3840x2160_xtrafondos.com.jpg', 0, '2024-08-14', '2024-08-20'),
+(43, 'Curso De Natacion', 'El mejor curso del mundo sin palabras, me encanta cuando no hablas y te quedas mirando.', 'chica-sola-en-la-ciudad-ilustracion_3840x2160_xtrafondos.com.jpg', 0, '2024-08-14', '2024-08-20'),
+(47, 'Curso de Aliexpress', 'Sabemos que esto es una cosa de locos.', 'jake-lofi-hora-de-aventura_3840x2160_xtrafondos.com.jpg', 0, '2024-08-23', '2024-08-21'),
+(48, 'TECNICA RELLENO EN QUIZ', 'ESTAN DISFRUTANDO DE UNA ACTIVIDAD ACADEMICA', 'habitacion-lofi_3840x2160_xtrafondos.com.jpg', 0, '2024-08-29', '2024-09-07'),
+(49, 'Sapo Hp', 'Perro Mk', 'pexels-anastasiya-gepp-654466-1462637.jpg', 0, '2024-09-11', '2024-09-18');
 
 -- --------------------------------------------------------
 
@@ -341,6 +369,12 @@ ALTER TABLE `asistencia`
   ADD KEY `id_curso` (`id_curso`);
 
 --
+-- Indices de la tabla `carousel`
+--
+ALTER TABLE `carousel`
+  ADD PRIMARY KEY (`id_carrousel`);
+
+--
 -- Indices de la tabla `cursos`
 --
 ALTER TABLE `cursos`
@@ -422,6 +456,12 @@ ALTER TABLE `asig_modulo`
 --
 ALTER TABLE `asistencia`
   MODIFY `id_asistencia` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=4;
+
+--
+-- AUTO_INCREMENT de la tabla `carousel`
+--
+ALTER TABLE `carousel`
+  MODIFY `id_carrousel` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=50;
 
 --
 -- AUTO_INCREMENT de la tabla `cursos`
