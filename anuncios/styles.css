@@ -1,0 +1,229 @@
+:root {
+    --primary-color: #007bff;
+    --secondary-color: #28a745;
+    --background-color: #f8f9fa;
+    --text-color: #343a40;
+    --accent-color: #dc3545;
+}
+
+* {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+}
+
+body {
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    background-color: var(--background-color);
+    color: var(--text-color);
+    line-height: 1.6;
+    padding: 20px;
+}
+
+.container {
+    max-width: 1000px;
+    margin: 0 auto;
+    padding: 20px;
+    background-color: white;
+    box-shadow: 0 0 20px rgba(0, 0, 0, 0.1);
+    border-radius: 8px;
+   
+    display: flex;
+    flex-direction: column;
+}
+
+
+
+h1 {
+    color: var(--primary-color);
+    margin-bottom: 30px;
+    text-align: center;
+    font-size: 2.5em;
+}
+
+form {
+    margin-bottom: 40px;
+    background-color: #ffffff;
+    padding: 30px;
+    border-radius: 8px;
+    box-shadow: 0 0 15px rgba(0, 0, 0, 0.05);
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+}
+
+label {
+    font-weight: bold;
+    color: var(--primary-color);
+    margin-bottom: 5px;
+}
+
+input[type="text"], input[type="number"], textarea, input[type="file"] {
+    width: 100%;
+    padding: 10px;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    transition: border-color 0.3s ease;
+}
+
+input[type="text"]:focus, input[type="number"]:focus, textarea:focus {
+    border-color: var(--primary-color);
+    outline: none;
+}
+
+
+
+input[type="file"] + label {
+    display: inline-block;
+    padding: 10px 20px;
+    background-color: var(--primary-color);
+    color: white;
+    border-radius: 4px;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+    text-align: center;
+}
+
+
+
+button {
+    background-color: var(--secondary-color);
+    color: white;
+    padding: 12px 20px;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    margin-top: 20px;
+    transition: background-color 0.3s ease, transform 0.2s ease;
+}
+
+button:hover {
+    background-color:rgb(11, 109, 19);
+    transform: translateY(-2px);
+}
+
+table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 30px;
+    overflow: hidden;
+    box-shadow: 0 0 20px rgba(0, 0, 0, 0.1);
+    border-radius: 8px;
+}
+
+th, td {
+    padding: 15px;
+    text-align: left;
+    border-bottom: 1px solid #ddd;
+}
+
+th {
+    background-color: var(--primary-color);
+    color: white;
+    font-weight: bold;
+    text-transform: uppercase;
+    letter-spacing: 0.03em;
+}
+
+tr {
+    transition: background-color 0.3s ease;
+}
+
+tr:nth-child(even) {
+    background-color: #f8f9fa;
+}
+
+tr:hover {
+    background-color: #e8f4f8;
+}
+
+img {
+    max-width: 100px;
+    height: auto;
+    border-radius: 4px;
+    transition: transform 0.3s ease;
+}
+
+img:hover {
+    transform: scale(1.1);
+}
+
+.btn {
+    display: inline-block;
+    padding: 8px 15px;
+    text-decoration: none;
+    color: white;
+    background-color: var(--accent-color);
+    border-radius: 4px;
+    transition: background-color 0.3s ease, transform 0.2s ease;
+}
+
+.btn:hover {
+    background-color: red;
+    transform: translateY(-2px);
+}
+
+
+/* Estilos de los campos de fecha */
+input[type="date"] {
+    width: 100%; /* Hacer que el input ocupe todo el ancho disponible */
+    padding: 10px 15px;
+    font-family: 'Roboto', sans-serif;
+    font-size: 1rem;
+    color: #333; /* Color del texto */
+    background-color: #ffffff; /* Fondo suave */
+    border: 1px solid #dedddd; /* Borde fino y neutro */
+    border-radius: 5px; /* Bordes ligeramente redondeados */
+    
+   
+}
+
+/* Estilos de foco (cuando el campo es seleccionado) */
+input[type="date"]:focus {
+    border-color: #007bff; /* Color de borde al hacer foco */
+    box-shadow: 0 0 5px rgba(0, 123, 255, 0.5); /* Sombra azul al hacer foco */
+    outline: none; /* Eliminar el borde por defecto */
+}
+
+/* Estilos para pantallas pequeñas */
+@media (max-width: 768px) {
+    input[type="date"] {
+        font-size: 0.9rem; /* Ajuste del tamaño del texto para dispositivos móviles */
+        padding: 8px 10px; 
+        /* Reducir padding para pantallas pequeñas */
+    }
+
+
+.delete-btn:hover {
+    background-color: #c0392b;
+    transform: translateY(-2px);
+}
+
+@keyframes fadeIn {
+    from { opacity: 0; }
+    to { opacity: 1; }
+}
+
+.fade-in {
+    animation: fadeIn 0.5s ease-in;
+}
+
+@media (max-width: 768px) {
+    .container {
+        padding: 10px;
+    }
+    
+    form {
+        padding: 20px;
+        gap: 15px;
+    }
+    
+    table {
+        font-size: 14px;
+    }
+    
+    .back-button {
+        padding: 8px 12px;
+    }
+}
+}
