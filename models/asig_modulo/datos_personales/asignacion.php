@@ -6,6 +6,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Formulario de Asignación de Modulos</title>
     <link rel="stylesheet" href="../styles/asignacion.css">
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700&display=swap" rel="stylesheet">
 </head>
 
 <body>
@@ -65,6 +66,10 @@
             <p><span id="userTypeName"></span></p>
             <ul id="assignedModulesList"></ul>
         </div>
+    </div>
+
+    <div class="back-button-container">
+        <a href="../../modulos/modulos.php" class="back-button">Volver a Módulos</a>
     </div>
 
     <script src="../scripts/modulos.js"></script>
