@@ -16,7 +16,7 @@
   
   body {
     font-family: 'Inter', 'Segoe UI', sans-serif;
-    background-color: var(--background-color);
+    background-color: #e6f2ff;
     color: var(--text-color);
     line-height: 1.8;
     padding: 20px;
