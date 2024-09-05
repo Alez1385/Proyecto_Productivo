@@ -27,7 +27,7 @@ $result = $conn->query("SELECT * FROM carousel ORDER BY order_index ASC");
     <link rel="stylesheet" href="css/aos.css">
 
     <link rel="stylesheet" href="css/ionicons.min.css">
-    
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script> <!-- Librería jQuery para AJAX -->
     <link rel="stylesheet" href="css/flaticon.css">
     <link rel="stylesheet" href="css/icomoon.css">
     <link rel="stylesheet" href="css/style.css">
@@ -88,104 +88,50 @@ $result = $conn->query("SELECT * FROM carousel ORDER BY order_index ASC");
     	<div class="container">
     		<div class="row justify-content-center py-5 mt-5">
           <div class="col-md-12 heading-section text-center ftco-animate">
-          	<h1 class="big big-2">Cursos</h1>
-            <h2 class="mb-4">Cursos</h2>
+          	<h1 class="big big-2">Cursos </h1>
+            <h2 class="mb-4">Cursos Activos</h2>
             <p>Aquí podrás encontrar todos nuestros cursos. Recuerda seleccionar uno para inscribirte.</p>
           </div>
         </div>
     		<div class="row">
-					<div class="col-md-4 text-center d-flex ftco-animate">
-						<a href="#" class="services-1">
-							<span class="icon">
-								<i class="flaticon-analysis"></i>
-							</span>
-							<div class="desc">
-								<h3 class="mb-5">Ajedrez</h3>
-							</div>
-						</a>
-					</div>
-					<div class="col-md-4 text-center d-flex ftco-animate">
-						<a href="#" class="services-1">
-							<span class="icon">
-								<i class="flaticon-flasks"></i>
-							</span>
-							<div class="desc">
-								<h3 class="mb-5">Banda</h3>
-							</div>
-						</a>
-					</div>
-					<div class="col-md-4 text-center d-flex ftco-animate">
-						<a href="#" class="services-1">
-							<span class="icon">
-								<i class="flaticon-ideas"></i>
-							</span>
-							<div class="desc">
-								<h3 class="mb-5">Basquetbol</h3>
-							</div>
-						</a>
-					</div>
+			<!-- HTML para mostrar todos los cursos en cuadros independientes -->
+<div class="container">
+<?php
+$sql = "SELECT id_curso, nombre_curso, descripcion, nivel_educativo, duracion, estado FROM cursos";
+$result = $conn->query($sql);
+?>
+ <div class="row">
+        <?php
+        if ($result && $result->num_rows > 0) {
+            while ($row = $result->fetch_assoc()) {
+                echo '<div class="col-md-4 text-center d-flex ftco-animate">';
+                echo '  <a href="#" class="services-1" onclick="openModal(' . htmlspecialchars($row["id_curso"]) . ')">';
+                echo '      <span class="icon">';
+                echo '          <i class="flaticon-analysis"></i>';
+                echo '      </span>';
+                echo '      <div class="desc">';
+                echo '          <h3 class="mb-5">' . htmlspecialchars($row["nombre_curso"]) . '</h3>';
+                echo '          <p>' . htmlspecialchars($row["descripcion"]) . '</p>';
+                echo '          <p>Nivel: ' . htmlspecialchars(ucfirst($row["nivel_educativo"])) . ' | Duración: ' . htmlspecialchars($row["duracion"]) . ' semanas | Estado: ' . htmlspecialchars(ucfirst($row["estado"])) . '</p>';
+                echo '      </div>';
+                echo '  </a>';
+                echo '</div>';
+            }
+        } else {
+            echo '<p>No hay cursos disponibles actualmente.</p>';
+        }
+        ?>
+    </div>
+</div>
 
-					<div class="col-md-4 text-center d-flex ftco-animate">
-						<a href="#" class="services-1">
-							<span class="icon">
-								<i class="flaticon-analysis"></i>
-							</span>
-							<div class="desc">
-								<h3 class="mb-5">Danzas</h3>
-							</div>
-						</a>
-					</div>
-					<div class="col-md-4 text-center d-flex ftco-animate">
-						<a href="#" class="services-1">
-							<span class="icon">
-								<i class="flaticon-flasks"></i>
-							</span>
-							<div class="desc">
-								<h3 class="mb-5">Sinfonica</h3>
-							</div>
-						</a>
-					</div>
-					<div class="col-md-4 text-center d-flex ftco-animate">
-						<a href="#" class="services-1">
-							<span class="icon">
-								<i class="flaticon-ideas"></i>
-							</span>
-							<div class="desc">
-								<h3 class="mb-5">Microfutbol</h3>
-							</div>
-						</a>
-					</div>
-					<div class="col-md-4 text-center d-flex ftco-animate">
-						<a href="#" class="services-1">
-							<span class="icon">
-								<i class="flaticon-analysis"></i>
-							</span>
-							<div class="desc">
-								<h3 class="mb-5">Natación</h3>
-							</div>
-						</a>
-					</div>
-					<div class="col-md-4 text-center d-flex ftco-animate">
-						<a href="#" class="services-1">
-							<span class="icon">
-								<i class="flaticon-flasks"></i>
-							</span>
-							<div class="desc">
-								<h3 class="mb-5">Voleibol</h3>
-							</div>
-						</a>
-					</div>
-					<div class="col-md-4 text-center d-flex ftco-animate">
-						<a href="#" class="services-1">
-							<span class="icon">
-								<i class="flaticon-flasks"></i>
-							</span>
-							<div class="desc">
-								<h3 class="mb-5">Pastoral</h3>
-							</div>
-						</a>
-					</div>
-				</div>
+
+<?php
+// Cerrar la conexión
+$conn->close();
+?>
+
+
+			
     	</div>
     </section>
 
@@ -393,6 +339,8 @@ $result = $conn->query("SELECT * FROM carousel ORDER BY order_index ASC");
   <script src="js/jquery.animateNumber.min.js"></script>
   <script src="js/scrollax.min.js"></script>
   <script src="js/main.js"></script>
+  <!-- JavaScript para manejar el modal y filtrar los cursos activos -->
+ 
     
   </body>
 </html>
