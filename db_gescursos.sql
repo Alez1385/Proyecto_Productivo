@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Servidor: 127.0.0.1
--- Tiempo de generación: 03-09-2024 a las 19:22:23
+-- Tiempo de generación: 06-09-2024 a las 22:23:52
 -- Versión del servidor: 10.4.32-MariaDB
 -- Versión de PHP: 8.2.12
 
@@ -60,7 +60,6 @@ INSERT INTO `asig_modulo` (`id_asig_modulo`, `id_modulo`, `id_tipo_usuario`, `fe
 (13, 2, 1, NULL),
 (14, 3, 1, NULL),
 (15, 3, 2, NULL),
-(16, 4, 1, '2024-08-29'),
 (17, 5, 1, NULL),
 (18, 6, 1, NULL),
 (19, 7, 1, NULL);
@@ -220,7 +219,6 @@ CREATE TABLE `modulos` (
 INSERT INTO `modulos` (`id_modulo`, `nom_modulo`, `url`, `icono`) VALUES
 (2, 'Profesor', '../models/profesor/profesor.php', 'school'),
 (3, 'Estudiante', '../models/estudiante/estudiante.php', 'face\r\n'),
-(4, 'Pagos', '', 'shopping_cart'),
 (5, 'Usuarios', '../models/usuarios/users.php', 'person'),
 (6, 'Cursos', 'models/cursos/cursos.php', 'assignment'),
 (7, 'Modulos', 'models/modulos/modulos.php', 'event');
@@ -334,10 +332,11 @@ CREATE TABLE `usuario` (
 --
 
 INSERT INTO `usuario` (`id_usuario`, `nombre`, `apellido`, `tipo_doc`, `documento`, `fecha_nac`, `foto`, `mail`, `telefono`, `direccion`, `id_tipo_usuario`, `username`, `clave`, `fecha_registro`, `estado`, `ultimo_acceso`) VALUES
-(36, 'Santiagoe', 'Capon', 'ID', '12341235234', '2345-03-12', 'WhatsApp Image 2024-07-23 at 4.49.07 PM.jpeg', 'santiagocaponf@gmail.com', '32452345', 'CL 18 A NORTE 2 72', 1, 'alez', '$2y$10$cCIaWsXSHC1OWcRBpDQU.uhrDuxWP0j4IMUTxNNojuHeT3Sq.uYkq', '2024-08-25 17:43:54', 'activo', '2024-09-03 11:43:00'),
+(36, 'Santiagoe', 'Capon', 'ID', '12341235234', '2345-03-12', 'WhatsApp Image 2024-07-23 at 4.49.07 PM.jpeg', 'santiagocaponf@gmail.com', '32452345', 'CL 18 A NORTE 2 72', 1, 'alez', '$2y$10$cCIaWsXSHC1OWcRBpDQU.uhrDuxWP0j4IMUTxNNojuHeT3Sq.uYkq', '2024-08-25 17:43:54', 'activo', '2024-09-06 15:22:16'),
 (42, 'chad', 'sexteto', 'ID', '523456346', '3654-04-23', '66d273c33d474_Recurso 9europe.jpg', 'luisillo@gmail.com', '4563475674', 'CL 18 A NORTE 2 72', 1, 'alez23', '$2y$10$FrpZXvgI3WrL22y9MxNtfuQsyQSgCJ7Jm4VPUv3Aa4qEn2HCKdxsK', '2024-08-29 16:26:44', 'activo', NULL),
 (51, 'antonela', 'sepulveda', 'ID', '342352345', '0005-04-23', '66d23c1021bab_f7c0528d915ec3b38dd89bf7beb2a194.jpg', 'scflorez@corsaje.edu.co', '42352345', 'CL 18 A NORTE 2 72', 1, 'mientras', '$2y$10$KJU2liHj854T1T9M.6/EK.xDYy4sfLf2XEwCldj230rdreZmC.3KC', '2024-08-30 16:39:28', 'activo', NULL),
-(53, 'Juanito', 'Alimaña', 'ID', '43523634', '0634-06-02', '66d2441faa705_pngwing.com.png', 'juanit@gmail.com', '5233456345', 'CL 18 A NORTE 2 72', 3, 'alez123123', '$2y$10$p.bJhCL9d2VM1IjUCnC63.Edj5Pg87KZgKGTFyedUHPusUd.QSDAK', '2024-08-30 17:13:51', 'activo', NULL);
+(53, 'Juanito', 'Alimaña', 'ID', '43523634', '0634-06-02', '66d2441faa705_pngwing.com.png', 'juanit@gmail.com', '5233456345', 'CL 18 A NORTE 2 72', 3, 'alez123123', '$2y$10$p.bJhCL9d2VM1IjUCnC63.Edj5Pg87KZgKGTFyedUHPusUd.QSDAK', '2024-08-30 17:13:51', 'activo', NULL),
+(55, 'Santiago', 'Capon', 'Passport', '4234523456', '5234-04-23', 'pngwing.com.png', 'scflorez@corsaje.edu.co3', '53643563456', 'CL 18 A NORTE 2 72', 2, 'alez1234', '$2y$10$pcvzMHIh1F53bR25oEpRfu5MbZB5FO6Kn3ceIKwNBtp9KWahjApMe', '2024-09-03 12:35:04', 'activo', NULL);
 
 --
 -- Índices para tablas volcadas
@@ -515,7 +514,7 @@ ALTER TABLE `tipo_usuario`
 -- AUTO_INCREMENT de la tabla `usuario`
 --
 ALTER TABLE `usuario`
-  MODIFY `id_usuario` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=55;
+  MODIFY `id_usuario` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=56;
 
 --
 -- Restricciones para tablas volcadas
@@ -533,7 +532,7 @@ ALTER TABLE `asignacion_curso`
 -- Filtros para la tabla `asig_modulo`
 --
 ALTER TABLE `asig_modulo`
-  ADD CONSTRAINT `asig_modulo_ibfk_1` FOREIGN KEY (`id_modulo`) REFERENCES `modulos` (`id_modulo`);
+  ADD CONSTRAINT `asig_modulo_ibfk_1` FOREIGN KEY (`id_modulo`) REFERENCES `modulos` (`id_modulo`) ON DELETE CASCADE;
 
 --
 -- Filtros para la tabla `asistencia`

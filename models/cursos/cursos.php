@@ -22,18 +22,27 @@
         try {
             include "../../scripts/sidebar.php";
             include "../../scripts/conexion.php";
+            require_once '../../scripts/filters.php';
         } catch (Exception $e) {
             logError("Error al incluir archivos necesarios: " . $e->getMessage());
             $_SESSION['error'] = "Error al cargar componentes necesarios. Por favor, contacte al administrador.";
-            // Redirigir a una página de error general
             header("Location: error.php");
             exit();
         }
 
-        // Consulta para obtener los cursos
-        $sql = "SELECT id_curso, nombre_curso, descripcion, nivel_educativo, duracion, estado FROM cursos";
+        // Obtener filtros desde la URL
+        $course_filters = [
+            'nombre_curso' => isset($_GET['nombre_curso']) ? $_GET['nombre_curso'] : '',
+            'nivel_educativo' => isset($_GET['nivel_educativo']) ? $_GET['nivel_educativo'] : '',
+            'categoria' => isset($_GET['categoria']) ? $_GET['categoria'] : ''
+        ];
+
+        // Crear instancia de Filter para cursos
+        $courseFilter = new Filter($conn, 'cursos', $course_filters);
+
+        // Aplicar filtros y obtener resultados
         try {
-            $result = $conn->query($sql);
+            $result = $courseFilter->applyFilters();
             if (!$result) {
                 throw new Exception($conn->error);
             }
@@ -43,7 +52,6 @@
             $result = false;
         }
         ?>
-        <!-- Main Content -->
         <div class="main-content">
             <header class="header">
                 <div class="header-left">
@@ -56,20 +64,29 @@
 
             <section class="content">
                 <?php
-                // Mostrar mensajes de error si existen
                 if (isset($_SESSION['error'])) {
                     echo '<div class="error-message">' . $_SESSION['error'] . '</div>';
                     unset($_SESSION['error']);
                 }
                 ?>
 
-                <!-- Barra de búsqueda -->
                 <div class="search-bar">
                     <span class="material-icons-sharp search-icon">search</span>
                     <input type="text" id="searchInput" placeholder="Buscar cursos..." onkeyup="filterCourses()">
+
+                    <!-- Contenedor de Filtros -->
+                    <div class="filter-container">
+                        <select id="filterNivelEducativo" onchange="filterCourses()">
+                            <option value="">Todos los Niveles</option>
+                            <option value="primaria">Primaria</option>
+                            <option value="secundaria">Secundaria</option>
+                            <option value="terciaria">Terciaria</option>
+                        </select>
+                        <input type="text" id="filterTerm" placeholder="Filtrar por término..." onkeyup="filterCourses()">
+                    </div>
                 </div>
 
-                <!-- Lista de cursos -->
+
                 <div class="course-list">
                     <?php
                     if ($result && $result->num_rows > 0) {
@@ -153,7 +170,43 @@
                 }
             }
 
-            // Mostrar mensaje si no se encontraron cursos
+            let noResultsMessage = document.getElementById('noResultsMessage');
+            if (!found) {
+                if (!noResultsMessage) {
+                    noResultsMessage = document.createElement('p');
+                    noResultsMessage.id = 'noResultsMessage';
+                    noResultsMessage.textContent = 'No se encontraron cursos que coincidan con la búsqueda.';
+                    courseList.appendChild(noResultsMessage);
+                }
+            } else if (noResultsMessage) {
+                noResultsMessage.remove();
+            }
+        }
+
+        function filterCourses() {
+            const searchInput = document.getElementById('searchInput').value.toLowerCase();
+            const filterNivelEducativo = document.getElementById('filterNivelEducativo').value.toLowerCase();
+            const filterTerm = document.getElementById('filterTerm').value.toLowerCase();
+            const courseList = document.querySelector('.course-list');
+            const courses = courseList.getElementsByClassName('course-item');
+            let found = false;
+
+            for (let i = 0; i < courses.length; i++) {
+                const courseDetails = courses[i].getElementsByClassName('course-details')[0];
+                const name = courseDetails.getElementsByTagName('h2')[0].textContent.toLowerCase();
+                const description = courseDetails.getElementsByTagName('p')[0].textContent.toLowerCase();
+                const nivelEducativo = courseDetails.getElementsByTagName('p')[1].textContent.toLowerCase();
+
+                if ((name.indexOf(searchInput) > -1 || description.indexOf(searchInput) > -1) &&
+                    (nivelEducativo.indexOf(filterNivelEducativo) > -1 || filterNivelEducativo === "") &&
+                    (name.indexOf(filterTerm) > -1 || description.indexOf(filterTerm) > -1)) {
+                    courses[i].style.display = '';
+                    found = true;
+                } else {
+                    courses[i].style.display = 'none';
+                }
+            }
+
             let noResultsMessage = document.getElementById('noResultsMessage');
             if (!found) {
                 if (!noResultsMessage) {
