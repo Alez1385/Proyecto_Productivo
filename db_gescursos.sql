@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Servidor: 127.0.0.1
--- Tiempo de generación: 06-09-2024 a las 22:23:52
+-- Tiempo de generación: 07-09-2024 a las 23:16:07
 -- Versión del servidor: 10.4.32-MariaDB
 -- Versión de PHP: 8.2.12
 
@@ -128,18 +128,21 @@ CREATE TABLE `cursos` (
   `descripcion` text DEFAULT NULL,
   `nivel_educativo` enum('primaria','secundaria','terciaria') NOT NULL,
   `duracion` int(3) NOT NULL COMMENT 'Duración en semanas',
-  `estado` enum('activo','inactivo') NOT NULL DEFAULT 'activo'
+  `estado` enum('activo','inactivo') NOT NULL DEFAULT 'activo',
+  `categoria` enum('artwork','game-engine','support','jobs','coding','general-forums','contests','promotions') NOT NULL DEFAULT 'general-forums',
+  `icono` varchar(255) DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 --
 -- Volcado de datos para la tabla `cursos`
 --
 
-INSERT INTO `cursos` (`id_curso`, `nombre_curso`, `descripcion`, `nivel_educativo`, `duracion`, `estado`) VALUES
-(1, 'Danzas', 'Curso de danzas', 'primaria', 3, 'activo'),
-(2, 'Ajedrez', 'Curso de ajedrez', 'terciaria', 3, 'activo'),
-(3, 'Natacion', 'Curso de natacion', 'secundaria', 6, 'activo'),
-(5, 'Banda', 'Banda marcial del colegio', 'terciaria', 14, 'activo');
+INSERT INTO `cursos` (`id_curso`, `nombre_curso`, `descripcion`, `nivel_educativo`, `duracion`, `estado`, `categoria`, `icono`) VALUES
+(1, 'Danzas', 'Curso de danzas', 'primaria', 3, 'activo', 'general-forums', 'flamenco-svgrepo-com.svg'),
+(2, 'Ajedrez', 'Curso de ajedrez', 'terciaria', 3, 'activo', 'general-forums', 'chess-queen-svgrepo-com.svg'),
+(3, 'Natacion', 'Curso de natacion', 'secundaria', 6, 'inactivo', 'general-forums', '297148.svg'),
+(5, 'Banda', 'Banda marcial del colegio', 'terciaria', 14, 'activo', 'general-forums', 'trumpet-svgrepo-com.svg'),
+(6, 'Pastoral', 'Curso de pastoral', 'secundaria', 3, 'activo', 'general-forums', 'bible-2-svgrepo-com.svg');
 
 -- --------------------------------------------------------
 
@@ -332,7 +335,7 @@ CREATE TABLE `usuario` (
 --
 
 INSERT INTO `usuario` (`id_usuario`, `nombre`, `apellido`, `tipo_doc`, `documento`, `fecha_nac`, `foto`, `mail`, `telefono`, `direccion`, `id_tipo_usuario`, `username`, `clave`, `fecha_registro`, `estado`, `ultimo_acceso`) VALUES
-(36, 'Santiagoe', 'Capon', 'ID', '12341235234', '2345-03-12', 'WhatsApp Image 2024-07-23 at 4.49.07 PM.jpeg', 'santiagocaponf@gmail.com', '32452345', 'CL 18 A NORTE 2 72', 1, 'alez', '$2y$10$cCIaWsXSHC1OWcRBpDQU.uhrDuxWP0j4IMUTxNNojuHeT3Sq.uYkq', '2024-08-25 17:43:54', 'activo', '2024-09-06 15:22:16'),
+(36, 'Santiagoe', 'Capon', 'ID', '12341235234', '2345-03-12', 'WhatsApp Image 2024-07-23 at 4.49.07 PM.jpeg', 'santiagocaponf@gmail.com', '32452345', 'CL 18 A NORTE 2 72', 1, 'alez', '$2y$10$cCIaWsXSHC1OWcRBpDQU.uhrDuxWP0j4IMUTxNNojuHeT3Sq.uYkq', '2024-08-25 17:43:54', 'activo', '2024-09-07 14:56:07'),
 (42, 'chad', 'sexteto', 'ID', '523456346', '3654-04-23', '66d273c33d474_Recurso 9europe.jpg', 'luisillo@gmail.com', '4563475674', 'CL 18 A NORTE 2 72', 1, 'alez23', '$2y$10$FrpZXvgI3WrL22y9MxNtfuQsyQSgCJ7Jm4VPUv3Aa4qEn2HCKdxsK', '2024-08-29 16:26:44', 'activo', NULL),
 (51, 'antonela', 'sepulveda', 'ID', '342352345', '0005-04-23', '66d23c1021bab_f7c0528d915ec3b38dd89bf7beb2a194.jpg', 'scflorez@corsaje.edu.co', '42352345', 'CL 18 A NORTE 2 72', 1, 'mientras', '$2y$10$KJU2liHj854T1T9M.6/EK.xDYy4sfLf2XEwCldj230rdreZmC.3KC', '2024-08-30 16:39:28', 'activo', NULL),
 (53, 'Juanito', 'Alimaña', 'ID', '43523634', '0634-06-02', '66d2441faa705_pngwing.com.png', 'juanit@gmail.com', '5233456345', 'CL 18 A NORTE 2 72', 3, 'alez123123', '$2y$10$p.bJhCL9d2VM1IjUCnC63.Edj5Pg87KZgKGTFyedUHPusUd.QSDAK', '2024-08-30 17:13:51', 'activo', NULL),
@@ -466,7 +469,7 @@ ALTER TABLE `carousel`
 -- AUTO_INCREMENT de la tabla `cursos`
 --
 ALTER TABLE `cursos`
-  MODIFY `id_curso` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=6;
+  MODIFY `id_curso` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=7;
 
 --
 -- AUTO_INCREMENT de la tabla `estudiante`
