@@ -1,8 +1,6 @@
 <?php
 
-// sanitize_input.php
-function sanitize_input($data)
-{
+function sanitize_input($data) {
     $data = trim($data);
     $data = stripslashes($data);
     $data = htmlspecialchars($data);
@@ -11,15 +9,12 @@ function sanitize_input($data)
 
 try {
     // Configuración de la base de datos
-    // Configuración de la base de datos
-    $db_host = 'localhost'; // Cambia según tu configuración
-    $db_name = 'db_gescursos'; // Cambia según tu configuración
-    $db_user = 'root'; // Cambia según tu configuración
-    $db_pass = ''; // Cambia según tu configuración
+    $db_host = 'localhost'; 
+    $db_name = 'db_gescursos'; 
+    $db_user = 'root'; 
+    $db_pass = ''; 
 
-
-
-    // Crear una nueva conexión utilizando PDO para mayor seguridad
+    // Crear una nueva conexión utilizando PDO
     $dsn = "mysql:host=$db_host;dbname=$db_name;charset=utf8mb4";
     $options = [
         PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION,
@@ -35,15 +30,33 @@ try {
     $nivel_educativo = sanitize_input($_POST['nivel_educativo']);
     $duracion = filter_var($_POST['duracion'], FILTER_VALIDATE_INT);
     $estado = sanitize_input($_POST['estado']);
+    $upload_icon = $_FILES['upload_icon'];
 
-    // Validación adicional
     if (!$nombre_curso || !$descripcion || !$nivel_educativo || !$duracion || !$estado) {
         throw new Exception('Por favor, complete todos los campos correctamente.');
     }
 
+    // Manejo de la imagen del icono
+    if ($upload_icon['error'] === UPLOAD_ERR_OK) {
+        $allowed_types = ['image/jpeg', 'image/png', 'image/gif', 'svg'];
+        if (!in_array($upload_icon['type'], $allowed_types)) {
+            throw new Exception('Tipo de archivo no permitido. Solo se permiten imágenes JPEG, PNG y GIF.');
+        }
+
+        $upload_dir = '../../../uploads/icons/';
+        $icono_name = uniqid('icon_', true) . '.' . pathinfo($upload_icon['name'], PATHINFO_EXTENSION);
+        $icono_path = $upload_dir . $icono_name;
+
+        if (!move_uploaded_file($upload_icon['tmp_name'], $icono_path)) {
+            throw new Exception('Error al subir el icono.');
+        }
+    } else {
+        throw new Exception('Por favor, suba un archivo de icono.');
+    }
+
     // Preparar la consulta SQL para insertar en la base de datos
-    $sql = "INSERT INTO cursos (nombre_curso, descripcion, nivel_educativo, duracion, estado)
-            VALUES (:nombre_curso, :descripcion, :nivel_educativo, :duracion, :estado)";
+    $sql = "INSERT INTO cursos (nombre_curso, descripcion, nivel_educativo, duracion, estado, icono)
+            VALUES (:nombre_curso, :descripcion, :nivel_educativo, :duracion, :estado, :icono)";
 
     $stmt = $pdo->prepare($sql);
 
@@ -53,19 +66,19 @@ try {
         ':descripcion' => $descripcion,
         ':nivel_educativo' => $nivel_educativo,
         ':duracion' => $duracion,
-        ':estado' => $estado
+        ':estado' => $estado,
+        ':icono' => $icono_name
     ]);
 
     // Redirigir a una página de éxito o mostrar mensaje de éxito
     header("Location: ../cursos.php");
     exit();
+
 } catch (PDOException $e) {
-    // Manejo de errores de la base de datos
     error_log($e->getMessage());
     header("Location: ../../error.php?message=Error en la base de datos.");
     exit();
 } catch (Exception $e) {
-    // Manejo de errores generales
     error_log($e->getMessage());
     header("Location: ../../error.php?message=" . urlencode($e->getMessage()));
     exit();

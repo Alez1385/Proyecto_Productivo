@@ -4,7 +4,7 @@ require_once '../../scripts/conexion.php';
 
 // Check if an ID was provided in the URL
 if (!isset($_GET['id_curso']) || !is_numeric($_GET['id_curso'])) {
-    die("Invalid course ID");
+    die("ID de curso no válido");
 }
 
 $id_curso = intval($_GET['id_curso']);
@@ -18,11 +18,12 @@ $curso = $result->fetch_assoc();
 
 // If no course was found, display an error
 if (!$curso) {
-    die("Course not found");
+    die("Curso no encontrado");
 }
 
 $stmt->close();
 ?>
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -30,10 +31,11 @@ $stmt->close();
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Editar Curso</title>
     <link rel="stylesheet" href="../../css/form.css">
+    <link rel="stylesheet" href="https://fonts.googleapis.com/icon?family=Material+Icons+Sharp">
 </head>
 <body>
     <div class="form-container">
-        <form class="course-form" action="scripts/update.php" method="post">
+        <form class="course-form" action="scripts/update.php" method="post" enctype="multipart/form-data">
             <h2>Editar Curso</h2>
 
             <div class="form-group">
@@ -69,9 +71,19 @@ $stmt->close();
                 </select>
             </div>
 
+            <div class="form-group">
+                <div class="icon-upload">
+                    <label for="upload_icon">Suba su propio icono:</label>
+                    <input type="file" id="upload_icon" name="upload_icon" accept="image/*">
+                </div>
+                <?php if (!empty($curso['icono'])): ?>
+                    <p>Icono actual:</p>
+                    <img src="../../uploads/icons/<?php echo htmlspecialchars($curso['icono']); ?>" alt="Icono del curso" style="width: 50px; height: 50px;">
+                <?php endif; ?>
+            </div>
+
             <button type="submit" class="btn btn-primary">Guardar Cambios</button>
         </form>
     </div>
 </body>
 </html>
-

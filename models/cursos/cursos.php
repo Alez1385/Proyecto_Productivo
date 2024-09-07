@@ -12,7 +12,6 @@
 <body>
     <div class="dashboard-container">
         <?php
-
         // Función para registrar errores
         function logError($message)
         {
@@ -74,26 +73,37 @@
                     <span class="material-icons-sharp search-icon">search</span>
                     <input type="text" id="searchInput" placeholder="Buscar cursos..." onkeyup="filterCourses()">
 
-                    <!-- Contenedor de Filtros -->
-                    <div class="filter-container">
-                        <select id="filterNivelEducativo" onchange="filterCourses()">
-                            <option value="">Todos los Niveles</option>
-                            <option value="primaria">Primaria</option>
-                            <option value="secundaria">Secundaria</option>
-                            <option value="terciaria">Terciaria</option>
-                        </select>
-                        <input type="text" id="filterTerm" placeholder="Filtrar por término..." onkeyup="filterCourses()">
+                    <div class="filter-dropdown">
+                        <button class="filter-button" onclick="toggleFilters()">Filtros</button>
+                        <div class="filter-content" id="filterContent">
+                            <div class="filter-category">
+                                <div class="filter-category-title">Categorías</div>
+                                <label class="filter-option"><input type="checkbox" value="artwork"> Artwork</label>
+                                <label class="filter-option"><input type="checkbox" value="game-engine"> Game Engine</label>
+                                <label class="filter-option"><input type="checkbox" value="support"> Support</label>
+                                <label class="filter-option"><input type="checkbox" value="jobs"> Jobs</label>
+                                <label class="filter-option"><input type="checkbox" value="coding"> Coding</label>
+                                <label class="filter-option"><input type="checkbox" value="general-forums"> General Forums</label>
+                                <label class="filter-option"><input type="checkbox" value="contests"> Contests</label>
+                                <label class="filter-option"><input type="checkbox" value="promotions"> Promotions</label>
+                            </div>
+                        </div>
                     </div>
                 </div>
 
+                <div class="filter-tags" id="filterTags"></div>
 
                 <div class="course-list">
                     <?php
                     if ($result && $result->num_rows > 0) {
                         while ($row = $result->fetch_assoc()) {
-                            echo '<div class="course-item" data-course-id="' . htmlspecialchars($row["id_curso"]) . '">';
+                            echo '<div class="course-item" data-course-id="' . htmlspecialchars($row["id_curso"]) . '" data-category="' . htmlspecialchars($row["categoria"]) . '">';
                             echo '<div class="course-icon-container">';
-                            echo '<span class="material-icons-sharp course-icon">school</span>';
+                            if (!empty($row["icono"])) {
+                                echo '<img src="../../uploads/icons/' . htmlspecialchars($row["icono"]) . '" alt=" " class="course-icon">';
+                            } else {
+                                echo '<span class="material-icons-sharp">school</span>';
+                            }
                             echo '</div>';
                             echo '<div class="course-details">';
                             echo '<h2>' . htmlspecialchars($row["nombre_curso"]) . '</h2>';
@@ -116,110 +126,7 @@
         </div>
     </div>
 
-    <script>
-        function deleteCourse(courseId) {
-            if (confirm("¿Estás seguro de que deseas eliminar este curso?")) {
-                fetch('scripts/delete_courses.php', {
-                        method: 'POST',
-                        headers: {
-                            'Content-Type': 'application/x-www-form-urlencoded',
-                        },
-                        body: 'id_curso=' + encodeURIComponent(courseId)
-                    })
-                    .then(response => {
-                        if (!response.ok) {
-                            throw new Error('Network response was not ok');
-                        }
-                        return response.json();
-                    })
-                    .then(data => {
-                        if (data.success) {
-                            const courseElement = document.querySelector(`[data-course-id="${courseId}"]`);
-                            if (courseElement) {
-                                courseElement.remove();
-                            }
-                            alert('Curso eliminado exitosamente');
-                        } else {
-                            throw new Error(data.message || 'Error desconocido al eliminar el curso');
-                        }
-                    })
-                    .catch(error => {
-                        console.error('Error:', error);
-                        alert('Ocurrió un error al eliminar el curso: ' + error.message);
-                    });
-            }
-        }
-
-        function filterCourses() {
-            const input = document.getElementById('searchInput');
-            const filter = input.value.toLowerCase();
-            const courseList = document.querySelector('.course-list');
-            const courses = courseList.getElementsByClassName('course-item');
-            let found = false;
-
-            for (let i = 0; i < courses.length; i++) {
-                const courseDetails = courses[i].getElementsByClassName('course-details')[0];
-                const name = courseDetails.getElementsByTagName('h2')[0].textContent.toLowerCase();
-                const description = courseDetails.getElementsByTagName('p')[0].textContent.toLowerCase();
-
-                if (name.indexOf(filter) > -1 || description.indexOf(filter) > -1) {
-                    courses[i].style.display = '';
-                    found = true;
-                } else {
-                    courses[i].style.display = 'none';
-                }
-            }
-
-            let noResultsMessage = document.getElementById('noResultsMessage');
-            if (!found) {
-                if (!noResultsMessage) {
-                    noResultsMessage = document.createElement('p');
-                    noResultsMessage.id = 'noResultsMessage';
-                    noResultsMessage.textContent = 'No se encontraron cursos que coincidan con la búsqueda.';
-                    courseList.appendChild(noResultsMessage);
-                }
-            } else if (noResultsMessage) {
-                noResultsMessage.remove();
-            }
-        }
-
-        function filterCourses() {
-            const searchInput = document.getElementById('searchInput').value.toLowerCase();
-            const filterNivelEducativo = document.getElementById('filterNivelEducativo').value.toLowerCase();
-            const filterTerm = document.getElementById('filterTerm').value.toLowerCase();
-            const courseList = document.querySelector('.course-list');
-            const courses = courseList.getElementsByClassName('course-item');
-            let found = false;
-
-            for (let i = 0; i < courses.length; i++) {
-                const courseDetails = courses[i].getElementsByClassName('course-details')[0];
-                const name = courseDetails.getElementsByTagName('h2')[0].textContent.toLowerCase();
-                const description = courseDetails.getElementsByTagName('p')[0].textContent.toLowerCase();
-                const nivelEducativo = courseDetails.getElementsByTagName('p')[1].textContent.toLowerCase();
-
-                if ((name.indexOf(searchInput) > -1 || description.indexOf(searchInput) > -1) &&
-                    (nivelEducativo.indexOf(filterNivelEducativo) > -1 || filterNivelEducativo === "") &&
-                    (name.indexOf(filterTerm) > -1 || description.indexOf(filterTerm) > -1)) {
-                    courses[i].style.display = '';
-                    found = true;
-                } else {
-                    courses[i].style.display = 'none';
-                }
-            }
-
-            let noResultsMessage = document.getElementById('noResultsMessage');
-            if (!found) {
-                if (!noResultsMessage) {
-                    noResultsMessage = document.createElement('p');
-                    noResultsMessage.id = 'noResultsMessage';
-                    noResultsMessage.textContent = 'No se encontraron cursos que coincidan con la búsqueda.';
-                    courseList.appendChild(noResultsMessage);
-                }
-            } else if (noResultsMessage) {
-                noResultsMessage.remove();
-            }
-        }
-    </script>
+    <script src="./scripts/cursos.js"></script>
 </body>
 
 </html>
