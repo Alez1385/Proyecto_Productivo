@@ -37,7 +37,7 @@ $result = $conn->query("SELECT * FROM carousel ORDER BY order_index ASC");
 	  
     <nav class="navbar navbar-expand-lg navbar-dark ftco_navbar ftco-navbar-light site-navbar-target" id="ftco-navbar">
 	    <div class="container">
-	      <a class="navbar-brand" href="index.html">Corsacor</a>
+	      <a class="navbar-brand" href="#home-section" class="nav-link">Corsacor</a>
 	      <button class="navbar-toggler js-fh5co-nav-toggle fh5co-nav-toggle" type="button" data-toggle="collapse" data-target="#ftco-nav" aria-controls="ftco-nav" aria-expanded="false" aria-label="Toggle navigation">
 	        <span class="oi oi-menu"></span> Menu
 	      </button>
@@ -53,8 +53,8 @@ $result = $conn->query("SELECT * FROM carousel ORDER BY order_index ASC");
 	      </div>
 	    </div>
 	  </nav>
+    <!-- incio del carrousel -->
 	  <section id="home-section" class="hero">
-		
 	  <div class="home-slider owl-carousel">
     <?php while ($row = $result->fetch_assoc()): ?>
     <div class="slider-item">
@@ -78,12 +78,10 @@ $result = $conn->query("SELECT * FROM carousel ORDER BY order_index ASC");
         </div>
     </div>
     <?php endwhile; ?>
-</div>
-
-			
+</div>	
     </section>
 
-	
+	<!-- HTML para mostrar todos los cursos en cuadros independientes -->
     <section class="ftco-section" id="services-section">
     	<div class="container">
     		<div class="row justify-content-center py-5 mt-5">
@@ -94,11 +92,6 @@ $result = $conn->query("SELECT * FROM carousel ORDER BY order_index ASC");
           </div>
         </div>
     		<div class="row">
-
-
-        
-			<!-- HTML para mostrar todos los cursos en cuadros independientes -->
-
 <div class="container">
 <?php
 $sql = "SELECT id_curso, nombre_curso, descripcion, nivel_educativo, duracion, estado, categoria, icono FROM cursos";
@@ -131,90 +124,61 @@ $result = $conn->query($sql);
         ?>
     </div>
 </div>
-
-
 <?php
 // Cerrar la conexión
-$conn->close();
+$conn->close();?>	
+</div>
+    </section>
+
+<!-- resumen de los cursos -->
+<?php
+// Incluir el archivo de conexión
+include('scripts/conexion.php'); // Asegúrate de que aquí no se cierre $conn
+
+// Consulta SQL para obtener todos los cursos de la tabla resume_cursos
+$sql = "SELECT * FROM resume_cursos";
+$result = $conn->query($sql);
+
+// Verificar si la consulta fue exitosa
+if (!$result) {
+    die("Error en la consulta: " . $conn->error);
+}
 ?>
 
-
-			
-    	</div>
-    </section>
-
-
-    <section class="ftco-section ftco-no-pb" id="resume-section">
-    	<div class="container">
-    		<div class="row justify-content-center pb-5">
-          <div class="col-md-10 heading-section text-center ftco-animate">
-          	<h1 class="big big-2">Resumen</h1>
-            <h2 class="mb-4">Resumen</h2>
-            <p>Bienvenidos a todos los cursos del Colegio Sagrado Corazón de Jesús. ¡Prepárense para una experiencia de aprendizaje inolvidable!</p>
-          </div>
+<section class="ftco-section ftco-no-pb" id="resume-section">
+    <div class="container">
+        <div class="row justify-content-center pb-5">
+            <div class="col-md-10 heading-section text-center ftco-animate">
+                <h1 class="big big-2">Resumen</h1>
+                <h2 class="mb-4">Resumen</h2>
+                <p>Bienvenidos a todos los cursos del Colegio Sagrado Corazón de Jesús. ¡Prepárense para una experiencia de aprendizaje inolvidable!</p>
+            </div>
         </div>
-    		<div class="row">
-    			<div class="col-md-6">
-    				<div class="resume-wrap ftco-animate">
-    					<span class="date">Sabados</span>
-    					<h2>Ajedrez</h2>
-    					<span class="position">CORSAJE</span>
-    					<p class="mt-4">Desarrolla tu pensamiento crítico, toma mejores decisiones y mejora tu capacidad de análisis con nuestro curso de ajedrez.</p>
-    				</div>
-    				<div class="resume-wrap ftco-animate">
-    					<span class="date">Sabados</span>
-    					<h2>Banda</h2>
-    					<span class="position">CORSAJE</span>
-    					<p class="mt-4">Desarrolla tu oído musical y tu sentido del ritmo. Nuestras clases de banda te brindarán la oportunidad de aprender a tocar en conjunto y crear música de calidad.</p>
-    				</div>
-    				<div class="resume-wrap ftco-animate">
-    					<span class="date">Sabados</span>
-    					<h2>Basquetbol</h2>
-    					<span class="position">CORSAJE</span>
-    					<p class="mt-4">¡Encesta tus sueños! Nuestras clases de básquet te enseñarán las técnicas básicas y avanzadas de este deporte. Mejora tu agilidad, coordinación y trabajo en equipo.</p>
-    				</div>
-					<div class="resume-wrap ftco-animate">
-    					<span class="date">Sabados</span>
-    					<h2>Natación</h2>
-    					<span class="position">CORSAJE</span>
-    					<p class="mt-4">¡Sumerge en un mundo de diversión y salud! Nuestras clases de natación te enseñarán a nadar con seguridad y confianza. Perfecto para todas las edades y niveles.</p>
-    				</div>
-    			</div>
+        <div class="row">
+            <?php if ($result->num_rows > 0): ?>
+                <?php while($row = $result->fetch_assoc()): ?>
+                    <div class="col-md-6">
+                        <div class="resume-wrap ftco-animate">
+                            <span class="date"><?php echo htmlspecialchars($row['dia']); ?></span>
+                            <h2><?php echo htmlspecialchars($row['nombre']); ?></h2>
+                            <span class="position"><?php echo htmlspecialchars($row['lugar']); ?></span>
+                            <p class="mt-4"><?php echo htmlspecialchars($row['descripcion']); ?></p>
+                        </div>
+                    </div>
+                <?php endwhile; ?>
+            <?php else: ?>
+                <p>No hay cursos disponibles en este momento.</p>
+            <?php endif; ?>
+        </div>
+    </div>
+</section>
 
-    			<div class="col-md-6">
-    				<div class="resume-wrap ftco-animate">
-    					<span class="date">Sabados</span>
-    					<h2>Danza</h2> 
-						<span class="position">CORSAJE</span>
-    					<p class="mt-4">¿Quieres tener más confianza en ti mismo y mejorar tu figura? La danza es la actividad perfecta. Aprenderás diferentes técnicas y coreografías, mientras te ejercitas de forma divertida.</p>
-    				</div>
-    				<div class="resume-wrap ftco-animate">
-    					<span class="date">Sabados</span>
-    					<h2>Sinfónica</h2>
-    					<span class="position">CORSAJE</span>
-    					<p class="mt-4">Desarrolla tu sensibilidad musical y tu disciplina. Nuestras clases de sinfónica te brindarán la oportunidad de tocar en conjunto y crear música de alta calidad.</p>
-    				</div>
-    				<div class="resume-wrap ftco-animate">
-    					<span class="date">Sabados</span>
-    					<h2>Microfútbol</h2>
-    					<span class="position">CORSAJE</span>
-    					<p class="mt-4"> ¡El microfútbol es más que un deporte! Es una forma divertida de hacer ejercicio, mejorar tu coordinación y trabajar en equipo.</p>
-    				</div>
-					<div class="resume-wrap ftco-animate">
-    					<span class="date">Sabados</span>
-    					<h2>Voleibol</h2>
-    					<span class="position">CORSAJE</span>
-    					<p class="mt-4">  ¡Salta y volea hacia la diversión! Nuestras clases de voleibol te enseñarán a jugar en equipo, a mejorar tu coordinación y a tener reflejos rápidos. ¡Perfecto para quemar energía y hacer nuevos amigos!</p>
-    				</div>
-    			</div>
-    		</div>
-    		<div class="row justify-content-center mt-5">
-    			
-    		</div>
-    	</div>
-    </section>
- 
-
+<?php
+// Verifica que $conn no haya sido cerrado antes, y ciérralo aquí si es necesario
+if ($conn) {
+    $conn->close(); // Solo cerrar si no se cerró antes
+}
+?>
 
     <section class="ftco-section contact-section ftco-no-pb" id="contact-section">
       <div class="container">
@@ -351,4 +315,4 @@ $conn->close();
  
     
   </body>
-</html>
+</html> 

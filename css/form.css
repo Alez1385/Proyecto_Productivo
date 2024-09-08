@@ -10,7 +10,7 @@ html{
 
 body {
     font-family: 'Poppins', sans-serif;
-    background: linear-gradient(135deg, #00c6ff, #0072ff);
+    background: #2980b9;
     display: flex;
     justify-content: center;
     align-items: center;
@@ -134,15 +134,7 @@ body::after {
     z-index: 1;
 }
 
-body::before {
-    background: linear-gradient(135deg, #fff, rgba(255, 255, 255, 0));
-    clip-path: circle(25% at right 70%);
-}
 
-body::after {
-    background: linear-gradient(135deg, rgba(255, 255, 255, 0), #fff);
-    clip-path: circle(20% at left 30%);
-}
 
 @media (max-width: 600px) {
     .form-container {
