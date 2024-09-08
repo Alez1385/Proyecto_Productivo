@@ -48,7 +48,7 @@ $result = $conn->query("SELECT * FROM carousel ORDER BY order_index ASC");
 			  <li class="nav-item"><a href="#services-section" class="nav-link"><span>Cursos</span></a></li>
 	          <li class="nav-item"><a href="#resume-section" class="nav-link"><span>Resumen</span></a></li>
 	          <li class="nav-item"><a href="#contact-section" class="nav-link"><span>Contactos</span></a></li>
-			  <li class="nav-item"><a href="/login/login.php" class="nav-link"><span>Login</span></a></li>
+			  <li class="nav-item"><a href="/login/login.php" class="nav-link" target= "_blank"><span>Login</span></a></li>
 	        </ul>
 	      </div>
 	    </div>
@@ -94,10 +94,14 @@ $result = $conn->query("SELECT * FROM carousel ORDER BY order_index ASC");
           </div>
         </div>
     		<div class="row">
+
+
+        
 			<!-- HTML para mostrar todos los cursos en cuadros independientes -->
+
 <div class="container">
 <?php
-$sql = "SELECT id_curso, nombre_curso, descripcion, nivel_educativo, duracion, estado FROM cursos";
+$sql = "SELECT id_curso, nombre_curso, descripcion, nivel_educativo, duracion, estado, categoria, icono FROM cursos";
 $result = $conn->query($sql);
 ?>
  <div class="row">
@@ -106,8 +110,12 @@ $result = $conn->query($sql);
             while ($row = $result->fetch_assoc()) {
                 echo '<div class="col-md-4 text-center d-flex ftco-animate">';
                 echo '  <a href="#" class="services-1" onclick="openModal(' . htmlspecialchars($row["id_curso"]) . ')">';
-                echo '      <span class="icon">';
-                echo '          <i class="flaticon-analysis"></i>';
+                echo '      <span class="icon course-icon">';
+                if (!empty($row["icono"])) {
+                    echo '          <img src="../../uploads/icons/' . htmlspecialchars($row["icono"]) . '" alt="Icono del curso" class="course-icon-img">';
+                } else {
+                    echo '          <i class="flaticon-analysis"></i>';
+                }
                 echo '      </span>';
                 echo '      <div class="desc">';
                 echo '          <h3 class="mb-5">' . htmlspecialchars($row["nombre_curso"]) . '</h3>';

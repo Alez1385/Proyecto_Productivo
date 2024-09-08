@@ -8827,9 +8827,12 @@ h1, h2, h3, h4, h5,
   -webkit-box-shadow: 0px 20px 69px -27px rgba(0, 0, 0, 0.17);
   -moz-box-shadow: 0px 20px 69px -27px rgba(0, 0, 0, 0.17);
   box-shadow: 0px 20px 69px -27px rgba(0, 0, 0, 0.17); }
+
   .services-1 .icon {
     display: block;
-    margin-bottom: 30px; }
+    margin-bottom: 30px; 
+    margin-top: 10px;
+  }
     .services-1 .icon i {
       font-size: 60px;
       line-height: 1.0;
@@ -8841,7 +8844,9 @@ h1, h2, h3, h4, h5,
     letter-spacing: 3px;
     text-transform: uppercase;
     position: relative;
-    color: #fff; }
+    color: #fff;
+    margin-top: 20px;
+   }
     .services-1 .desc h3:after {
       position: absolute;
       bottom: -15px;
@@ -9735,3 +9740,40 @@ textarea.form-control {
       .col-md-4 {
           margin-bottom: 20px;
       }
+
+    
+      .services-1 {
+        position: relative;
+        padding-top: 80px; /* Ajusta este valor según sea necesario */
+    }
+    
+    .course-icon {
+        position: absolute;
+        top: 0;
+        left: 50%;
+        transform: translateX(-50%);
+        width: 80px; /* Ajusta el tamaño según sea necesario */
+        height: 80px;
+        background-color: #f8f9fa; /* O el color que prefieras */
+     
+        display: flex;
+        justify-content: center;
+        background-color: transparent;
+        align-items: center;
+        overflow: hidden;
+    }
+    
+    .course-icon-img {
+        max-width: 100%;
+        max-height: 100%;
+        object-fit: cover;
+        filter: invert(100%); 
+       
+        
+       
+    }
+    
+    .course-icon i {
+        font-size: 40px; /* Ajusta el tamaño según sea necesario */
+        color: #007bff; /* O el color que prefieras */
+    }
