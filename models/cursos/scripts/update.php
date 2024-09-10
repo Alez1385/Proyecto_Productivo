@@ -1,87 +1,103 @@
 <?php
-require_once '../../../scripts/conexion.php';
 
-// Función para registrar errores
-function logError($message)
-{
-    error_log(date('[Y-m-d H:i:s] ') . $message . "\n", 3, '../../logs/error.log');
-    echo "<script>alert('$message');</script>";
+function sanitize_input($data) {
+    $data = trim($data);
+    $data = stripslashes($data);
+    $data = htmlspecialchars($data);
+    return $data;
 }
 
-// Verifica si se ha enviado el formulario
-if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-    $id_curso = intval($_POST['id_curso']);
-    $nombre_curso = trim($_POST['nombre_curso']);
-    $descripcion = trim($_POST['descripcion']);
-    $nivel_educativo = trim($_POST['nivel_educativo']);
-    $duracion = intval($_POST['duracion']);
-    $estado = trim($_POST['estado']);
+try {
+    // Configuración de la base de datos
+    $db_host = 'localhost'; 
+    $db_name = 'db_gescursos'; 
+    $db_user = 'root'; 
+    $db_pass = ''; 
 
-    // Procesar la carga del icono si se subió uno nuevo
-    $icono = '';
-    if (isset($_FILES['upload_icon']) && $_FILES['upload_icon']['error'] === UPLOAD_ERR_OK) {
-        $icono = basename($_FILES['upload_icon']['name']);
-        $target_dir = "../../../uploads/icons/";
-        $target_file = $target_dir . $icono;
-        $imageFileType = strtolower(pathinfo($target_file, PATHINFO_EXTENSION));
+    // Crear una nueva conexión utilizando PDO
+    $dsn = "mysql:host=$db_host;dbname=$db_name;charset=utf8mb4";
+    $options = [
+        PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION,
+        PDO::ATTR_DEFAULT_FETCH_MODE => PDO::FETCH_ASSOC,
+        PDO::ATTR_EMULATE_PREPARES => false,
+    ];
 
-        // Validar que el archivo subido sea una imagen
-        $check = getimagesize($_FILES['upload_icon']['tmp_name']);
-        if ($check === false && $imageFileType != "svg") {
-            logError("El archivo subido no es una imagen o un SVG válido.");
-            
-            exit();
-        }
+    $pdo = new PDO($dsn, $db_user, $db_pass, $options);
 
-        // Validar el tamaño del archivo (máximo 5MB)
-        if ($_FILES['upload_icon']['size'] > 5000000) {
-            logError("El archivo es demasiado grande.");
-            
-            exit();
-        }
+    // Sanitizar y validar los datos del formulario
+    $id_curso = filter_var($_POST['id_curso'], FILTER_VALIDATE_INT);
+    $nombre_curso = sanitize_input($_POST['nombre_curso']);
+    $descripcion = sanitize_input($_POST['descripcion']);
+    $nivel_educativo = sanitize_input($_POST['nivel_educativo']);
+    $duracion = filter_var($_POST['duracion'], FILTER_VALIDATE_INT);
+    $estado = sanitize_input($_POST['estado']);
+    $categoria = filter_var($_POST['categoria'], FILTER_VALIDATE_INT);
+    $upload_icon = $_FILES['upload_icon'];
 
-        // Validar el tipo de archivo (solo imágenes JPG, JPEG, PNG, GIF, y SVG)
-        if (!in_array($imageFileType, ["jpg", "jpeg", "png", "gif", "svg"])) {
-            logError("Solo se permiten archivos JPG, JPEG, PNG, GIF y SVG.");
-            
-            exit();
-        }
-
-        // Mover el archivo subido al directorio de destino
-        if (!move_uploaded_file($_FILES['upload_icon']['tmp_name'], $target_file)) {
-            logError("Hubo un error al subir el archivo.");
-            
-            exit();
-        }
+    if (!$id_curso || !$nombre_curso || !$descripcion || !$nivel_educativo || !$duracion || !$estado || !$categoria) {
+        throw new Exception('Por favor, complete todos los campos correctamente.');
     }
 
-    // Actualizar el curso en la base de datos
-    try {
-        if (!empty($icono)) {
-            $stmt = $conn->prepare("UPDATE cursos SET nombre_curso = ?, descripcion = ?, nivel_educativo = ?, duracion = ?, estado = ?, icono = ? WHERE id_curso = ?");
-            $stmt->bind_param("ssssssi", $nombre_curso, $descripcion, $nivel_educativo, $duracion, $estado, $icono, $id_curso);
-        } else {
-            $stmt = $conn->prepare("UPDATE cursos SET nombre_curso = ?, descripcion = ?, nivel_educativo = ?, duracion = ?, estado = ? WHERE id_curso = ?");
-            $stmt->bind_param("sssssi", $nombre_curso, $descripcion, $nivel_educativo, $duracion, $estado, $id_curso);
+    // Manejo de la imagen del icono
+    $icono_name = null;
+    if ($upload_icon['error'] === UPLOAD_ERR_OK) {
+        $allowed_types = ['image/jpeg', 'image/png', 'image/gif', 'svg'];
+        if (!in_array($upload_icon['type'], $allowed_types)) {
+            throw new Exception('Tipo de archivo no permitido. Solo se permiten imágenes JPEG, PNG y GIF.');
         }
 
-        if (!$stmt->execute()) {
-            throw new Exception($stmt->error);
+        $upload_dir = '../../../uploads/icons/';
+        $icono_name = uniqid('icon_', true) . '.' . pathinfo($upload_icon['name'], PATHINFO_EXTENSION);
+        $icono_path = $upload_dir . $icono_name;
+
+        if (!move_uploaded_file($upload_icon['tmp_name'], $icono_path)) {
+            throw new Exception('Error al subir el icono.');
         }
-
-        $stmt->close();
-        $conn->close();
-
-        // Redirigir a la página de detalles del curso actualizado
-        header("Location: ../cursos.php");
-        exit();
-    } catch (Exception $e) {
-        logError("Error al actualizar el curso: " . $e->getMessage());
-        header("Location: ../cursos.php");
-        exit();
+    } else {
+        // Mantener el icono actual si no se sube uno nuevo
+        $stmt = $pdo->prepare("SELECT icono FROM cursos WHERE id_curso = ?");
+        $stmt->execute([$id_curso]);
+        $current_icono = $stmt->fetchColumn();
+        $icono_name = $current_icono;
     }
-} else {
-    // Redirigir si el acceso no es a través de un formulario POST
+
+    // Preparar la consulta SQL para actualizar en la base de datos
+    $sql = "UPDATE cursos SET
+            nombre_curso = :nombre_curso,
+            descripcion = :descripcion,
+            nivel_educativo = :nivel_educativo,
+            duracion = :duracion,
+            estado = :estado,
+            id_categoria = :categoria,
+            icono = :icono
+            WHERE id_curso = :id_curso";
+
+    $stmt = $pdo->prepare($sql);
+
+    // Ejecutar la consulta con los valores ligados
+    $stmt->execute([
+        ':nombre_curso' => $nombre_curso,
+        ':descripcion' => $descripcion,
+        ':nivel_educativo' => $nivel_educativo,
+        ':duracion' => $duracion,
+        ':estado' => $estado,
+        ':categoria' => $categoria,
+        ':icono' => $icono_name,
+        ':id_curso' => $id_curso
+    ]);
+
+    // Redirigir a una página de éxito o mostrar mensaje de éxito
     header("Location: ../cursos.php");
     exit();
+
+} catch (PDOException $e) {
+    error_log($e->getMessage());
+    header("Location: ../../error.php?message=Error en la base de datos.");
+    exit();
+} catch (Exception $e) {
+    error_log($e->getMessage());
+    header("Location: ../../error.php?message=" . urlencode($e->getMessage()));
+    exit();
 }
+
+?>

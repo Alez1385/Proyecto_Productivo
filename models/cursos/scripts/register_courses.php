@@ -30,9 +30,10 @@ try {
     $nivel_educativo = sanitize_input($_POST['nivel_educativo']);
     $duracion = filter_var($_POST['duracion'], FILTER_VALIDATE_INT);
     $estado = sanitize_input($_POST['estado']);
+    $categoria = filter_var($_POST['categoria'], FILTER_VALIDATE_INT);
     $upload_icon = $_FILES['upload_icon'];
 
-    if (!$nombre_curso || !$descripcion || !$nivel_educativo || !$duracion || !$estado) {
+    if (!$nombre_curso || !$descripcion || !$nivel_educativo || !$duracion || !$estado || !$categoria) {
         throw new Exception('Por favor, complete todos los campos correctamente.');
     }
 
@@ -55,8 +56,8 @@ try {
     }
 
     // Preparar la consulta SQL para insertar en la base de datos
-    $sql = "INSERT INTO cursos (nombre_curso, descripcion, nivel_educativo, duracion, estado, icono)
-            VALUES (:nombre_curso, :descripcion, :nivel_educativo, :duracion, :estado, :icono)";
+    $sql = "INSERT INTO cursos (nombre_curso, descripcion, nivel_educativo, duracion, estado, id_categoria, icono)
+            VALUES (:nombre_curso, :descripcion, :nivel_educativo, :duracion, :estado, :categoria, :icono)";
 
     $stmt = $pdo->prepare($sql);
 
@@ -67,6 +68,7 @@ try {
         ':nivel_educativo' => $nivel_educativo,
         ':duracion' => $duracion,
         ':estado' => $estado,
+        ':categoria' => $categoria,
         ':icono' => $icono_name
     ]);
 
@@ -83,3 +85,5 @@ try {
     header("Location: ../../error.php?message=" . urlencode($e->getMessage()));
     exit();
 }
+
+?>

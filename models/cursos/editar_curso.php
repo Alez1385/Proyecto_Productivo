@@ -72,14 +72,34 @@ $stmt->close();
             </div>
 
             <div class="form-group">
+                <select id="categoria" name="categoria" required>
+                    <option value="" disabled>Seleccione la Categoría</option>
+                    <?php
+                    // Consulta para obtener las categorías desde la base de datos
+                    include '../../scripts/conexion.php';
+                    $sql = "SELECT id_categoria, nombre_categoria FROM categorias";
+                    $result = $conn->query($sql);
+                    while ($row = $result->fetch_assoc()) {
+                        $selected = ($curso['id_categoria'] == $row['id_categoria']) ? 'selected' : '';
+                        echo '<option value="' . $row["id_categoria"] . '" ' . $selected . '>' . $row["nombre_categoria"] . '</option>';
+                    }
+                    ?>
+                </select>
+            </div>
+
+            <div class="form-group">
                 <div class="icon-upload">
-                    <label for="upload_icon">Suba su propio icono:</label>
+                    <label for="upload_icon">Suba la imagen del curso:</label>
                     <input type="file" id="upload_icon" name="upload_icon" accept="image/*">
                 </div>
                 <?php if (!empty($curso['icono'])): ?>
-                    <p>Icono actual:</p>
+                    <p>Imagen actual:</p>
                     <img src="../../uploads/icons/<?php echo htmlspecialchars($curso['icono']); ?>" alt="Icono del curso" style="width: 50px; height: 50px;">
                 <?php endif; ?>
+            </div>
+
+            <div class="form-group">
+                <a href="modulos.php" style="color: #00bcff;">Volver</a>
             </div>
 
             <button type="submit" class="btn btn-primary">Guardar Cambios</button>

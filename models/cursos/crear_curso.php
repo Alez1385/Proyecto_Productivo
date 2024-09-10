@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -7,6 +8,7 @@
     <link rel="stylesheet" href="../../css/form.css">
     <link rel="stylesheet" href="https://fonts.googleapis.com/icon?family=Material+Icons+Sharp">
 </head>
+
 <body>
     <div class="form-container">
         <form class="course-form" action="scripts/register_courses.php" method="post" enctype="multipart/form-data">
@@ -46,15 +48,35 @@
             </div>
 
             <div class="form-group">
+                <select id="categoria" name="categoria" required>
+                    <option value="" disabled selected>Seleccione la Categoría</option>
+                    <?php
+                    // Consulta para obtener las categorías desde la base de datos
+                    include '../../scripts/conexion.php';
+                    $sql = "SELECT id_categoria, nombre_categoria FROM categorias";
+                    $result = $conn->query($sql);
+                    while ($row = $result->fetch_assoc()) {
+                        echo '<option value="' . $row["id_categoria"] . '">' . $row["nombre_categoria"] . '</option>';
+                    }
+                    ?>
+                </select>
+            </div>
+
+
+            <div class="form-group">
                 <div class="icon-upload">
-                    <label for="upload_icon">Suba su propio icono:</label>
-                    <input type="file" id="upload_icon" name="upload_icon" accept="image/*">
+                    <label for="upload_icon">Suba la imagen del curso</label>
+                    <input type="file" id="upload_icon" name="upload_icon" accept="image/*" required>
                 </div>
+            </div>
+
+            <div class="form-group">
+                <a href="modulos.php" style="color: #00bcff;">Volver</a>
             </div>
 
             <button type="submit" class="btn btn-primary">Registrar Curso</button>
         </form>
     </div>
 </body>
-</html>
 
+</html>
