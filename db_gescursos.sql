@@ -3,9 +3,9 @@
 -- https://www.phpmyadmin.net/
 --
 -- Servidor: 127.0.0.1
--- Tiempo de generación: 08-09-2024 a las 20:14:01
+-- Tiempo de generación: 10-09-2024 a las 02:29:49
 -- Versión del servidor: 10.4.32-MariaDB
--- Versión de PHP: 8.0.30
+-- Versión de PHP: 8.2.12
 
 SET SQL_MODE = "NO_AUTO_VALUE_ON_ZERO";
 START TRANSACTION;
@@ -119,6 +119,26 @@ INSERT INTO `carousel` (`id_carrousel`, `title`, `description`, `image`, `order_
 -- --------------------------------------------------------
 
 --
+-- Estructura de tabla para la tabla `categoria_curso`
+--
+
+CREATE TABLE `categoria_curso` (
+  `id_categoria` int(11) NOT NULL,
+  `nombre_categoria` varchar(255) NOT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+--
+-- Volcado de datos para la tabla `categoria_curso`
+--
+
+INSERT INTO `categoria_curso` (`id_categoria`, `nombre_categoria`) VALUES
+(1, 'Danza'),
+(2, 'Ajedrez'),
+(3, 'Pastoral');
+
+-- --------------------------------------------------------
+
+--
 -- Estructura de tabla para la tabla `cursos`
 --
 
@@ -129,21 +149,18 @@ CREATE TABLE `cursos` (
   `nivel_educativo` enum('primaria','secundaria','terciaria') NOT NULL,
   `duracion` int(3) NOT NULL COMMENT 'Duración en semanas',
   `estado` enum('activo','inactivo') NOT NULL DEFAULT 'activo',
-  `categoria` enum('artwork','game-engine','support','jobs','coding','general-forums','contests','promotions') NOT NULL DEFAULT 'general-forums',
-  `icono` varchar(255) DEFAULT NULL
+  `icono` varchar(255) DEFAULT NULL,
+  `id_categoria` int(11) DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 --
 -- Volcado de datos para la tabla `cursos`
 --
 
-INSERT INTO `cursos` (`id_curso`, `nombre_curso`, `descripcion`, `nivel_educativo`, `duracion`, `estado`, `categoria`, `icono`) VALUES
-(1, 'Danzas', 'Curso de danzas', 'primaria', 3, 'activo', 'general-forums', 'flamenco-svgrepo-com.svg'),
-(2, 'Ajedrez', 'Curso de ajedrez', 'terciaria', 3, 'activo', 'general-forums', 'chess-queen-svgrepo-com.svg'),
-(3, 'Natacion', 'Curso de natacion', 'secundaria', 6, 'inactivo', 'general-forums', '297148.svg'),
-(5, 'Banda', 'Banda marcial del colegio', 'terciaria', 14, 'activo', 'general-forums', 'trumpet-svgrepo-com.svg'),
-(6, 'Pastoral', 'Curso de pastoral', 'secundaria', 3, 'activo', 'general-forums', 'bible-2-svgrepo-com.svg'),
-(7, 'Spao', 'asdasd', 'primaria', 3, 'activo', 'general-forums', 'icon_66dceb4bdce473.36397529.jpg');
+INSERT INTO `cursos` (`id_curso`, `nombre_curso`, `descripcion`, `nivel_educativo`, `duracion`, `estado`, `icono`, `id_categoria`) VALUES
+(1, 'Danzas', 'Curso de danzas', 'primaria', 3, 'activo', 'icon_66df8b8983f491.65048104.jpg', 1),
+(2, 'Ajedrez', 'Curso de ajedrez', 'terciaria', 3, 'activo', 'icon_66df8ca659c689.92859720.jpg', 2),
+(8, 'Ajedrez', 'Curso de ajedrez para pequeños', 'primaria', 3, 'activo', 'icon_66df89588f54d8.68981697.jpg', 2);
 
 -- --------------------------------------------------------
 
@@ -305,9 +322,9 @@ CREATE TABLE `resume_cursos` (
 --
 
 INSERT INTO `resume_cursos` (`id`, `dia`, `nombre`, `lugar`, `descripcion`) VALUES
-(3, '25', 'Curso de Danza', 'Colegio Sagrado Corazon De Jesus', 'Las mariposas siguen siendo unas personas que son muy moviles, no las tocas porque si npalabras'),
 (4, '24', 'Curso para gerson', 'En la casa de gerson', 'Para mover la pampa, hay que ser personas de bien señores '),
-(5, 'asdas', 'asdasdasd', 'asdasdasdas', 'dasdas');
+(5, 'asdas', 'asdasdasd', 'asdasdasdas', 'dasdas'),
+(6, '33', 'Gersson', 'Su casa', 'Para bailar la bamba se necesita un poco de gracia');
 
 -- --------------------------------------------------------
 
@@ -359,7 +376,7 @@ CREATE TABLE `usuario` (
 --
 
 INSERT INTO `usuario` (`id_usuario`, `nombre`, `apellido`, `tipo_doc`, `documento`, `fecha_nac`, `foto`, `mail`, `telefono`, `direccion`, `id_tipo_usuario`, `username`, `clave`, `fecha_registro`, `estado`, `ultimo_acceso`) VALUES
-(36, 'Santiagoe', 'Capon', 'ID', '12341235234', '2345-03-12', 'WhatsApp Image 2024-07-23 at 4.49.07 PM.jpeg', 'santiagocaponf@gmail.com', '32452345', 'CL 18 A NORTE 2 72', 1, 'alez', '$2y$10$cCIaWsXSHC1OWcRBpDQU.uhrDuxWP0j4IMUTxNNojuHeT3Sq.uYkq', '2024-08-25 17:43:54', 'activo', '2024-09-07 14:56:07'),
+(36, 'Santiagoe', 'Capon', 'ID', '12341235234', '2345-03-12', 'WhatsApp Image 2024-07-23 at 4.49.07 PM.jpeg', 'santiagocaponf@gmail.com', '32452345', 'CL 18 A NORTE 2 72', 1, 'alez', '$2y$10$cCIaWsXSHC1OWcRBpDQU.uhrDuxWP0j4IMUTxNNojuHeT3Sq.uYkq', '2024-08-25 17:43:54', 'activo', '2024-09-09 17:23:14'),
 (42, 'chad', 'sexteto', 'ID', '523456346', '3654-04-23', '66d273c33d474_Recurso 9europe.jpg', 'luisillo@gmail.com', '4563475674', 'CL 18 A NORTE 2 72', 1, 'alez23', '$2y$10$FrpZXvgI3WrL22y9MxNtfuQsyQSgCJ7Jm4VPUv3Aa4qEn2HCKdxsK', '2024-08-29 16:26:44', 'activo', NULL),
 (51, 'antonela', 'sepulveda', 'ID', '342352345', '0005-04-23', '66d23c1021bab_f7c0528d915ec3b38dd89bf7beb2a194.jpg', 'scflorez@corsaje.edu.co', '42352345', 'CL 18 A NORTE 2 72', 1, 'mientras', '$2y$10$KJU2liHj854T1T9M.6/EK.xDYy4sfLf2XEwCldj230rdreZmC.3KC', '2024-08-30 16:39:28', 'activo', NULL),
 (53, 'Juanito', 'Alimaña', 'ID', '43523634', '0634-06-02', '66d2441faa705_pngwing.com.png', 'juanit@gmail.com', '5233456345', 'CL 18 A NORTE 2 72', 3, 'alez123123', '$2y$10$p.bJhCL9d2VM1IjUCnC63.Edj5Pg87KZgKGTFyedUHPusUd.QSDAK', '2024-08-30 17:13:51', 'activo', NULL),
@@ -402,10 +419,17 @@ ALTER TABLE `carousel`
   ADD PRIMARY KEY (`id_carrousel`);
 
 --
+-- Indices de la tabla `categoria_curso`
+--
+ALTER TABLE `categoria_curso`
+  ADD PRIMARY KEY (`id_categoria`);
+
+--
 -- Indices de la tabla `cursos`
 --
 ALTER TABLE `cursos`
-  ADD PRIMARY KEY (`id_curso`);
+  ADD PRIMARY KEY (`id_curso`),
+  ADD KEY `fk_categoria` (`id_categoria`);
 
 --
 -- Indices de la tabla `estudiante`
@@ -497,10 +521,16 @@ ALTER TABLE `carousel`
   MODIFY `id_carrousel` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=50;
 
 --
+-- AUTO_INCREMENT de la tabla `categoria_curso`
+--
+ALTER TABLE `categoria_curso`
+  MODIFY `id_categoria` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=6;
+
+--
 -- AUTO_INCREMENT de la tabla `cursos`
 --
 ALTER TABLE `cursos`
-  MODIFY `id_curso` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=8;
+  MODIFY `id_curso` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=9;
 
 --
 -- AUTO_INCREMENT de la tabla `estudiante`
@@ -542,7 +572,7 @@ ALTER TABLE `profesor`
 -- AUTO_INCREMENT de la tabla `resume_cursos`
 --
 ALTER TABLE `resume_cursos`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=6;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=7;
 
 --
 -- AUTO_INCREMENT de la tabla `tipo_usuario`
@@ -580,6 +610,12 @@ ALTER TABLE `asig_modulo`
 ALTER TABLE `asistencia`
   ADD CONSTRAINT `asistencia_ibfk_1` FOREIGN KEY (`id_estudiante`) REFERENCES `estudiante` (`id_estudiante`),
   ADD CONSTRAINT `asistencia_ibfk_2` FOREIGN KEY (`id_curso`) REFERENCES `cursos` (`id_curso`);
+
+--
+-- Filtros para la tabla `cursos`
+--
+ALTER TABLE `cursos`
+  ADD CONSTRAINT `fk_categoria` FOREIGN KEY (`id_categoria`) REFERENCES `categoria_curso` (`id_categoria`);
 
 --
 -- Filtros para la tabla `estudiante`

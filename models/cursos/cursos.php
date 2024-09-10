@@ -15,12 +15,12 @@
         include "../../scripts/conexion.php";
 
         // Definir los filtros iniciales
-        $selectedCategory = isset($_GET['category']) ? $_GET['category'] : '';
+        $selectedCategoryId = isset($_GET['category']) ? $_GET['category'] : '';
         $selectedStatus = isset($_GET['status']) ? $_GET['status'] : '';
         $selectedLevel = isset($_GET['level']) ? $_GET['level'] : '';
 
         // Consulta para obtener los cursos con información adicional y aplicar filtros
-        $sql = "SELECT c.id_curso, c.nombre_curso, c.descripcion, c.nivel_educativo, c.duracion, c.estado, c.categoria, c.icono,
+        $sql = "SELECT c.id_curso, c.nombre_curso, c.descripcion, c.nivel_educativo, c.duracion, c.estado, c.id_categoria, c.icono,
                        u.nombre AS nombre_profesor, u.apellido AS apellido_profesor,
                        GROUP_CONCAT(DISTINCT CONCAT(h.dia_semana, ' ', h.hora_inicio, '-', h.hora_fin) SEPARATOR ', ') AS horarios,
                        COUNT(DISTINCT i.id_estudiante) AS num_estudiantes
@@ -30,14 +30,14 @@
                 LEFT JOIN usuario u ON p.id_usuario = u.id_usuario
                 LEFT JOIN horarios h ON c.id_curso = h.id_curso
                 LEFT JOIN inscripciones i ON c.id_curso = i.id_curso
-                WHERE (c.categoria LIKE '%$selectedCategory%' OR '$selectedCategory' = '')
+                WHERE (c.id_categoria LIKE '%$selectedCategoryId%' OR '$selectedCategoryId' = '')
                   AND (c.estado LIKE '%$selectedStatus%' OR '$selectedStatus' = '')
                   AND (c.nivel_educativo LIKE '%$selectedLevel%' OR '$selectedLevel' = '')
                 GROUP BY c.id_curso";
         $result = $conn->query($sql);
 
         // Cargar opciones de filtro
-        $sql_categories = "SELECT DISTINCT categoria FROM cursos";
+        $sql_categories = "SELECT id_categoria, nombre_categoria FROM categoria_curso";
         $categories = $conn->query($sql_categories);
 
         $sql_states = "SELECT DISTINCT estado FROM cursos";
@@ -69,9 +69,14 @@
                 <div class="filter-bar">
                     <select id="categoryFilter" onchange="filterCourses()">
                         <option value="">Categoría</option>
-                        <?php while ($row = $categories->fetch_assoc()) { ?>
-                            <option value="<?php echo $row["categoria"]; ?>" <?php echo $selectedCategory === $row["categoria"] ? 'selected' : ''; ?>>
-                                <?php echo $row["categoria"]; ?>
+                        <?php
+                        // Guardar las categorías en un array para usar más tarde
+                        $categoriesArray = [];
+                        while ($row = $categories->fetch_assoc()) {
+                            $categoriesArray[$row["id_categoria"]] = $row["nombre_categoria"];
+                            ?>
+                            <option value="<?php echo $row["id_categoria"]; ?>" <?php echo $selectedCategoryId == $row["id_categoria"] ? 'selected' : ''; ?>>
+                                <?php echo $row["nombre_categoria"]; ?>
                             </option>
                         <?php } ?>
                     </select>
@@ -94,13 +99,11 @@
                         <?php } ?>
                     </select>
 
-                    
-
                     <!-- Filtros aplicados -->
                     <div id="appliedFilters">
-                        <?php if ($selectedCategory) { ?>
+                        <?php if ($selectedCategoryId) { ?>
                             <div class="filter-tag" data-filter="category">
-                                <span><?php echo $selectedCategory; ?></span>
+                                <span><?php echo $categoriesArray[$selectedCategoryId] ?? 'Categoría'; ?></span>
                                 <span class="filter-close" onclick="removeFilter('category')">&times;</span>
                             </div>
                         <?php } ?>

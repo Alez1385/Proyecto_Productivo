@@ -77,7 +77,7 @@ $stmt->close();
                     <?php
                     // Consulta para obtener las categorías desde la base de datos
                     include '../../scripts/conexion.php';
-                    $sql = "SELECT id_categoria, nombre_categoria FROM categorias";
+                    $sql = "SELECT id_categoria, nombre_categoria FROM categoria_curso";
                     $result = $conn->query($sql);
                     while ($row = $result->fetch_assoc()) {
                         $selected = ($curso['id_categoria'] == $row['id_categoria']) ? 'selected' : '';
@@ -99,7 +99,7 @@ $stmt->close();
             </div>
 
             <div class="form-group">
-                <a href="modulos.php" style="color: #00bcff;">Volver</a>
+                <a href="cursos.php" style="color: #00bcff;">Volver</a>
             </div>
 
             <button type="submit" class="btn btn-primary">Guardar Cambios</button>
