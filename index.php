@@ -59,7 +59,7 @@ $result = $conn->query("SELECT * FROM carousel ORDER BY order_index ASC");
     <?php while ($row = $result->fetch_assoc()): ?>
     <div class="slider-item">
         <div class="overlay"></div>
-        <div class="container">
+        <div class="container"> 
             <div class="row d-md-flex no-gutters slider-text align-items-end justify-content-end" data-scrollax-parent="true">
                 <div class="one-third js-fullheight order-md-last img" style="border-radius: 9px; background-image:url(uploads/<?php echo $row['image']; ?>);">
                     <div style="border-radius: 9px; position: absolute; top: 0; left: 0; width: 100%; height: 100%; background-color: rgba(0, 0, 0, 0.5);"></div>
@@ -92,9 +92,10 @@ $result = $conn->query("SELECT * FROM carousel ORDER BY order_index ASC");
           </div>
         </div>
     		<div class="row">
-<div class="container">
+        <div class="container">
 <?php
-$sql = "SELECT id_curso, nombre_curso, descripcion, nivel_educativo, duracion, estado, categoria, icono FROM cursos";
+
+$sql = "SELECT id_curso, nombre_curso, descripcion, nivel_educativo, duracion, icono FROM cursos";
 $result = $conn->query($sql);
 ?>
  <div class="row">
@@ -102,7 +103,7 @@ $result = $conn->query($sql);
         if ($result && $result->num_rows > 0) {
             while ($row = $result->fetch_assoc()) {
                 echo '<div class="col-md-4 text-center d-flex ftco-animate">';
-                echo '  <a href="#" class="services-1" onclick="openModal(' . htmlspecialchars($row["id_curso"]) . ')">';
+                echo '  <div class="services-1">';
                 echo '      <span class="icon course-icon">';
                 if (!empty($row["icono"])) {
                     echo '          <img src="../../uploads/icons/' . htmlspecialchars($row["icono"]) . '" alt="Icono del curso" class="course-icon-img">';
@@ -112,10 +113,12 @@ $result = $conn->query($sql);
                 echo '      </span>';
                 echo '      <div class="desc">';
                 echo '          <h3 class="mb-5">' . htmlspecialchars($row["nombre_curso"]) . '</h3>';
-                echo '          <p>' . htmlspecialchars($row["descripcion"]) . '</p>';
-                echo '          <p>Nivel: ' . htmlspecialchars(ucfirst($row["nivel_educativo"])) . ' | Duración: ' . htmlspecialchars($row["duracion"]) . ' semanas | Estado: ' . htmlspecialchars(ucfirst($row["estado"])) . '</p>';
+                echo '          <p class="text-curso">Categoria: ' . htmlspecialchars($row["descripcion"]) . '</p>';
+                echo '          <p class="text-curso">Nivel: ' . htmlspecialchars(ucfirst($row["nivel_educativo"])) . '</p>';
+                echo '          <p class="text-curso">Duración: ' . htmlspecialchars($row["duracion"]) . ' semanas</p>';
+                echo '          <a href="inscribirse.php?id_curso=' . htmlspecialchars($row["id_curso"]) . '" class="btn btn-primary">Inscribirse</a>';
                 echo '      </div>';
-                echo '  </a>';
+                echo '  </div>';
                 echo '</div>';
             }
         } else {
@@ -126,7 +129,8 @@ $result = $conn->query($sql);
 </div>
 <?php
 // Cerrar la conexión
-$conn->close();?>	
+$conn->close();
+?>
 </div>
     </section>
 
