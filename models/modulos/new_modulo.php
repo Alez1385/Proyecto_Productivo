@@ -58,7 +58,7 @@ function getModuloData($conn) {
 <body>
     <div class="form-container">
         <h2>Registrar Módulo</h2>
-        <form action="/scripts/procesar_modulo.php" method="POST" enctype="multipart/form-data">
+        <form action="scripts/procesar_modulo.php" method="POST" enctype="multipart/form-data">
             
             <!-- Campo nom_modulo -->
             <div class="form-group">
