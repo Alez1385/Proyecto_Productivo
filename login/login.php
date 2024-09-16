@@ -1,44 +1,40 @@
 <?php
-session_start();
+session_start();  // Asegúrate de que la sesión siempre inicia
+
 include('../scripts/conexion.php');
 
+// Si existe una cookie, restaurar sesión
 if (isset($_COOKIE['username'])) {
     $_SESSION['username'] = $_COOKIE['username'];
     header("Location: ../dashboard/dashboard.php");
     exit();
 }
 
+// Comprobar si el formulario ha sido enviado
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
     $username = filter_var($_POST['username'], FILTER_SANITIZE_STRING);
     $password = $_POST['password'];
 
+    // Comprobar en la base de datos
     $stmt = $conn->prepare("SELECT clave FROM usuario WHERE username = ?");
     $stmt->bind_param("s", $username);
     $stmt->execute();
     $stmt->store_result();
 
-    // Asumiendo que ya tienes el código para manejar el inicio de sesión
-
-    // Actualizar la fecha y hora del último acceso
-    $update_sql = "UPDATE usuario SET ultimo_acceso = NOW() WHERE username = ?";
-    $update_stmt = $conn->prepare($update_sql);
-    $update_stmt->bind_param("s", $username);
-    $update_stmt->execute();
-
-    // Resto del código para iniciar sesión y redirigir al dashboard
-
-
     if ($stmt->num_rows > 0) {
         $stmt->bind_result($hashed_password);
         $stmt->fetch();
 
+        // Verificar la contraseña
         if (password_verify($password, $hashed_password)) {
             $_SESSION['username'] = $username;
 
+            // Si seleccionó "Recordarme", establecer cookie
             if (isset($_POST['remember'])) {
-                setcookie('username', $username, time() + (86400 * 30), "/", "", true, true);
+                setcookie('username', $username, time() + (86400 * 30), "/", "", true, true); // 30 días
             }
 
+            // Redirigir al dashboard
             header("Location: ../dashboard/dashboard.php");
             exit();
         } else {
@@ -52,6 +48,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     $conn->close();
 }
 ?>
+
 
 <!DOCTYPE html>
 <html lang="en">

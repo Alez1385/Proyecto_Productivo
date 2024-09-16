@@ -9,27 +9,24 @@
 </head>
 
 <body>
+    <div id="overlay"></div>
+    <div id="sidebar">
+        <button class="sidebar-close" onclick="toggleSidebar()">&times;</button>
+        <div id="sidebar-content">
+            <!-- El contenido del formulario se cargará dinámicamente aquí -->
+        </div>
+        <div id="sidebar-resizer"></div>
+    </div>
 
     <div class="dashboard-container">
-
-        <?php
-        include "../../scripts/sidebar.php";
-        include "../../scripts/conexion.php";
-
-        // Consulta para obtener los usuarios
-        $sql = "SELECT t.nombre as tipo_usuario, u.id_usuario, u.nombre, u.apellido, u.mail, u.foto FROM usuario u
-        JOIN tipo_usuario t ON u.id_tipo_usuario = t.id_tipo_usuario ";
-        $result = $conn->query($sql);
-        ?>
-
-        <!-- Main Content -->
+        <?php include "../../scripts/sidebar.php"; ?>
         <div class="main-content">
             <header class="header">
                 <div class="header-left">
                     <h1>Control de Usuarios</h1>
                 </div>
                 <div class="header-right">
-                    <button class="add-user-btn" onclick="window.location.href='new_user.php'">+ Add New User</button>
+                    <button class="add-user-btn" onclick="openSidebar('new_user.php')">+ Add New User</button>
                 </div>
             </header>
 
@@ -40,12 +37,16 @@
                     <input type="text" id="searchInput" placeholder="Buscar usuarios..." onkeyup="filterUsers()">
                 </div>
 
-
                 <!-- Lista de usuarios -->
                 <div class="user-list">
                     <?php
+                    include "../../scripts/conexion.php";
+
+                    $sql = "SELECT t.nombre as tipo_usuario, u.id_usuario, u.nombre, u.apellido, u.mail, u.foto FROM usuario u
+                    JOIN tipo_usuario t ON u.id_tipo_usuario = t.id_tipo_usuario ";
+                    $result = $conn->query($sql);
+
                     if ($result->num_rows > 0) {
-                        // Salida de datos de cada fila
                         while ($row = $result->fetch_assoc()) {
                             echo '<div class="user-item" data-user-id="' . $row["id_usuario"] . '">';
                             echo '<img src="../../uploads/' . $row["foto"] . '" alt="User Image">';
@@ -55,7 +56,7 @@
                             echo '<p>' . $row["mail"] . '</p>';
                             echo '</div>';
                             echo '<div class="user-actions">';
-                            echo '<button onclick=window.location.href="edit_user.php?id_usuario=' . $row["id_usuario"] . '" class="edit-btn">Edit</button>';
+                            echo '<button onclick="openSidebar(\'edit_user.php?id_usuario=' . $row["id_usuario"] . '\')" class="edit-btn">Edit</button>';
                             echo '<button onclick="deleteUser(' . $row["id_usuario"] . ')" class="delete-btn">Delete</button>';
                             echo '</div>';
                             echo '</div>';
@@ -71,8 +72,73 @@
     </div>
 
     <script>
+        let isResizing = false;
+        let lastDownX = 0;
+        const sidebar = document.getElementById('sidebar');
+        const resizer = document.getElementById('sidebar-resizer');
+        resizer.addEventListener('mousedown', initResize, false);
+
+        function initResize(e) {
+            isResizing = true;
+            lastDownX = e.clientX;
+            document.addEventListener('mousemove', resize, false);
+            document.addEventListener('mouseup', stopResize, false);
+        }
+
+        function resize(e) {
+            if (!isResizing) return;
+            const offsetRight = document.body.offsetWidth - (e.clientX - document.body.offsetLeft);
+            const minWidth = 200; // Ancho mínimo del sidebar
+            const maxWidth = document.body.offsetWidth / 2; // Máximo 50% del ancho de la ventana
+            if (offsetRight > minWidth && offsetRight < maxWidth) {
+                sidebar.style.width = offsetRight + 'px';
+                sidebar.style.right = '0px';
+            }
+        }
+
+        function stopResize(e) {
+            isResizing = false;
+            document.removeEventListener('mousemove', resize, false);
+            document.removeEventListener('mouseup', stopResize, false);
+        }
+
+        // Modificar la función toggleSidebar para manejar el ancho correctamente
+        function toggleSidebar() {
+            const sidebar = document.getElementById('sidebar');
+            const overlay = document.getElementById('overlay');
+            const mainContent = document.querySelector('.main-content');
+
+            if (sidebar.classList.contains('open')) {
+                sidebar.classList.remove('open');
+                sidebar.style.right = '-' + sidebar.offsetWidth + 'px'; // Usa offsetWidth en lugar de style.width
+                overlay.style.display = 'none';
+                mainContent.classList.remove('shifted');
+            } else {
+                sidebar.classList.add('open');
+                sidebar.style.right = '0px';
+                overlay.style.display = 'block';
+                mainContent.classList.add('shifted');
+            }
+        }
+
+        function openSidebar(url) {
+            const sidebarContent = document.getElementById('sidebar-content');
+            sidebarContent.innerHTML = '<p>Cargando...</p>'; // Indicador de carga
+            fetch(url)
+                .then(response => response.text())
+                .then(data => {
+                    sidebarContent.innerHTML = data;
+                    toggleSidebar();
+                    setupFormValidation();
+                })
+                .catch(error => {
+                    sidebarContent.innerHTML = '<p>Error al cargar el contenido</p>';
+                    console.error('Error:', error);
+                });
+        }
+
         function deleteUser(userId) {
-            if (confirm("Are you sure you want to delete this user?")) {
+            if (confirm("¿Estás seguro de que deseas eliminar este usuario?")) {
                 fetch('delete_user.php', {
                         method: 'POST',
                         headers: {
@@ -83,19 +149,15 @@
                     .then(response => response.json())
                     .then(data => {
                         if (data.success) {
-                            // Remove the user element from the DOM
-                            const userElement = document.querySelector(`[data-user-id="${userId}"]`);
-                            if (userElement) {
-                                userElement.remove();
-                            }
-                            alert('User deleted successfully');
+                            document.querySelector(`[data-user-id="${userId}"]`).remove();
+                            alert('Usuario eliminado con éxito');
                         } else {
-                            alert('Error deleting user: ' + data.message);
+                            alert('Error eliminando el usuario: ' + data.message);
                         }
                     })
                     .catch(error => {
                         console.error('Error:', error);
-                        alert('An error occurred while deleting the user');
+                        alert('Ocurrió un error al eliminar el usuario.');
                     });
             }
         }
@@ -109,7 +171,7 @@
             for (let i = 0; i < users.length; i++) {
                 const userDetails = users[i].getElementsByClassName('user-details')[0];
                 const name = userDetails.getElementsByTagName('h2')[0].textContent.toLowerCase();
-                const email = userDetails.getElementsByTagName('p')[0].textContent.toLowerCase();
+                const email = userDetails.getElementsByTagName('p')[1].textContent.toLowerCase();
 
                 if (name.indexOf(filter) > -1 || email.indexOf(filter) > -1) {
                     users[i].style.display = '';
@@ -118,8 +180,145 @@
                 }
             }
         }
-    </script>
 
+        document.getElementById('overlay').addEventListener('click', toggleSidebar);
+
+        function setupFormValidation() {
+            // Verificar si el campo de nombre de usuario existe antes de agregar el event listener
+            const usernameField = document.getElementById('username');
+            if (usernameField) {
+                usernameField.addEventListener('input', function() {
+                    const username = this.value;
+                    const usernameError = document.getElementById('usernameError');
+                    const submitBtn = document.getElementById('submitBtn');
+
+                    if (username.length > 0) {
+                        const xhr = new XMLHttpRequest();
+                        xhr.open('POST', '../../login/scripts/check_username.php', true);
+                        xhr.setRequestHeader('Content-type', 'application/x-www-form-urlencoded');
+
+                        xhr.onreadystatechange = function() {
+                            if (this.readyState === 4) {
+                                console.log('Estado de la solicitud:', this.status);
+                                console.log('Respuesta del servidor:', this.responseText);
+                                if (this.status === 200) {
+                                    if (this.responseText === 'taken') {
+                                        usernameError.textContent = 'El nombre de usuario ya está en uso. Elige otro.';
+                                        usernameError.style.color = '#c12646';
+                                    } else {
+                                        usernameError.textContent = 'El nombre de usuario está disponible.';
+                                        usernameError.style.color = '#00bcff';
+                                        submitBtn.disabled = false;
+                                    }
+                                } else {
+                                    usernameError.textContent = 'Error al verificar el nombre de usuario. Inténtalo más tarde.';
+                                    usernameError.style.color = '#c12646';
+                                }
+                            }
+                        };
+
+                        xhr.onerror = function() {
+                            usernameError.textContent = 'Error al conectar con el servidor. Inténtalo más tarde.';
+                            usernameError.style.color = '#c12646';
+                        };
+
+                        xhr.send('username=' + encodeURIComponent(username));
+                    } else {
+                        usernameError.textContent = '';
+                    }
+                });
+            }
+
+            // Verificar si el campo de email existe antes de agregar el event listener
+            const emailField = document.getElementById('email');
+            if (emailField) {
+                emailField.addEventListener('input', function() {
+                    const email = this.value;
+                    const emailError = document.getElementById('emailError');
+
+                    // Expresión regular para validar el formato del correo electrónico
+                    const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+
+                    if (emailPattern.test(email)) {
+                        const xhr = new XMLHttpRequest();
+                        xhr.open('POST', '../../login/scripts/check_email.php', true);
+                        xhr.setRequestHeader('Content-type', 'application/x-www-form-urlencoded');
+
+                        xhr.onreadystatechange = function() {
+                            if (this.readyState === 4) {
+                                console.log('Estado de la solicitud:', this.status);
+                                console.log('Respuesta del servidor:', this.responseText);
+                                if (this.status === 200) {
+                                    if (this.responseText === 'taken') {
+                                        emailError.textContent = 'El correo electrónico ya está en uso. Elige otro.';
+                                        emailError.style.color = '#c12646';
+                                    } else {
+                                        emailError.textContent = 'El correo electrónico está disponible.';
+                                        emailError.style.color = '#00bcff';
+                                        submitBtn.disabled = false;
+                                    }
+                                } else {
+                                    emailError.textContent = 'Error al verificar el correo electrónico. Inténtalo más tarde.';
+                                    emailError.style.color = '#c12646';
+                                }
+                            }
+                        };
+
+                        xhr.onerror = function() {
+                            emailError.textContent = 'Error al conectar con el servidor. Inténtalo más tarde.';
+                            emailError.style.color = '#c12646';
+                        };
+
+                        xhr.send('email=' + encodeURIComponent(email));
+                    } else {
+                        emailError.textContent = 'Introduce un formato de correo electrónico válido.';
+                        emailError.style.color = '#c12646';
+                    }
+                });
+            }
+        }
+
+        function togglePassword(passwordId, toggleId) {
+            const passwordField = document.getElementById(passwordId);
+            const lockIcon = document.getElementById(toggleId);
+
+            if (passwordField.type === 'password') {
+                passwordField.type = 'text';
+                lockIcon.src = '../../login/img/eye-close.svg';
+                lockIcon.classList.add('rotate');
+            } else {
+                passwordField.type = 'password';
+                lockIcon.src = '../../login/img/eye-open.svg';
+                lockIcon.classList.remove('rotate');
+            }
+        }
+
+        function previewImage(input) {
+            var preview = document.getElementById('previewImg');
+            var file = input.files[0];
+            var reader = new FileReader();
+
+            reader.onloadend = function() {
+                if (preview) {
+                    preview.src = reader.result;
+                } else {
+                    var img = document.createElement('img');
+                    img.src = reader.result;
+                    img.width = 100;
+                    img.id = 'previewImg';
+                    document.getElementById('imagePreview').appendChild(img);
+                }
+            }
+
+            if (file) {
+                reader.readAsDataURL(file);
+            } else {
+                if (preview) {
+                    preview.src = "";
+                }
+            }
+        }
+    </script>
 </body>
 
 </html>
