@@ -1,93 +1,105 @@
-<?php
-include '../../scripts/conexion.php';
-
-function getUserIds($conn) {
-    $sql = "SELECT u.id_usuario, CONCAT(u.nombre, ' ', u.apellido) AS nombre_completo, tu.nombre AS tipo_usuario
-            FROM usuario u
-            JOIN tipo_usuario tu ON u.id_tipo_usuario = tu.id_tipo_usuario
-            WHERE u.estado = 'activo' AND u.id_tipo_usuario like 3  -- Filtrar solo estudiantes y profesores
-            ORDER BY u.id_usuario";
-    $result = $conn->query($sql);
-
-    $users = [];
-    if ($result->num_rows > 0) {
-        while($row = $result->fetch_assoc()) {
-            $users[] = $row;
-        }
-    }
-    $conn->close(); // Cerrar la conexión a la base de datos
-    return $users;
-}
-?>
-
 <!DOCTYPE html>
-<html lang="en">
+<html lang="es">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Student Registration</title>
-    <link rel="stylesheet" href="../../css/form.css">
+    <title>Cursos Disponibles</title>
+    <link rel="stylesheet" href="css/estudiante.css">
 </head>
+
 <body>
-    <div class="form-container">
-        <form class="course-form" action="scripts/register_student.php" method="post">
-            <h2>Student Registration</h2>
-            <?php
-            $users = getUserIds($conn); // Obtener la lista de usuarios con tipo
-            ?>
+    <div class="dashboard-container">
+        <?php
+        include "../../scripts/sidebar.php";
+        include "../../scripts/conexion.php";
 
-            <!-- Campo id_usuario (cuadro combinado) -->
-            <div class="form-group">
-                <select name="id_usuario" required>
-                    <option value="" disabled selected>Select User</option>
-                    <?php foreach ($users as $user): ?>
-                        <option value="<?php echo htmlspecialchars($user['id_usuario']); ?>">
-                            <?php echo htmlspecialchars($user['nombre_completo']) . ' (' . htmlspecialchars($user['tipo_usuario']) . ')'; ?>
-                        </option>
-                    <?php endforeach; ?>
-                </select>
-            </div>
+        // Obtener el id_estudiante basado en el username
+        $username = $_SESSION['username'];
+        $query = "SELECT e.id_estudiante FROM estudiante e 
+                  INNER JOIN usuario u ON e.id_usuario = u.id_usuario 
+                  WHERE u.username = ?";
+        $stmt = $conn->prepare($query);
+        $stmt->bind_param("s", $username);
+        $stmt->execute();
+        $result = $stmt->get_result();
 
-            <!-- Campo genero -->
-            <div class="form-group">
-                <select name="genero" required>
-                    <option value="" disabled selected>Gender</option>
-                    <option value="M">Male</option>
-                    <option value="F">Female</option>
-                    <option value="O">Other</option>
-                </select>
-            </div>
+        if ($result->num_rows === 0) {
+            echo '<h2 class="no-eres-estudiante">Lo sentimos, no eres un estudiante.</h2>';
+            exit;
+        }
 
-            <!-- Campo fecha_registro -->
-            <div class="form-group">
-                <input type="date" placeholder="Registration Date" name="fecha_registro" value="<?php echo date('Y-m-d'); ?>" required>
-            </div>
+        $row = $result->fetch_assoc();
+        $id_estudiante = $row['id_estudiante'];
 
-            <!-- Campo estado -->
-            <div class="form-group">
-                <select name="estado" required>
-                    <option value="activo">Active</option>
-                    <option value="inactivo">Inactive</option>
-                </select>
-            </div>
-                                
-            <!-- Campo nivel_educativo -->
-            <div class="form-group">
-                <select id="nivel_educativo" name="nivel_educativo" required>
-                    <option value="" disabled selected>Select Educational Level</option>
-                    <option value="primaria">Primaria</option>
-                    <option value="secundaria">Secundaria</option>
-                    <option value="terciaria">Terciaria</option>
-                </select>
-            </div>
+        // Obtener los cursos disponibles
+        $query_cursos = "SELECT c.*, cc.nombre_categoria, 
+                         GROUP_CONCAT(DISTINCT CONCAT(h.dia_semana, ' ', h.hora_inicio, '-', h.hora_fin) SEPARATOR ', ') AS horarios
+                         FROM cursos c
+                         LEFT JOIN categoria_curso cc ON c.id_categoria = cc.id_categoria
+                         LEFT JOIN horarios h ON c.id_curso = h.id_curso
+                         WHERE c.estado = 'activo' AND c.id_curso NOT IN (
+                             SELECT id_curso FROM inscripciones WHERE id_estudiante = ?
+                         )
+                         GROUP BY c.id_curso";
+        $stmt_cursos = $conn->prepare($query_cursos);
+        $stmt_cursos->bind_param("i", $id_estudiante);
+        $stmt_cursos->execute();
+        $result_cursos = $stmt_cursos->get_result();
 
-            <!-- Campo observaciones -->
-            <div class="form-group">
-                <textarea placeholder="Observations" name="observaciones" rows="4"></textarea>
-            </div>
+        // Procesar la inscripción
+        if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['inscribir'])) {
+            $id_curso = $_POST['id_curso'];
 
-            <button type="submit" class="btn btn-primary">Register Student</button>
-        </form>
+            $query_inscribir = "INSERT INTO inscripciones (id_curso, id_estudiante, fecha_inscripcion, estado) VALUES (?, ?, CURDATE(), 'pendiente')";
+            $stmt_inscribir = $conn->prepare($query_inscribir);
+            $stmt_inscribir->bind_param("ii", $id_curso, $id_estudiante);
+
+            if ($stmt_inscribir->execute()) {
+                $mensaje = "Inscripción realizada con éxito. Espere la aprobación.";
+            } else {
+                $mensaje = "Error al realizar la inscripción: " . $conn->error;
+            }
+        }
+        ?>
+
+        <!-- Main Content -->
+        <div class="main-content">
+            <header class="header">
+                <h1>Cursos Disponibles</h1>
+            </header>
+            <section class="content">
+                <?php if (isset($mensaje)) : ?>
+                    <div class="alert alert-info"><?php echo $mensaje; ?></div>
+                <?php endif; ?>
+
+                <div class="course-list">
+                    <?php while ($curso = $result_cursos->fetch_assoc()) : ?>
+                        <div class="course-item">
+                            <img src="../../uploads/icons/<?php echo $curso['icono']; ?>" alt="<?php echo $curso['nombre_curso']; ?>">
+                            <div class="course-content">
+                                <div class="course-details">
+                                    <h2><?php echo $curso['nombre_curso']; ?></h2>
+                                    <p><?php echo $curso['descripcion']; ?></p>
+                                    <p><strong>Categoría:</strong> <?php echo $curso['nombre_categoria']; ?></p>
+                                    <p><strong>Nivel:</strong> <?php echo $curso['nivel_educativo']; ?></p>
+                                    <p><strong>Duración:</strong> <?php echo $curso['duracion']; ?> semanas</p>
+                                    <p><strong>Horarios:</strong> <?php echo $curso['horarios']; ?></p>
+                                </div>
+                                <div class="course-actions">
+                                    <form method="POST">
+                                        <input type="hidden" name="id_curso" value="<?php echo $curso['id_curso']; ?>">
+                                        <button type="submit" name="inscribir" class="inscribir-btn">Inscribirse</button>
+                                    </form>
+                                </div>
+                            </div>
+                        </div>
+                    <?php endwhile; ?>
+                </div>
+            </section>
+        </div>
     </div>
+    <script src="scripts/cursos_disponibles.js"></script>
 </body>
+
 </html>
