@@ -8,8 +8,8 @@ session_start();
 $username = $_POST['username'];
 $password = $_POST['password'];
 
-// Consulta para obtener el usuario
-$sql = "SELECT * FROM usuario WHERE username = ?";
+// Preparar la consulta SQL
+$sql = "SELECT id_usuario, username, clave FROM usuario WHERE username = ?";
 $stmt = $conn->prepare($sql);
 $stmt->bind_param("s", $username);
 $stmt->execute();
@@ -20,19 +20,21 @@ if ($result->num_rows > 0) {
 
     // Verificar la contraseña (asumiendo que la contraseña está hasheada con bcrypt)
     if (password_verify($password, $user['clave'])) {
-        // Autenticación exitosa
-        $_SESSION['user_id'] = $user['id_usuario'];
-        $_SESSION['user_name'] = $user['username'];
-        
+        // Autenticación exitosa, crear sesiones
+        $_SESSION['id_usuario'] = $user['id_usuario'];
+        $_SESSION['username'] = $user['username'];
+
         // Recordar el usuario si la opción está marcada
         if (isset($_POST['remember'])) {
-            setcookie('username', $username, time() + (86400 * 30), "/"); // 30 días
+            // Crear una cookie disponible para todo el proyecto (ruta "/")
+            setcookie('username', $username, time() + (86400 * 30), "/", "", false, true); // 30 días, disponible en todo el dominio
         } else {
+            // Eliminar la cookie si no se selecciona "recordar usuario"
             if (isset($_COOKIE['username'])) {
-                setcookie('username', '', time() - 3600, "/"); // Eliminar cookie
+                setcookie('username', '', time() - 3600, "/", "", false, true); // Expira la cookie
             }
         }
-        
+
         // Redirigir al usuario al dashboard o página principal
         header("Location: ../../dashboard/dashboard.php");
         exit();
