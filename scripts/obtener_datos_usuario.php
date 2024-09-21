@@ -1,52 +1,56 @@
 <?php
 // scripts/obtener_datos_usuario.php
+error_reporting(E_ALL);
+ini_set('display_errors', 1);
 
-// Iniciar sesión
 session_start();
 include 'conexion.php';
 
-// Función para obtener los datos del usuario de la base de datos
-function getUserDataFromDatabase($userId, $pdo) {
-    $query = "SELECT nombre, apellido, mail, telefono FROM usuario WHERE id_usuario = :userId AND estado = 'activo'";
-    $stmt = $pdo->prepare($query);
-    $stmt->execute(['userId' => $userId]);
-    return $stmt->fetch(PDO::FETCH_ASSOC);
+function getUserDataFromDatabase($userId, $conn) {
+    $query = "SELECT nombre, apellido, mail, telefono FROM usuario WHERE id_usuario = ? AND estado = 'activo'";
+    $stmt = $conn->prepare($query);
+    $stmt->bind_param("i", $userId);
+    $stmt->execute();
+    $result = $stmt->get_result();
+    return $result->fetch_assoc();
 }
 
-// Verificar si el usuario está autenticado
-if (isset($_SESSION['id_usuario'])) {
+if (isset($_SESSION['username'])) {
+    $username = $_SESSION['username'];
+
     try {
-        // Conectar a la base de datos
-        $pdo = new PDO("mysql:host=$servername;dbname=$dbname;charset=utf8", $username, $password);
-        $pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
+        // Asumiendo que $conn es una conexión MySQLi válida
+        $stmt = $conn->prepare("SELECT id_usuario FROM usuario WHERE username = ?");
+        $stmt->bind_param("s", $username);
+        $stmt->execute();
+        $result = $stmt->get_result();
+        $row = $result->fetch_assoc();
 
-        // Obtener los datos del usuario
-        $userId = $_SESSION['id_usuario'];
-        $userData = getUserDataFromDatabase($userId, $pdo);
-
-        if ($userData) {
-            // Preparar los datos para enviar
-            $responseData = [
-                'nombre' => $userData['nombre'] . ' ' . $userData['apellido'],
-                'email' => $userData['mail'],
-                'telefono' => $userData['telefono']
-            ];
-
-            // Devolver los datos como JSON
-            header('Content-Type: application/json');
-            echo json_encode($responseData);
+        if ($row) {
+            $id_usuario = $row['id_usuario'];
+            $userData = getUserDataFromDatabase($id_usuario, $conn);
+            
+            if ($userData) {
+                $responseData = [
+                    'nombre' => $userData['nombre'] . ' ' . $userData['apellido'],
+                    'email' => $userData['mail'],
+                    'telefono' => $userData['telefono']
+                ];
+                header('Content-Type: application/json');
+                echo json_encode($responseData);
+            } else {
+                header('HTTP/1.1 404 Not Found');
+                echo json_encode(['error' => 'Usuario no encontrado']);
+            }
         } else {
-            // Si no se encontraron datos del usuario
             header('HTTP/1.1 404 Not Found');
             echo json_encode(['error' => 'Usuario no encontrado']);
         }
-    } catch (PDOException $e) {
-        // Error en la base de datos
+    } catch (Exception $e) {
         header('HTTP/1.1 500 Internal Server Error');
         echo json_encode(['error' => 'Error de base de datos: ' . $e->getMessage()]);
     }
 } else {
-    // Si el usuario no está autenticado
     header('HTTP/1.1 401 Unauthorized');
     echo json_encode(['error' => 'Usuario no autenticado']);
 }

@@ -151,42 +151,71 @@ document.addEventListener('DOMContentLoaded', function () {
     
     // Función para obtener datos del usuario desde el servidor
     async function obtenerDatosUsuario() {
+        console.log('Iniciando obtenerDatosUsuario');
         try {
+            console.log('Haciendo fetch a scripts/obtener_datos_usuario.php');
             const response = await fetch('scripts/obtener_datos_usuario.php', {
                 method: 'GET',
-                credentials: 'include', // Asegura que las cookies se envíen con la solicitud
+                credentials: 'include',
                 headers: {
                     'Content-Type': 'application/json'
                 }
             });
-    
+       
+            console.log('Respuesta recibida:', response);
             if (!response.ok) {
-                throw new Error('No estás autenticado para obtener tus datos');
+                if (response.status === 401) {
+                    console.log('Usuario no autenticado');
+                    return null; // Retornamos null si el usuario no está autenticado
+                }
+                throw new Error(`HTTP error! status: ${response.status}`);
+            }
+       
+            const textResponse = await response.text();
+            console.log('Respuesta en texto plano:', textResponse);
+    
+            let data;
+            try {
+                data = JSON.parse(textResponse);
+                console.log('Datos parseados:', data);
+            } catch (parseError) {
+                console.error('Error al parsear JSON:', parseError);
+                console.error('Contenido que causó el error:', textResponse);
+                throw new Error('La respuesta del servidor no es un JSON válido');
             }
     
-            const data = await response.json();
-            // Procesar los datos del usuario aquí
-            console.log(data);
+            return data;
         } catch (error) {
             console.error('Error al obtener datos del usuario:', error);
+            throw error;
         }
     }
     
-
-    // Función para manejar la preinscripción rápida
     function preinscripcionRapida(cursoId) {
-        obtenerDatosUsuario().then(datosUsuario => {
-            console.log("Datos del usuario obtenidos:", datosUsuario);
-
-            if (datosUsuario.nombre && datosUsuario.email && datosUsuario.telefono) {
-                // Si tenemos todos los datos necesarios, enviar directamente la preinscripción
-                enviarPreinscripcion(cursoId, datosUsuario);
-            } else {
-                // Si falta algún dato, mostrar el formulario de preinscripción
-                mostrarFormularioPreinscripcion(cursoId, datosUsuario);
-            }
+      console.log("Iniciando preinscripcionRapida para curso:", cursoId);
+      obtenerDatosUsuario()
+        .then((datosUsuario) => {
+          console.log("Datos del usuario obtenidos:", datosUsuario);
+          if (
+            datosUsuario &&
+            datosUsuario.nombre &&
+            datosUsuario.email &&
+            datosUsuario.telefono
+          ) {
+            // Si tenemos todos los datos necesarios, enviar directamente la preinscripción
+            enviarPreinscripcion(cursoId, datosUsuario);
+          } else {
+            // Si no hay datos de usuario o falta algún dato, mostrar el formulario de preinscripción
+            mostrarFormularioPreinscripcion(cursoId, datosUsuario || {});
+          }
+        })
+        .catch((error) => {
+          console.error("Error en preinscripcionRapida:", error);
+          // En caso de error, también mostramos el formulario
+          mostrarFormularioPreinscripcion(cursoId, {});
         });
     }
+    
 
     function enviarPreinscripcion(cursoId, datosUsuario) {
         let formData = new FormData();

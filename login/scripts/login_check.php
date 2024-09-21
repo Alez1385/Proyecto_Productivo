@@ -4,9 +4,15 @@ require '../../scripts/conexion.php';
 
 session_start();
 
-// Obtener los datos del formulario
-$username = $_POST['username'];
-$password = $_POST['password'];
+// Validar y sanitizar las entradas
+$username = trim($_POST['username'] ?? '');
+$password = trim($_POST['password'] ?? '');
+
+if (empty($username) || empty($password)) {
+    // Si el usuario o la contraseña están vacíos, redirigir con mensaje de error
+    header("Location: ../../login.php?error=emptyfields");
+    exit();
+}
 
 // Preparar la consulta SQL
 $sql = "SELECT id_usuario, username, clave FROM usuario WHERE username = ?";
@@ -24,14 +30,19 @@ if ($result->num_rows > 0) {
         $_SESSION['id_usuario'] = $user['id_usuario'];
         $_SESSION['username'] = $user['username'];
 
+        // Depurar la sesión
+        if (!isset($_SESSION['id_usuario'])) {
+            die("Error: No se pudo establecer la sesión.");
+        }
+
         // Recordar el usuario si la opción está marcada
         if (isset($_POST['remember'])) {
-            // Crear una cookie disponible para todo el proyecto (ruta "/")
-            setcookie('username', $username, time() + (86400 * 30), "/", "", false, true); // 30 días, disponible en todo el dominio
+            // Crear una cookie segura disponible para todo el proyecto
+            setcookie('username', $username, time() + (86400 * 30), "/", "", isset($_SERVER["HTTPS"]), true); // 30 días, HTTPS y HttpOnly
         } else {
             // Eliminar la cookie si no se selecciona "recordar usuario"
             if (isset($_COOKIE['username'])) {
-                setcookie('username', '', time() - 3600, "/", "", false, true); // Expira la cookie
+                setcookie('username', '', time() - 3600, "/", "", isset($_SERVER["HTTPS"]), true); // Expira la cookie
             }
         }
 
@@ -39,10 +50,14 @@ if ($result->num_rows > 0) {
         header("Location: ../../dashboard/dashboard.php");
         exit();
     } else {
-        echo "Usuario o contraseña incorrectos.";
+        // Contraseña incorrecta, redirigir con mensaje de error
+        header("Location: ../../login.php?error=invalidpassword");
+        exit();
     }
 } else {
-    echo "Usuario o contraseña incorrectos.";
+    // Usuario no encontrado, redirigir con mensaje de error
+    header("Location: ../../login.php?error=nouser");
+    exit();
 }
 
 // Cerrar la conexión

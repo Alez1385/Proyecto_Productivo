@@ -6,6 +6,7 @@ include('../scripts/conexion.php');
 // Si existe una cookie, restaurar sesión
 if (isset($_COOKIE['username'])) {
     $_SESSION['username'] = $_COOKIE['username'];
+    $_SESSION['id_usuario'] = $_COOKIE['id_usuario'];
     header("Location: ../dashboard/dashboard.php");
     exit();
 }
