@@ -51,6 +51,7 @@ if (!filter_var($email, FILTER_VALIDATE_EMAIL)) {
 }
 
 try {
+    $user_id = null;
     if (!isAuthenticated()) {
         // Verificar si el email ya existe
         $stmt = $conn->prepare("SELECT id_usuario FROM usuario WHERE mail = ?");
@@ -72,16 +73,24 @@ try {
        
         $user_id = $newUser['user_id'];
         $temp_password = $newUser['password'];
+    } else {
+        // If the user is authenticated, get their user_id from the session
+        $username = $_SESSION['username'];
+        $stmt = $conn->prepare("SELECT id_usuario FROM usuario WHERE username = ?");
+        $stmt->bind_param("s", $username);
+        $stmt->execute();
+        $result = $stmt->get_result();
+        $user_id = $result->fetch_assoc()['id_usuario'];
     }
 
     // Generar un token único
     $token = bin2hex(random_bytes(16));
 
     // Insertar datos en la tabla de preinscripciones
-    $sql = "INSERT INTO preinscripciones (id_curso, nombre, email, telefono, fecha_preinscripcion, estado, token)
-            VALUES (?, ?, ?, ?, NOW(), 'pendiente', ?)";
+    $sql = "INSERT INTO preinscripciones (id_curso, nombre, email, telefono, fecha_preinscripcion, estado, token, id_usuario)
+            VALUES (?, ?, ?, ?, NOW(), 'pendiente', ?, ?)";
     $stmt = $conn->prepare($sql);
-    $stmt->bind_param("issss", $id_curso, $nombre, $email, $telefono, $token);
+    $stmt->bind_param("issssi", $id_curso, $nombre, $email, $telefono, $token, $user_id);
     
     if (!$stmt->execute()) {
         throw new Exception("Error al realizar la preinscripción: " . $stmt->error);

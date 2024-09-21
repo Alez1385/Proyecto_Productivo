@@ -314,34 +314,169 @@ document.addEventListener('DOMContentLoaded', function () {
     }
 
     // Función para manejar la inscripción completa
-    function inscripcionCompleta(cursoId) {
-        fetch('scripts/verificar_usuario.php', {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/x-www-form-urlencoded',
-            },
-            body: 'curso_id=' + cursoId
-        })
-        .then(response => {
-            if (!response.ok) {
-                throw new Error('Network response was not ok');
-            }
-            return response.text();
-        })
-        .then(data => {
-            if (data === "logueado") {
-                // Redirigir al formulario de inscripción completa
-                window.location.href = "inscripcion_completa.php?curso_id=" + cursoId;
-            } else {
-                // Redirigir al login si no está logueado
-                window.location.href = "login.php?redirect=inscripcion_completa.php&curso_id=" + cursoId;
-            }
-        })
-        .catch(error => {
-            console.error('Error:', error);
-            alert("Error al verificar la sesión. Por favor, intenta nuevamente más tarde.");
-        });
+function inscripcionCompleta(cursoId) {
+    if (!cursoId || isNaN(cursoId)) {
+        mostrarError("ID de curso inválido.");
+        return;
     }
+
+    mostrarCargando();
+
+    fetch('scripts/verificar_usuario.php', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/x-www-form-urlencoded',
+            'X-Requested-With': 'XMLHttpRequest'
+        },
+        body: 'curso_id=' + encodeURIComponent(cursoId),
+        credentials: 'same-origin'
+    })
+    .then(response => {
+        if (!response.ok) {
+            throw new Error('Error en la respuesta del servidor: ' + response.status);
+        }
+        return response.json();
+    })
+    .then(data => {
+        ocultarCargando();
+        if (data.error) {
+            throw new Error(data.error);
+        }
+        if (data.status === 'logueado') {
+            if (data.ya_inscrito) {
+                mostrarError('Ya estás inscrito en este curso.');
+            } else {
+                window.location.href = "inscripcion_completa.php?curso_id=" + encodeURIComponent(cursoId);
+            }
+        } else if (data.status === 'no_logueado') {
+            window.location.href = "login.php?redirect=inscripcion_completa.php&curso_id=" + encodeURIComponent(cursoId);
+        } else {
+            throw new Error('Respuesta inesperada del servidor');
+        }
+    })
+    .catch(error => {
+        ocultarCargando();
+        console.error('Error:', error);
+        mostrarError("Hubo un problema al procesar tu solicitud: " + error.message);
+    });
+}
+
+function agregarEstilosDinamicos() {
+    const estilos = `
+        #loading-spinner {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.5);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 9999;
+        }
+
+        #loading-spinner::after {
+            content: '';
+            width: 50px;
+            height: 50px;
+            border: 5px solid #f3f3f3;
+            border-top: 5px solid #3498db;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        .mensaje {
+            position: fixed;
+            top: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            padding: 15px;
+            border-radius: 5px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.2);
+            z-index: 9999;
+            text-align: center;
+            max-width: 80%;
+        }
+
+        .error-mensaje {
+            background-color: #f44336;
+            color: white;
+        }
+
+        .success-mensaje {
+            background-color: #4CAF50;
+            color: white;
+        }
+    `;
+
+    const styleElement = document.createElement('style');
+    styleElement.textContent = estilos;
+    document.head.appendChild(styleElement);
+}
+
+// Llamar a esta función cuando se cargue el DOM
+document.addEventListener('DOMContentLoaded', agregarEstilosDinamicos);
+
+// Actualizar las funciones auxiliares
+function mostrarCargando() {
+    if (!document.getElementById('loading-spinner')) {
+        const spinner = document.createElement('div');
+        spinner.id = 'loading-spinner';
+        document.body.appendChild(spinner);
+    }
+}
+
+function ocultarCargando() {
+    const spinner = document.getElementById('loading-spinner');
+    if (spinner) {
+        spinner.remove();
+    }
+}
+
+function mostrarMensaje(mensaje, tipo) {
+    const mensajeDiv = document.createElement('div');
+    mensajeDiv.className = `mensaje ${tipo}-mensaje`;
+    mensajeDiv.textContent = mensaje;
+    document.body.appendChild(mensajeDiv);
+    
+    // Remover el mensaje después de 5 segundos
+    setTimeout(() => {
+        mensajeDiv.remove();
+    }, 5000);
+}
+
+function mostrarError(mensaje) {
+    mostrarMensaje(mensaje, 'error');
+}
+
+function mostrarExito(mensaje) {
+    mostrarMensaje(mensaje, 'success');
+}
+
+// Asegúrate de que este código se ejecute después de que el DOM esté completamente cargado
+document.addEventListener('DOMContentLoaded', function() {
+    // Seleccionar todos los botones de inscripción completa
+    const inscripcionCompletaBtns = document.querySelectorAll('.inscripcion-completa-btn');
+
+    // Añadir event listener a cada botón
+    inscripcionCompletaBtns.forEach(function(btn) {
+        btn.addEventListener('click', function(e) {
+            e.preventDefault();
+            const cursoId = this.getAttribute('data-curso-id');
+            if (cursoId) {
+                inscripcionCompleta(cursoId);
+            } else {
+                mostrarError("No se pudo obtener el ID del curso.");
+            }
+        });
+    });
+});
 
     // Función para cerrar modales
     function cerrarModal(modalId) {

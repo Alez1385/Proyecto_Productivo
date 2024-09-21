@@ -23,6 +23,9 @@ if (ini_get("session.use_cookies")) {
 if (isset($_COOKIE['username'])) {
     setcookie('username', '', time() - 3600, "/"); // Expirarla
 }
+if (isset($_COOKIE['id_usuario'])) {
+    setcookie('id_usuario', '', time() - 3600, "/"); // Expirarla
+}
 
 // Destruir la sesión
 session_destroy();

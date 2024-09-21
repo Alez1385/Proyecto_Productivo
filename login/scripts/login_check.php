@@ -27,8 +27,8 @@ if ($result->num_rows > 0) {
     // Verificar la contraseña (asumiendo que la contraseña está hasheada con bcrypt)
     if (password_verify($password, $user['clave'])) {
         // Autenticación exitosa, crear sesiones
-        $_SESSION['id_usuario'] = $user['id_usuario'];
         $_SESSION['username'] = $user['username'];
+        $_SESSION['id_usuario'] = $user['id_usuario'];
 
         // Depurar la sesión
         if (!isset($_SESSION['id_usuario'])) {
@@ -39,10 +39,14 @@ if ($result->num_rows > 0) {
         if (isset($_POST['remember'])) {
             // Crear una cookie segura disponible para todo el proyecto
             setcookie('username', $username, time() + (86400 * 30), "/", "", isset($_SERVER["HTTPS"]), true); // 30 días, HTTPS y HttpOnly
+            setcookie('id_usuario', $user['id_usuario'], time() + (86400 * 30), "/", "", isset($_SERVER["HTTPS"]), true); // 30 días, HTTPS y HttpOnly
         } else {
             // Eliminar la cookie si no se selecciona "recordar usuario"
             if (isset($_COOKIE['username'])) {
                 setcookie('username', '', time() - 3600, "/", "", isset($_SERVER["HTTPS"]), true); // Expira la cookie
+            }
+            if (isset($_COOKIE['id_usuario'])) {
+                setcookie('id_usuario', '', time() - 3600, "/", "", isset($_SERVER["HTTPS"]), true); // Expira la cookie
             }
         }
 
