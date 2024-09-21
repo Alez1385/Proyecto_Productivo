@@ -88,7 +88,10 @@ try {
     }
 
     // Preparar respuesta
-    $response = "Preinscripción exitosa";
+    $response = [
+        "success" => "Preinscripción realizada con éxito.",
+        "token" => $token
+    ];
 
     if (!isAuthenticated()) {
         $response["newUser"] = [
@@ -96,9 +99,8 @@ try {
             "tempPassword" => $temp_password
         ];
     }
-    // Usar JSON_UNESCAPED_UNICODE para que se muestren correctamente los caracteres especiales
-    echo json_encode($response, JSON_UNESCAPED_UNICODE);
-    
+
+    echo json_encode($response);
 
 } catch (Exception $e) {
     error_log("Error en preinscripción: " . $e->getMessage());
