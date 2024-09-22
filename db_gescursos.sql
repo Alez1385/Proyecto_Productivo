@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Servidor: 127.0.0.1
--- Tiempo de generación: 21-09-2024 a las 22:46:40
+-- Tiempo de generación: 22-09-2024 a las 04:54:16
 -- Versión del servidor: 10.4.32-MariaDB
 -- Versión de PHP: 8.2.12
 
@@ -220,7 +220,8 @@ CREATE TABLE `inscripciones` (
   `id_preinscripcion` int(11) DEFAULT NULL,
   `fecha_inscripcion` date DEFAULT NULL,
   `estado` enum('pendiente','aprobada','rechazada','cancelada') NOT NULL DEFAULT 'pendiente',
-  `fecha_actualizacion` timestamp NOT NULL DEFAULT current_timestamp() ON UPDATE current_timestamp()
+  `fecha_actualizacion` timestamp NOT NULL DEFAULT current_timestamp() ON UPDATE current_timestamp(),
+  `comprobante_pago` varchar(255) DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 -- --------------------------------------------------------
@@ -317,7 +318,11 @@ CREATE TABLE `preinscripciones` (
 --
 
 INSERT INTO `preinscripciones` (`id_preinscripcion`, `id_curso`, `nombre`, `email`, `telefono`, `fecha_preinscripcion`, `estado`, `token`, `id_usuario`) VALUES
-(26, 2, 'Juanito Alimaña', 'juanit@gmail.com', '5233456345', '2024-09-21 19:39:12', 'pendiente', '94b595118998e3e11995c4b83072064c', 53);
+(26, 2, 'Juanito Alimaña', 'juanit@gmail.com', '5233456345', '2024-09-21 19:39:12', 'pendiente', '94b595118998e3e11995c4b83072064c', 53),
+(27, 2, 'Juanito Alimaña', 'juanit@gmail.com', '5233456345', '2024-09-21 21:17:33', 'pendiente', '787ccefb8827a1c9344c9ef8b8042c81', 53),
+(28, 2, 'Juanito Alimaña', 'juanit@gmail.com', '5233456345', '2024-09-22 01:47:58', 'pendiente', '85614afa65dad23bc45a5e694f47f43e', 53),
+(29, 2, 'Juanito Alimaña', 'juanit@gmail.com', '5233456345', '2024-09-22 01:54:04', 'pendiente', '01d33114c1d5540208ad13a6667fa41b', 53),
+(30, 2, 'Juanito Alimaña', 'juanit@gmail.com', '5233456345', '2024-09-22 01:58:06', 'pendiente', '39527d96fdf6cd60180736d8fa1acae1', 53);
 
 -- --------------------------------------------------------
 
@@ -595,7 +600,7 @@ ALTER TABLE `estudiante`
 -- AUTO_INCREMENT de la tabla `historial_inscripciones`
 --
 ALTER TABLE `historial_inscripciones`
-  MODIFY `id_historial` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=69;
+  MODIFY `id_historial` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=72;
 
 --
 -- AUTO_INCREMENT de la tabla `horarios`
@@ -607,7 +612,7 @@ ALTER TABLE `horarios`
 -- AUTO_INCREMENT de la tabla `inscripciones`
 --
 ALTER TABLE `inscripciones`
-  MODIFY `id_inscripcion` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=16;
+  MODIFY `id_inscripcion` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=33;
 
 --
 -- AUTO_INCREMENT de la tabla `modulos`
@@ -625,7 +630,7 @@ ALTER TABLE `pagos`
 -- AUTO_INCREMENT de la tabla `preinscripciones`
 --
 ALTER TABLE `preinscripciones`
-  MODIFY `id_preinscripcion` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=27;
+  MODIFY `id_preinscripcion` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=31;
 
 --
 -- AUTO_INCREMENT de la tabla `profesor`

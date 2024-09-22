@@ -1,0 +1,266 @@
+/* Reset y estilos base */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: 'Roboto', sans-serif;
+    line-height: 1.8;
+    color: #333;
+    background-color: #f4f7f9;
+    padding: 40px 20px;
+}
+
+/* Contenedor */
+.dashboard-container {
+    max-width: 1000px;
+    margin: 0 auto;
+    background-color: #ffffff;
+    padding: 50px;
+    border-radius: 15px;
+    box-shadow: 0 15px 30px rgba(0, 0, 0, 0.1);
+}
+
+/* Tipografía */
+h1 {
+    font-size: 3em;
+    color: #2c3e50;
+    margin-bottom: 40px;
+    text-align: center;
+    font-weight: 700;
+    letter-spacing: -1px;
+}
+
+h2 {
+    font-size: 2.2em;
+    color: #34495e;
+    margin-bottom: 20px;
+    font-weight: 600;
+}
+
+p {
+    margin-bottom: 20px;
+    font-size: 1.1em;
+    color: #555;
+    line-height: 1.6;
+}
+
+/* Detalles del curso */
+.course-details {
+    display: flex;
+    background-color: #f8fafc;
+    border-radius: 12px;
+    overflow: hidden;
+    margin-bottom: 40px;
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.05);
+}
+
+.course-image {
+    flex: 0 0 40%;
+    overflow: hidden;
+}
+
+.course-image img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    transition: transform 0.3s ease;
+}
+
+.course-image img:hover {
+    transform: scale(1.05);
+}
+
+.course-info {
+    flex: 1;
+    padding: 30px;
+}
+
+.course-info h2 {
+    color: #2980b9;
+    margin-bottom: 15px;
+}
+
+.description {
+    font-size: 1em;
+    color: #555;
+    margin-bottom: 20px;
+}
+
+.course-meta {
+    display: flex;
+    gap: 20px;
+    font-size: 0.9em;
+    color: #7f8c8d;
+}
+
+.course-meta span {
+    display: flex;
+    align-items: center;
+}
+
+.course-meta i {
+    margin-right: 5px;
+}
+
+/* Estilos del formulario */
+form {
+    display: grid;
+    gap: 25px;
+}
+
+.form-group {
+    display: flex;
+    flex-direction: column;
+}
+
+label {
+    font-weight: 500;
+    margin-bottom: 8px;
+    color: #2c3e50;
+    font-size: 1em;
+}
+
+input[type="text"],
+input[type="email"],
+input[type="tel"] {
+    width: 100%;
+    padding: 12px 15px;
+    border: 2px solid #e0e0e0;
+    border-radius: 8px;
+    font-size: 1em;
+    transition: all 0.3s ease;
+}
+
+input[type="text"]:focus,
+input[type="email"]:focus,
+input[type="tel"]:focus {
+    border-color: #3498db;
+    outline: none;
+    box-shadow: 0 0 0 3px rgba(52, 152, 219, 0.1);
+}
+
+button[type="submit"] {
+    background-color: #3498db;
+    color: #fff;
+    border: none;
+    padding: 15px 25px;
+    font-size: 1.1em;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    width: 100%;
+}
+
+button[type="submit"]:hover {
+    background-color: #2980b9;
+    transform: translateY(-2px);
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+}
+
+.file-info {
+    font-size: 0.9em;
+    color: #666;
+    margin-top: 5px;
+}
+
+/* Estilos mejorados para la subida de archivos */
+.file-upload {
+    position: relative;
+    overflow: hidden;
+    margin-top: 10px;
+    background-color: #f8fafc;
+    border: 2px dashed #3498db;
+    border-radius: 8px;
+    text-align: center;
+    padding: 20px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.file-upload:hover {
+    background-color: #e8f4fd;
+}
+
+.file-upload input[type="file"] {
+    position: absolute;
+    font-size: 100px;
+    right: 0;
+    top: 0;
+    opacity: 0;
+    cursor: pointer;
+}
+
+.file-upload-label {
+    display: inline-block;
+    padding: 10px 20px;
+    background-color: #3498db;
+    color: white;
+    border-radius: 4px;
+    transition: all 0.3s ease;
+}
+
+.file-upload:hover .file-upload-label {
+    background-color: #2980b9;
+}
+
+/* Estilos para la vista previa de la imagen */
+.image-preview {
+    max-width: 100%;
+    margin-top: 20px;
+    border-radius: 8px;
+    overflow: hidden;
+    display: none;
+}
+
+.image-preview img {
+    width: 100px;
+    height: auto;
+    display: block;
+    object-fit: cover;
+}
+
+/* Mensajes de éxito y error */
+.message {
+    padding: 15px;
+    border-radius: 8px;
+    margin-bottom: 20px;
+    font-weight: bold;
+    text-align: center;
+}
+
+.error {
+    background-color: #ffebee;
+    border: 1px solid #ffcdd2;
+    color: #b71c1c;
+}
+
+.success {
+    background-color: #e8f5e9;
+    border: 1px solid #c8e6c9;
+    color: #1b5e20;
+}
+
+/* Diseño responsivo */
+@media (max-width: 768px) {
+    .dashboard-container {
+        padding: 30px;
+    }
+    h1 {
+        font-size: 2.5em;
+    }
+    h2 {
+        font-size: 2em;
+    }
+    .course-details {
+        flex-direction: column;
+    }
+    .course-image {
+        height: 200px;
+    }
+}
