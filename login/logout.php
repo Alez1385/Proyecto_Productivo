@@ -31,5 +31,5 @@ if (isset($_COOKIE['id_usuario'])) {
 session_destroy();
 
 // Redirigir al login
-header("Location: ../../../login/login.php");
+header("Location: login.php");
 exit();

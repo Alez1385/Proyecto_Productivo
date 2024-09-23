@@ -24,19 +24,22 @@ $result = $stmt->get_result();
 // Verificar si el usuario existe
 if ($result->num_rows > 0) {
     $user = $result->fetch_assoc();
-    
+   
     // Verificar la contraseña hasheada con bcrypt
     if (password_verify($password, $user['clave'])) {
         // Autenticación exitosa, crear sesiones
         $_SESSION['username'] = $user['username'];
         $_SESSION['id_usuario'] = $user['id_usuario'];
-
+        
         // Recordar usuario con cookies si está seleccionado
         if ($remember) {
             setcookie('username', $user['username'], time() + (86400 * 30), "/", "", isset($_SERVER["HTTPS"]), true);
             setcookie('id_usuario', $user['id_usuario'], time() + (86400 * 30), "/", "", isset($_SERVER["HTTPS"]), true);
         }
-
+        
+        // Establecer una cookie para indicar que el registro fue exitoso
+        setcookie('registration_success', 'true', time() + 3600, '/');
+        
         // Redirigir al dashboard
         header("Location: $redirect");
         exit();
