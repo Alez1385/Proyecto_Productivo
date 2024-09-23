@@ -1,48 +1,57 @@
 <?php
-// Conectar a la base de datos
+session_start();
 require '../../scripts/conexion.php';
 
-session_start();
+// Validar y sanitizar las entradas
+$username = filter_var($_POST['username'] ?? '', FILTER_SANITIZE_STRING);
+$password = $_POST['password'] ?? '';
+$remember = isset($_POST['remember']) && $_POST['remember'] === 'on';  // Manejo del checkbox
+$redirect = '../../dashboard/dashboard.php';
 
-// Obtener los datos del formulario
-$username = $_POST['username'];
-$password = $_POST['password'];
+// Verificar si hay campos vacíos
+if (empty($username) || empty($password)) {
+    header("Location: ../login.php?error=emptyfields");
+    exit();
+}
 
-// Consulta para obtener el usuario
-$sql = "SELECT * FROM usuario WHERE username = ?";
+// Preparar la consulta SQL
+$sql = "SELECT id_usuario, username, clave FROM usuario WHERE username = ?";
 $stmt = $conn->prepare($sql);
 $stmt->bind_param("s", $username);
 $stmt->execute();
 $result = $stmt->get_result();
 
+// Verificar si el usuario existe
 if ($result->num_rows > 0) {
     $user = $result->fetch_assoc();
-
-    // Verificar la contraseña (asumiendo que la contraseña está hasheada con bcrypt)
+    
+    // Verificar la contraseña hasheada con bcrypt
     if (password_verify($password, $user['clave'])) {
-        // Autenticación exitosa
-        $_SESSION['user_id'] = $user['id_usuario'];
-        $_SESSION['user_name'] = $user['username'];
-        
-        // Recordar el usuario si la opción está marcada
-        if (isset($_POST['remember'])) {
-            setcookie('username', $username, time() + (86400 * 30), "/"); // 30 días
-        } else {
-            if (isset($_COOKIE['username'])) {
-                setcookie('username', '', time() - 3600, "/"); // Eliminar cookie
-            }
+        // Autenticación exitosa, crear sesiones
+        $_SESSION['username'] = $user['username'];
+        $_SESSION['id_usuario'] = $user['id_usuario'];
+
+        // Recordar usuario con cookies si está seleccionado
+        if ($remember) {
+            setcookie('username', $user['username'], time() + (86400 * 30), "/", "", isset($_SERVER["HTTPS"]), true);
+            setcookie('id_usuario', $user['id_usuario'], time() + (86400 * 30), "/", "", isset($_SERVER["HTTPS"]), true);
         }
-        
-        // Redirigir al usuario al dashboard o página principal
-        header("Location: ../../dashboard/dashboard.php");
+
+        // Redirigir al dashboard
+        header("Location: $redirect");
         exit();
     } else {
-        echo "Usuario o contraseña incorrectos.";
+        // Contraseña incorrecta
+        header("Location: ../login.php?error=invalidpassword");
+        exit();
     }
 } else {
-    echo "Usuario o contraseña incorrectos.";
+    // Usuario no encontrado
+    header("Location: ../login.php?error=nouser");
+    exit();
 }
 
 // Cerrar la conexión
 $stmt->close();
 $conn->close();
+?>

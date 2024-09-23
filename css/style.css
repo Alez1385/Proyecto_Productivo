@@ -8517,7 +8517,7 @@ h1, h2, h3, h4, h5,
             @media (min-width: 992px) {
               .owl-carousel.home-slider .slider-item .slider-text .one-forth .text {
                 position: absolute;
-                top: 50%;
+                top: 45%;
                 left: 0;
                 -webkit-transform: translateY(-50%);
                 -ms-transform: translateY(-50%);
@@ -8835,6 +8835,8 @@ h1, h2, h3, h4, h5,
   padding: 2em;
   background: #1b2c65;
   width: 100%;
+  transition: all 0.3s ease, background-color 0.6s ease-in-out;
+  
   -webkit-box-shadow: 0px 20px 69px -27px rgba(0, 0, 0, 0.17);
   -moz-box-shadow: 0px 20px 69px -27px rgba(0, 0, 0, 0.17);
   box-shadow: 0px 20px 69px -27px rgba(0, 0, 0, 0.17); }
@@ -8881,7 +8883,8 @@ h1, h2, h3, h4, h5,
     margin-bottom: 10px;
     color: #ffbd39; }
   .services-1:hover {
-    background: #ffbd39; }
+    background: #4d3684; 
+    transform: scale(1.05)}
     .services-1:hover .icon i {
       color: #fff; }
     .services-1:hover h3 {
@@ -9777,10 +9780,10 @@ textarea.form-control {
       max-width: 100%;
         max-height: 100%;
         object-fit: cover;
-      border-radius: 20%;
+      border-radius: 10px;
       transition: all 0.3s ease; /* Add smooth transition for all properties */
       margin-bottom: 15px;
-      transition: all 0.3s ease; /* Add smooth transition for all properties */
+    
   }
   
   .course-icon {
@@ -9788,12 +9791,6 @@ textarea.form-control {
       justify-content: center;
       align-items: center;
       margin-bottom: 20px;
-  }
-  
-  /* Hover effect */
-  .course-icon-img:hover {
-    transform: scale(1.05); /* Increase size by 10% on hover */
-      
   }
   
     .text-curso{

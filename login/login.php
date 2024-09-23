@@ -1,55 +1,33 @@
 <?php
 session_start();
+
 include('../scripts/conexion.php');
 
-if (isset($_COOKIE['username'])) {
+// Restaurar sesión si existen cookies
+if (isset($_COOKIE['username']) && isset($_COOKIE['id_usuario'])) {
     $_SESSION['username'] = $_COOKIE['username'];
+    $_SESSION['id_usuario'] = $_COOKIE['id_usuario'];
     header("Location: ../dashboard/dashboard.php");
     exit();
 }
 
-if ($_SERVER["REQUEST_METHOD"] == "POST") {
-    $username = filter_var($_POST['username'], FILTER_SANITIZE_STRING);
-    $password = $_POST['password'];
+$error = '';
 
-    $stmt = $conn->prepare("SELECT clave FROM usuario WHERE username = ?");
-    $stmt->bind_param("s", $username);
-    $stmt->execute();
-    $stmt->store_result();
-
-    // Asumiendo que ya tienes el código para manejar el inicio de sesión
-
-    // Actualizar la fecha y hora del último acceso
-    $update_sql = "UPDATE usuario SET ultimo_acceso = NOW() WHERE username = ?";
-    $update_stmt = $conn->prepare($update_sql);
-    $update_stmt->bind_param("s", $username);
-    $update_stmt->execute();
-
-    // Resto del código para iniciar sesión y redirigir al dashboard
-
-
-    if ($stmt->num_rows > 0) {
-        $stmt->bind_result($hashed_password);
-        $stmt->fetch();
-
-        if (password_verify($password, $hashed_password)) {
-            $_SESSION['username'] = $username;
-
-            if (isset($_POST['remember'])) {
-                setcookie('username', $username, time() + (86400 * 30), "/", "", true, true);
-            }
-
-            header("Location: ../dashboard/dashboard.php");
-            exit();
-        } else {
+// Verificar si hay un parámetro de error en la URL
+if (isset($_GET['error'])) {
+    switch ($_GET['error']) {
+        case 'emptyfields':
+            $error = "Por favor, complete todos los campos.";
+            break;
+        case 'invalidpassword':
             $error = "Contraseña incorrecta.";
-        }
-    } else {
-        $error = "Usuario no encontrado.";
+            break;
+        case 'nouser':
+            $error = "Usuario no encontrado.";
+            break;
+        default:
+            $error = "Ocurrió un error. Por favor, inténtelo de nuevo.";
     }
-
-    $stmt->close();
-    $conn->close();
 }
 ?>
 
@@ -64,42 +42,67 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     <link rel="icon" href="img/favicon.ico" type="image/x-icon">
     <script src="scripts/password.js"></script>
     <script>
-        function showSuccessModal() {
-            const urlParams = new URLSearchParams(window.location.search);
-            if (urlParams.has('message') && urlParams.get('message') === 'success') {
-                document.getElementById('overlay').style.display = 'block';
-                document.getElementById('successModal').style.display = 'flex';
-                setTimeout(() => {
-                    closeModal();
-                    removeURLParameter('message');
-                }, 3000);
-            } else {
-                document.getElementById('overlay').style.display = 'none';
-                document.getElementById('successModal').style.display = 'none';
-            }
-        }
+        // Mostrar el modal con el mensaje de éxito o error
+function showModal(type, message) {
+    const overlay = document.getElementById('overlay');
+    const modal = document.getElementById('modal');
+    const modalHeader = document.querySelector('.modal-header');
+    const modalBody = document.querySelector('.modal-body');
+    const loadingBar = document.querySelector('.loading-bar');
 
-        function closeModal() {
-            document.getElementById('overlay').style.display = 'none';
-            document.getElementById('successModal').style.display = 'none';
-        }
+    modalHeader.textContent = type === 'success' ? 'Completado' : 'Error';
+    modalBody.textContent = message;
 
-        function removeURLParameter(param) {
-            let url = new URL(window.location.href);
-            url.searchParams.delete(param);
-            window.history.replaceState(null, '', url);
-        }
+    if (type === 'success') {
+        modal.classList.add('success');
+        modal.classList.remove('error');
+        loadingBar.style.display = 'block';
+    } else {
+        modal.classList.add('error');
+        modal.classList.remove('success');
+        loadingBar.style.display = 'none';
+    }
 
+    overlay.style.display = 'block';
+    modal.style.display = 'flex';
 
+    // Eliminar el parámetro de la URL después de 3 segundos
 
-        document.addEventListener('DOMContentLoaded', showSuccessModal);
+        setTimeout(() => {
+            closeModal();
+            removeURLParameter('error');
+        }, 3000);
+}
+
+// Cerrar el modal
+function closeModal() {
+    document.getElementById('overlay').style.display = 'none';
+    document.getElementById('modal').style.display = 'none';
+}
+
+// Eliminar un parámetro específico de la URL
+function removeURLParameter(param) {
+    let url = new URL(window.location.href);
+    url.searchParams.delete(param);
+    window.history.replaceState(null, '', url);
+}
+
+// Mostrar el modal al cargar la página
+document.addEventListener('DOMContentLoaded', function() {
+    const urlParams = new URLSearchParams(window.location.search);
+    if (urlParams.has('message') && urlParams.get('message') === 'success') {
+        showModal('success', 'Tu registro ha sido exitoso!');
+    } else if (urlParams.has('error')) {
+        showModal('error', '<?php echo addslashes($error); ?>');
+    }
+});
+
     </script>
 </head>
 
 <body>
     <div class="login-container">
-        <form class="login-form" action="" method="POST" enctype="application/x-www-form-urlencoded">
-
+        <form class="login-form" action="scripts/login_check.php" method="POST"> <!-- Cambié el action -->
             <h2>Sign in</h2>
 
             <div class="input-group">
@@ -131,18 +134,15 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         </form>
     </div>
 
-    <!-- Overlay -->
+    <!-- Modal y Overlay -->
     <div id="overlay" class="overlay"></div>
-
-    <!-- Modal -->
-    <div id="successModal" class="modal">
+    <div id="modal" class="modal">
         <div class="modal-content">
             <span class="close" onclick="closeModal()">&times;</span>
-            <div class="modal-header">Completado</div>
-            <div class="modal-body">Tu registro ha sido exitoso!</div>
+            <div class="modal-header"></div>
+            <div class="modal-body"></div>
             <div class="loading-bar"></div>
         </div>
     </div>
 </body>
-
 </html>

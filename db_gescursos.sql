@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Servidor: 127.0.0.1
--- Tiempo de generación: 10-09-2024 a las 02:29:49
+-- Tiempo de generación: 22-09-2024 a las 04:54:16
 -- Versión del servidor: 10.4.32-MariaDB
 -- Versión de PHP: 8.2.12
 
@@ -62,7 +62,9 @@ INSERT INTO `asig_modulo` (`id_asig_modulo`, `id_modulo`, `id_tipo_usuario`, `fe
 (15, 3, 2, NULL),
 (17, 5, 1, NULL),
 (18, 6, 1, NULL),
-(19, 7, 1, NULL);
+(19, 7, 1, NULL),
+(20, 8, 1, NULL),
+(21, 3, 3, NULL);
 
 -- --------------------------------------------------------
 
@@ -78,15 +80,6 @@ CREATE TABLE `asistencia` (
   `presente` enum('si','no','','') DEFAULT NULL,
   `justificacion` text DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
-
---
--- Volcado de datos para la tabla `asistencia`
---
-
-INSERT INTO `asistencia` (`id_asistencia`, `id_estudiante`, `id_curso`, `fecha`, `presente`, `justificacion`) VALUES
-(1, 1, 1, '2024-08-14', 'si', NULL),
-(2, 1, 1, '2024-08-29', 'si', NULL),
-(3, 1, 1, '2024-08-31', 'no', NULL);
 
 -- --------------------------------------------------------
 
@@ -188,6 +181,21 @@ INSERT INTO `estudiante` (`id_estudiante`, `id_usuario`, `genero`, `fecha_regist
 -- --------------------------------------------------------
 
 --
+-- Estructura de tabla para la tabla `historial_inscripciones`
+--
+
+CREATE TABLE `historial_inscripciones` (
+  `id_historial` int(11) NOT NULL,
+  `id_inscripcion` int(11) DEFAULT NULL,
+  `estado_anterior` enum('pendiente','aprobada','rechazada','cancelada') DEFAULT NULL,
+  `estado_nuevo` enum('pendiente','aprobada','rechazada','cancelada') DEFAULT NULL,
+  `fecha_cambio` timestamp NOT NULL DEFAULT current_timestamp(),
+  `id_usuario_cambio` int(11) DEFAULT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+-- --------------------------------------------------------
+
+--
 -- Estructura de tabla para la tabla `horarios`
 --
 
@@ -209,16 +217,12 @@ CREATE TABLE `inscripciones` (
   `id_inscripcion` int(11) NOT NULL,
   `id_curso` int(11) DEFAULT NULL,
   `id_estudiante` int(11) DEFAULT NULL,
-  `fecha_inscripcion` date DEFAULT NULL
+  `id_preinscripcion` int(11) DEFAULT NULL,
+  `fecha_inscripcion` date DEFAULT NULL,
+  `estado` enum('pendiente','aprobada','rechazada','cancelada') NOT NULL DEFAULT 'pendiente',
+  `fecha_actualizacion` timestamp NOT NULL DEFAULT current_timestamp() ON UPDATE current_timestamp(),
+  `comprobante_pago` varchar(255) DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
-
---
--- Volcado de datos para la tabla `inscripciones`
---
-
-INSERT INTO `inscripciones` (`id_inscripcion`, `id_curso`, `id_estudiante`, `fecha_inscripcion`) VALUES
-(1, 2, 1, '2024-08-15'),
-(2, 1, 1, '2024-08-08');
 
 -- --------------------------------------------------------
 
@@ -242,7 +246,8 @@ INSERT INTO `modulos` (`id_modulo`, `nom_modulo`, `url`, `icono`) VALUES
 (3, 'Estudiante', '../models/estudiante/estudiante.php', 'face\r\n'),
 (5, 'Usuarios', '../models/usuarios/users.php', 'person'),
 (6, 'Cursos', 'models/cursos/cursos.php', 'assignment'),
-(7, 'Modulos', 'models/modulos/modulos.php', 'event');
+(7, 'Modulos', 'models/modulos/modulos.php', 'event'),
+(8, 'Inscripciones', 'models/inscripciones/inscripciones.php', 'card_travel');
 
 -- --------------------------------------------------------
 
@@ -289,6 +294,35 @@ INSERT INTO `password_resets` (`id`, `email`, `token`, `created_at`) VALUES
 (0, 'santiagocaponf@gmail.com', '31e556b6ebbe026453840ade559dcf2884c2fbc841528315720b0ab2da57fdd24763fc3c3506683b4fca5cf852de2b51910c', '2024-08-30 17:30:52'),
 (0, 'santiagocaponf@gmail.com', 'a3d6181dc3b303830466de3efa97046bcb5e374d2b0760da1d2eea03f5b613200ab5f3a99186bc36e739187776b0b1e35600', '2024-08-30 17:32:18'),
 (0, 'santiagocaponf@gmail.com', 'b973fd8b50d8c07c020c95468bc5ff5e59e6b7c6007dd752553910a66a1503f19f74ddba46e81b84e7ce1bd3437037d935de', '2024-08-30 17:32:35');
+
+-- --------------------------------------------------------
+
+--
+-- Estructura de tabla para la tabla `preinscripciones`
+--
+
+CREATE TABLE `preinscripciones` (
+  `id_preinscripcion` int(11) NOT NULL,
+  `id_curso` int(11) NOT NULL,
+  `nombre` varchar(255) NOT NULL,
+  `email` varchar(255) NOT NULL,
+  `telefono` varchar(20) NOT NULL,
+  `fecha_preinscripcion` timestamp NOT NULL DEFAULT current_timestamp(),
+  `estado` enum('pendiente','completada','cancelada') NOT NULL DEFAULT 'pendiente',
+  `token` varchar(255) NOT NULL,
+  `id_usuario` int(11) DEFAULT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+--
+-- Volcado de datos para la tabla `preinscripciones`
+--
+
+INSERT INTO `preinscripciones` (`id_preinscripcion`, `id_curso`, `nombre`, `email`, `telefono`, `fecha_preinscripcion`, `estado`, `token`, `id_usuario`) VALUES
+(26, 2, 'Juanito Alimaña', 'juanit@gmail.com', '5233456345', '2024-09-21 19:39:12', 'pendiente', '94b595118998e3e11995c4b83072064c', 53),
+(27, 2, 'Juanito Alimaña', 'juanit@gmail.com', '5233456345', '2024-09-21 21:17:33', 'pendiente', '787ccefb8827a1c9344c9ef8b8042c81', 53),
+(28, 2, 'Juanito Alimaña', 'juanit@gmail.com', '5233456345', '2024-09-22 01:47:58', 'pendiente', '85614afa65dad23bc45a5e694f47f43e', 53),
+(29, 2, 'Juanito Alimaña', 'juanit@gmail.com', '5233456345', '2024-09-22 01:54:04', 'pendiente', '01d33114c1d5540208ad13a6667fa41b', 53),
+(30, 2, 'Juanito Alimaña', 'juanit@gmail.com', '5233456345', '2024-09-22 01:58:06', 'pendiente', '39527d96fdf6cd60180736d8fa1acae1', 53);
 
 -- --------------------------------------------------------
 
@@ -344,7 +378,8 @@ CREATE TABLE `tipo_usuario` (
 INSERT INTO `tipo_usuario` (`id_tipo_usuario`, `nombre`) VALUES
 (1, 'admin'),
 (2, 'profesor'),
-(3, 'estudiante');
+(3, 'estudiante'),
+(4, 'user');
 
 -- --------------------------------------------------------
 
@@ -376,12 +411,17 @@ CREATE TABLE `usuario` (
 --
 
 INSERT INTO `usuario` (`id_usuario`, `nombre`, `apellido`, `tipo_doc`, `documento`, `fecha_nac`, `foto`, `mail`, `telefono`, `direccion`, `id_tipo_usuario`, `username`, `clave`, `fecha_registro`, `estado`, `ultimo_acceso`) VALUES
-(36, 'Santiagoe', 'Capon', 'ID', '12341235234', '2345-03-12', 'WhatsApp Image 2024-07-23 at 4.49.07 PM.jpeg', 'santiagocaponf@gmail.com', '32452345', 'CL 18 A NORTE 2 72', 1, 'alez', '$2y$10$cCIaWsXSHC1OWcRBpDQU.uhrDuxWP0j4IMUTxNNojuHeT3Sq.uYkq', '2024-08-25 17:43:54', 'activo', '2024-09-09 17:23:14'),
+(36, 'Santiagoe', 'Capon', 'ID', '12341235234', '2345-03-12', 'WhatsApp Image 2024-07-23 at 4.49.07 PM.jpeg', 'santiagocaponf@gmail.com', '32452345', 'CL 18 A NORTE 2 72', 1, 'alez', '$2y$10$cCIaWsXSHC1OWcRBpDQU.uhrDuxWP0j4IMUTxNNojuHeT3Sq.uYkq', '2024-08-25 17:43:54', 'activo', '2024-09-14 21:59:17'),
 (42, 'chad', 'sexteto', 'ID', '523456346', '3654-04-23', '66d273c33d474_Recurso 9europe.jpg', 'luisillo@gmail.com', '4563475674', 'CL 18 A NORTE 2 72', 1, 'alez23', '$2y$10$FrpZXvgI3WrL22y9MxNtfuQsyQSgCJ7Jm4VPUv3Aa4qEn2HCKdxsK', '2024-08-29 16:26:44', 'activo', NULL),
 (51, 'antonela', 'sepulveda', 'ID', '342352345', '0005-04-23', '66d23c1021bab_f7c0528d915ec3b38dd89bf7beb2a194.jpg', 'scflorez@corsaje.edu.co', '42352345', 'CL 18 A NORTE 2 72', 1, 'mientras', '$2y$10$KJU2liHj854T1T9M.6/EK.xDYy4sfLf2XEwCldj230rdreZmC.3KC', '2024-08-30 16:39:28', 'activo', NULL),
 (53, 'Juanito', 'Alimaña', 'ID', '43523634', '0634-06-02', '66d2441faa705_pngwing.com.png', 'juanit@gmail.com', '5233456345', 'CL 18 A NORTE 2 72', 3, 'alez123123', '$2y$10$p.bJhCL9d2VM1IjUCnC63.Edj5Pg87KZgKGTFyedUHPusUd.QSDAK', '2024-08-30 17:13:51', 'activo', NULL),
 (55, 'Santiago', 'Capon', 'Passport', '4234523456', '5234-04-23', 'pngwing.com.png', 'scflorez@corsaje.edu.co3', '53643563456', 'CL 18 A NORTE 2 72', 2, 'alez1234', '$2y$10$pcvzMHIh1F53bR25oEpRfu5MbZB5FO6Kn3ceIKwNBtp9KWahjApMe', '2024-09-03 12:35:04', 'activo', NULL),
-(56, 'camilo', 'prato', 'ID', '1091357317', '2024-09-17', 'salir guapo en fotos-605380757.webp', 'albertocamiloprato@gmail.com', '3043282464', 'Sapo Marica', 1, 'camilo', '$2y$10$pkH8Zi8gEArSclW4KlpcjOm0Tbx5fSF2o8f7Ukw8qUNWj8Bl7i2I.', '2024-09-07 18:45:23', 'activo', '2024-09-08 11:32:39');
+(56, 'camilo', 'prato', 'ID', '1091357317', '2024-09-17', 'salir guapo en fotos-605380757.webp', 'albertocamiloprato@gmail.com', '3043282464', 'Sapo Marica', 1, 'camilo', '$2y$10$pkH8Zi8gEArSclW4KlpcjOm0Tbx5fSF2o8f7Ukw8qUNWj8Bl7i2I.', '2024-09-07 18:45:23', 'activo', '2024-09-08 11:32:39'),
+(58, 'santiago', NULL, NULL, NULL, NULL, NULL, 'edison_alberto@hotmail.com', '52343456', '', 4, 'edison_alberto', '$2y$10$DLJSPUZnsBduhl5PFRtg6uP5aXma0xTP9FOSkKUN/g2l9MrcP7d3S', '2024-09-19 12:02:34', 'activo', NULL),
+(59, 'Santiago', NULL, NULL, NULL, NULL, NULL, 'scapon@misena.edu.co', '3034235435', '', 4, 'scapon', '$2y$10$yrrLCg7Fr85s6u9jOmiVMO14UhXLMOrHN6krm2bL4fCNqnnCqc4Oy', '2024-09-20 20:09:22', 'activo', NULL),
+(60, 'Santiago', NULL, NULL, NULL, NULL, NULL, 'albertocamiloprato@gmail.comw', '563456346', '', 4, 'albertocamiloprato', '$2y$10$3u2mhrj1Ce6x8WCnljewFOuy20NifY7kKhXbWo0Y7NqPSXH89a9qe', '2024-09-20 20:50:39', 'activo', NULL),
+(61, 'santiago', NULL, NULL, NULL, NULL, NULL, 'scflored@gmail.com', '634563456', '', 4, 'scflored', '$2y$10$C5qy9wo8KtCPNBhnXB/aluV2giTky9Dt9e9tj0BQQ0eG5sa0qyZTO', '2024-09-20 20:52:48', 'activo', NULL),
+(62, 'Santiago', NULL, NULL, NULL, NULL, NULL, 'asdfasdffasdf@asf.com', '52345234654', '', 4, 'asdfasdffasdf', '$2y$10$EBQX5bV7ZksXOq76A9/03./LTz3Dyjq7/ysWjbRsOAy8HTk5ZPrN6', '2024-09-21 13:59:07', 'activo', NULL);
 
 --
 -- Índices para tablas volcadas
@@ -439,6 +479,14 @@ ALTER TABLE `estudiante`
   ADD KEY `id_usuario` (`id_usuario`);
 
 --
+-- Indices de la tabla `historial_inscripciones`
+--
+ALTER TABLE `historial_inscripciones`
+  ADD PRIMARY KEY (`id_historial`),
+  ADD KEY `id_inscripcion` (`id_inscripcion`),
+  ADD KEY `historial_inscripciones_ibfk_2` (`id_usuario_cambio`);
+
+--
 -- Indices de la tabla `horarios`
 --
 ALTER TABLE `horarios`
@@ -451,7 +499,9 @@ ALTER TABLE `horarios`
 ALTER TABLE `inscripciones`
   ADD PRIMARY KEY (`id_inscripcion`),
   ADD KEY `id_curso` (`id_curso`),
-  ADD KEY `id_estudiante` (`id_estudiante`);
+  ADD KEY `id_estudiante` (`id_estudiante`),
+  ADD KEY `idx_inscripciones_curso_estudiante` (`id_curso`,`id_estudiante`),
+  ADD KEY `inscripciones_ibfk_3` (`id_preinscripcion`);
 
 --
 -- Indices de la tabla `modulos`
@@ -465,6 +515,14 @@ ALTER TABLE `modulos`
 ALTER TABLE `pagos`
   ADD PRIMARY KEY (`id_pago`),
   ADD KEY `id_estudiante` (`id_estudiante`);
+
+--
+-- Indices de la tabla `preinscripciones`
+--
+ALTER TABLE `preinscripciones`
+  ADD PRIMARY KEY (`id_preinscripcion`),
+  ADD KEY `id_curso` (`id_curso`),
+  ADD KEY `fk_preinscripciones_usuario` (`id_usuario`);
 
 --
 -- Indices de la tabla `profesor`
@@ -506,7 +564,7 @@ ALTER TABLE `asignacion_curso`
 -- AUTO_INCREMENT de la tabla `asig_modulo`
 --
 ALTER TABLE `asig_modulo`
-  MODIFY `id_asig_modulo` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=20;
+  MODIFY `id_asig_modulo` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=22;
 
 --
 -- AUTO_INCREMENT de la tabla `asistencia`
@@ -539,6 +597,12 @@ ALTER TABLE `estudiante`
   MODIFY `id_estudiante` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=3;
 
 --
+-- AUTO_INCREMENT de la tabla `historial_inscripciones`
+--
+ALTER TABLE `historial_inscripciones`
+  MODIFY `id_historial` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=72;
+
+--
 -- AUTO_INCREMENT de la tabla `horarios`
 --
 ALTER TABLE `horarios`
@@ -548,19 +612,25 @@ ALTER TABLE `horarios`
 -- AUTO_INCREMENT de la tabla `inscripciones`
 --
 ALTER TABLE `inscripciones`
-  MODIFY `id_inscripcion` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=3;
+  MODIFY `id_inscripcion` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=33;
 
 --
 -- AUTO_INCREMENT de la tabla `modulos`
 --
 ALTER TABLE `modulos`
-  MODIFY `id_modulo` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=8;
+  MODIFY `id_modulo` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=9;
 
 --
 -- AUTO_INCREMENT de la tabla `pagos`
 --
 ALTER TABLE `pagos`
   MODIFY `id_pago` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=3;
+
+--
+-- AUTO_INCREMENT de la tabla `preinscripciones`
+--
+ALTER TABLE `preinscripciones`
+  MODIFY `id_preinscripcion` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=31;
 
 --
 -- AUTO_INCREMENT de la tabla `profesor`
@@ -578,13 +648,13 @@ ALTER TABLE `resume_cursos`
 -- AUTO_INCREMENT de la tabla `tipo_usuario`
 --
 ALTER TABLE `tipo_usuario`
-  MODIFY `id_tipo_usuario` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=4;
+  MODIFY `id_tipo_usuario` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=5;
 
 --
 -- AUTO_INCREMENT de la tabla `usuario`
 --
 ALTER TABLE `usuario`
-  MODIFY `id_usuario` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=57;
+  MODIFY `id_usuario` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=63;
 
 --
 -- Restricciones para tablas volcadas
@@ -624,6 +694,13 @@ ALTER TABLE `estudiante`
   ADD CONSTRAINT `fk_estudiante_usuario` FOREIGN KEY (`id_usuario`) REFERENCES `usuario` (`id_usuario`);
 
 --
+-- Filtros para la tabla `historial_inscripciones`
+--
+ALTER TABLE `historial_inscripciones`
+  ADD CONSTRAINT `historial_inscripciones_ibfk_1` FOREIGN KEY (`id_inscripcion`) REFERENCES `inscripciones` (`id_inscripcion`),
+  ADD CONSTRAINT `historial_inscripciones_ibfk_2` FOREIGN KEY (`id_usuario_cambio`) REFERENCES `usuario` (`id_usuario`) ON DELETE CASCADE ON UPDATE CASCADE;
+
+--
 -- Filtros para la tabla `horarios`
 --
 ALTER TABLE `horarios`
@@ -634,13 +711,21 @@ ALTER TABLE `horarios`
 --
 ALTER TABLE `inscripciones`
   ADD CONSTRAINT `inscripciones_ibfk_1` FOREIGN KEY (`id_curso`) REFERENCES `cursos` (`id_curso`),
-  ADD CONSTRAINT `inscripciones_ibfk_2` FOREIGN KEY (`id_estudiante`) REFERENCES `estudiante` (`id_estudiante`);
+  ADD CONSTRAINT `inscripciones_ibfk_2` FOREIGN KEY (`id_estudiante`) REFERENCES `estudiante` (`id_estudiante`),
+  ADD CONSTRAINT `inscripciones_ibfk_3` FOREIGN KEY (`id_preinscripcion`) REFERENCES `preinscripciones` (`id_preinscripcion`);
 
 --
 -- Filtros para la tabla `pagos`
 --
 ALTER TABLE `pagos`
   ADD CONSTRAINT `pagos_ibfk_1` FOREIGN KEY (`id_estudiante`) REFERENCES `estudiante` (`id_estudiante`);
+
+--
+-- Filtros para la tabla `preinscripciones`
+--
+ALTER TABLE `preinscripciones`
+  ADD CONSTRAINT `fk_preinscripciones_usuario` FOREIGN KEY (`id_usuario`) REFERENCES `usuario` (`id_usuario`),
+  ADD CONSTRAINT `preinscripciones_ibfk_1` FOREIGN KEY (`id_curso`) REFERENCES `cursos` (`id_curso`);
 
 --
 -- Filtros para la tabla `profesor`

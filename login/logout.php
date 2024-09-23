@@ -1,14 +1,11 @@
 <?php
-// logout.php
-
-// Inicia la sesión
+// Iniciar la sesión
 session_start();
 
-// Destruye todas las variables de sesión
+// Destruir todas las variables de sesión
 $_SESSION = array();
 
-// Si se desea destruir la sesión por completo, también se debe eliminar la cookie de sesión.
-// Nota: Esta parte sólo es necesaria si se utiliza una cookie de sesión
+// Si se utiliza una cookie de sesión, eliminarla
 if (ini_get("session.use_cookies")) {
     $params = session_get_cookie_params();
     setcookie(
@@ -22,9 +19,17 @@ if (ini_get("session.use_cookies")) {
     );
 }
 
-// Finalmente, destruye la sesión
+// Eliminar la cookie 'username'
+if (isset($_COOKIE['username'])) {
+    setcookie('username', '', time() - 3600, "/"); // Expirarla
+}
+if (isset($_COOKIE['id_usuario'])) {
+    setcookie('id_usuario', '', time() - 3600, "/"); // Expirarla
+}
+
+// Destruir la sesión
 session_destroy();
 
-// Redirige al usuario a la página de inicio de sesión (o a la página principal)
-header("Location: ../../../login/login.php"); // Cambia la ubicación según sea necesario
-exit;
+// Redirigir al login
+header("Location: ../../../login/login.php");
+exit();

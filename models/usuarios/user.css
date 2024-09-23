@@ -16,11 +16,6 @@ html{
     background-color: #f8f9fa;
 }
 
-
-
-/* Sidebar */
-/* (Aquí irían los estilos del sidebar) */
-
 /* Contenido principal */
 .main-content {
     flex: 1;
@@ -192,4 +187,195 @@ html{
         padding: 6px 12px;
         font-size: 14px;
     }
+}
+
+
+/*estilos de formularios de creacion y edicion */
+
+#overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-color: rgba(0, 0, 0, 0.5);
+    backdrop-filter: blur(5px);
+    z-index: 999;
+    display: none;
+}
+
+#sidebar {
+    position: fixed;
+    top: 0;
+    right: -400px; /* Ajusta esto según el ancho inicial deseado */
+    width: 400px; /* Ancho inicial del sidebar */
+    height: 100%;
+    background-color: #e6f2ff;
+    transition: right 0.3s ease;
+    z-index: 1000;
+    overflow-y: auto;
+    min-width: 300px; /* Ancho mínimo del sidebar */
+    max-width: 50vw; /* Máximo 50% del ancho de la ventana */
+}
+
+#sidebar.open {
+    right: 0;
+}
+
+#sidebar-resizer {
+    position: absolute;
+    left: 0;
+    top: 0;
+    width: 5px;
+    height: 100% !important;
+    background-color: #f5c792;
+    cursor: ew-resize;
+}
+
+.sidebar-close {
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    background: none;
+    border: none;
+    font-size: 24px;
+    cursor: pointer;
+}
+
+    /* General form styles */
+.form-container {
+    margin: 0 auto;
+    padding: 30px;
+    background-color: #ffffff;
+    border-radius: 8px;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+}
+
+form h2 {
+    text-align: center;
+    color: #333;
+    margin-bottom: 20px;
+}
+
+.form-group {
+    margin-bottom: 15px;
+    position: relative;
+}
+
+.form-group input,
+.form-group select {
+    width: 100%;
+    padding: 10px;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    background-color: #fff;
+    font-size: 16px;
+    transition: border-color 0.3s ease-in-out;
+}
+
+.form-group input:focus,
+.form-group select:focus {
+    border-color: #00bcff;
+    outline: none;
+}
+
+input[type="file"] {
+    border: none;
+}
+
+.error-message {
+    color: #c12646;
+    font-size: 12px;
+    margin-top: 5px;
+    display: block;
+}
+
+.success-message {
+    color: #00bcff;
+    font-size: 12px;
+    margin-top: 5px;
+    display: block;
+}
+
+/* Button styles */
+.btn-primary {
+    width: 100%;
+    padding: 12px;
+    background-color: #00bcff;
+    color: #fff;
+    border: none;
+    border-radius: 4px;
+    font-size: 16px;
+    cursor: pointer;
+    transition: background-color 0.3s ease-in-out;
+}
+
+.btn-primary:disabled {
+    background-color: #ccc;
+    cursor: not-allowed;
+}
+
+.btn-primary:hover {
+    background-color: #008ecf;
+}
+
+/* Lock icon */
+.lock-icon {
+    position: absolute;
+    right: 10px;
+    top: 50%;
+    transform: translateY(-50%);
+    width: 25px;
+    height: 25px;
+    cursor: pointer;
+    transition: transform 0.3s ease;
+}
+
+.lock-icon.rotate {
+    transform: translateY(-50%) rotate(180deg);
+}
+
+.lock-icon:hover {
+    transform: translateY(-50%) scale(1.1);
+}
+
+/* File input styles */
+input[type="file"]::file-selector-button {
+    padding: 5px 15px;
+    background-color: #00bcff;
+    color: #fff;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    transition: background-color 0.3s ease-in-out;
+}
+
+input[type="file"]::file-selector-button:hover {
+    background-color: #008ecf;
+}
+
+/* Responsive styles */
+@media screen and (max-width: 768px) {
+    .form-container {
+        padding: 15px;
+    }
+
+    .form-group input,
+    .form-group select {
+        font-size: 14px;
+    }
+
+    .btn-primary {
+        font-size: 14px;
+    }
+}
+
+
+/* Ajuste para el contenido principal */
+.main-content {
+    transition: margin-right 0.3s ease-in-out;
+}
+
+.main-content.shifted {
+    margin-right: 400px;
 }

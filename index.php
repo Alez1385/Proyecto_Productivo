@@ -1,6 +1,8 @@
 <?php
+session_start();
 // Asegúrate de que esta línea esté al principio de tu archivo
 include('scripts/conexion.php'); // Ajusta la ruta según sea necesario
+
 
 // Consulta para obtener los slides del carrusel
 $result = $conn->query("SELECT * FROM carousel ORDER BY order_index ASC");
@@ -31,6 +33,7 @@ $result = $conn->query("SELECT * FROM carousel ORDER BY order_index ASC");
     <link rel="stylesheet" href="css/flaticon.css">
     <link rel="stylesheet" href="css/icomoon.css">
     <link rel="stylesheet" href="css/style.css">
+    <script src="js/inscripcion-handler.js"></script>
   </head>
   <body data-spy="scroll" data-target=".site-navbar-target" data-offset="300">
 	  
@@ -116,7 +119,7 @@ $result = $conn->query($sql);
                 echo '          <p class="text-curso">Categoria: ' . htmlspecialchars($row["descripcion"]) . '</p>';
                 echo '          <p class="text-curso">Nivel: ' . htmlspecialchars(ucfirst($row["nivel_educativo"])) . '</p>';
                 echo '          <p class="text-curso">Duración: ' . htmlspecialchars($row["duracion"]) . ' semanas</p>';
-                echo '          <a href="inscribirse.php?id_curso=' . htmlspecialchars($row["id_curso"]) . '" class="btn btn-primary">Inscribirse</a>';
+                echo '          <a href="#" class="btn btn-primary inscribirse-btn" data-curso-id="' . htmlspecialchars($row["id_curso"]) . '">Inscribirse</a>';
                 echo '      </div>';
                 echo '  </div>';
                 echo '</div>';
