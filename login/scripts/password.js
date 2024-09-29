@@ -3,12 +3,10 @@ function togglePassword(passwordId, toggleId) {
     const lockIcon = document.getElementById(toggleId);
 
     if (passwordField.type === 'password') {
-        passwordField.type = 'text';
-        lockIcon.src = 'img/eye-close.svg'; // Cambia a ícono de ojo cerrado
-        lockIcon.classList.add('rotate');
+        passwordField.type = 'text';  // Cambiar a texto para mostrar la contraseña
+        lockIcon.src = 'img/eye-close.svg';  // Cambiar el ícono a 'cerrado'
     } else {
-        passwordField.type = 'password';
-        lockIcon.src = 'img/eye-open.svg'; // Cambia a ícono de ojo abierto
-        lockIcon.classList.remove('rotate');
+        passwordField.type = 'password';  // Cambiar a contraseña para ocultarla
+        lockIcon.src = 'img/eye-open.svg';  // Cambiar el ícono a 'abierto'
     }
 }

@@ -1,36 +1,42 @@
 <?php
+// index.php
+ini_set('session.cookie_httponly', 1);
+ini_set('session.cookie_secure', 1);
 session_start();
+header("Strict-Transport-Security: max-age=31536000; includeSubDomains");
+header("Content-Security-Policy: default-src 'self'; script-src 'self' https://cdnjs.cloudflare.com; style-src 'self' https://cdnjs.cloudflare.com; img-src 'self' data:;");
+header("X-Frame-Options: DENY");
+header("X-XSS-Protection: 1; mode=block");
+header("X-Content-Type-Options: nosniff");
+header("Referrer-Policy: strict-origin-when-cross-origin");
 
-include('../scripts/conexion.php');
+require_once('../scripts/conexion.php');
+require_once('../scripts/functions.php');
 
-// Restaurar sesión si existen cookies
-if (isset($_COOKIE['username']) && isset($_COOKIE['id_usuario'])) {
-    $_SESSION['username'] = $_COOKIE['username'];
-    $_SESSION['id_usuario'] = $_COOKIE['id_usuario'];
-    header("Location: ../dashboard/dashboard.php");
-    exit();
+// Force HTTPS
+if (!in_array($_SERVER['SERVER_NAME'], ['localhost', '127.0.0.1'])) {
+    if (!isset($_SERVER['HTTPS']) || $_SERVER['HTTPS'] !== 'on') {
+        header("Location: https://" . $_SERVER['HTTP_HOST'] . $_SERVER['REQUEST_URI'], true, 301);
+        exit();
+    }
+}
+
+// CSRF Token generation
+if (empty($_SESSION['csrf_token'])) {
+    $_SESSION['csrf_token'] = bin2hex(random_bytes(32));
+}
+
+// Redirect handling
+$redirect = filter_input(INPUT_GET, 'redirect', FILTER_SANITIZE_URL) ?? '/dashboard/dashboard.php';
+if (!isValidRedirect($redirect)) {
+    $redirect = '/dashboard/dashboard.php';
 }
 
 $error = '';
-
-// Verificar si hay un parámetro de error en la URL
 if (isset($_GET['error'])) {
-    switch ($_GET['error']) {
-        case 'emptyfields':
-            $error = "Por favor, complete todos los campos.";
-            break;
-        case 'invalidpassword':
-            $error = "Contraseña incorrecta.";
-            break;
-        case 'nouser':
-            $error = "Usuario no encontrado.";
-            break;
-        default:
-            $error = "Ocurrió un error. Por favor, inténtelo de nuevo.";
-    }
+    $error = htmlspecialchars($_GET['error'], ENT_QUOTES, 'UTF-8');
 }
 ?>
-
 <!DOCTYPE html>
 <html lang="en">
 
@@ -41,122 +47,76 @@ if (isset($_GET['error'])) {
     <link rel="stylesheet" href="css/style-login.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
     <link rel="icon" href="img/favicon.ico" type="image/x-icon">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/zxcvbn/4.4.2/zxcvbn.js" integrity="sha512-TZlMGFY9xKj38t/5m2FzJ+RM/aD5alMHDe26p0mYUMoCF5G7ibfHUQILq0qQPV3wlsnCwL+TPRNK4vIWGLOkUQ==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
     <script src="scripts/password.js"></script>
-    <script>
-        // Mostrar el modal con el mensaje de éxito o error
-function showModal(type, message) {
-    const overlay = document.getElementById('overlay');
-    const modal = document.getElementById('modal');
-    const modalHeader = document.querySelector('.modal-header');
-    const modalBody = document.querySelector('.modal-body');
-    const loadingBar = document.querySelector('.loading-bar');
-
-    modalHeader.textContent = type === 'success' ? 'Completado' : 'Error';
-    modalBody.textContent = message;
-
-    if (type === 'success') {
-        modal.classList.add('success');
-        modal.classList.remove('error');
-        loadingBar.style.display = 'block';
-    } else {
-        modal.classList.add('error');
-        modal.classList.remove('success');
-        loadingBar.style.display = 'none';
-    }
-
-    overlay.style.display = 'block';
-    modal.style.display = 'flex';
-
-    // Eliminar el parámetro de la URL después de 3 segundos
-
-        setTimeout(() => {
-            closeModal();
-            removeURLParameter('error');
-        }, 3000);
-}
-
-// Cerrar el modal
-function closeModal() {
-    document.getElementById('overlay').style.display = 'none';
-    document.getElementById('modal').style.display = 'none';
-}
-
-// Eliminar un parámetro específico de la URL
-function removeURLParameter(param) {
-    let url = new URL(window.location.href);
-    url.searchParams.delete(param);
-    window.history.replaceState(null, '', url);
-}
-
-// Mostrar el modal al cargar la página
-document.addEventListener('DOMContentLoaded', function() {
-    const urlParams = new URLSearchParams(window.location.search);
-    if (urlParams.has('message') && urlParams.get('message') === 'success') {
-        showModal('success', 'Tu registro ha sido exitoso!');
-    } else if (urlParams.has('error')) {
-        showModal('error', '<?php echo addslashes($error); ?>');
-    }
-});
-
-    </script>
 </head>
 
-
-
-<body>   
+<body>
     <div class="container" id="container">
-    <div class="form-container sign-up">
-    <form action="scripts/register.php" method="post" enctype="multipart/form-data">
+        <!-- Formulario de Registro -->
+        <div class="form-container sign-up">
+            <form action="scripts/register.php" method="post" id="registerForm">
+                <input type="hidden" name="csrf_token" value="<?php echo $_SESSION['csrf_token']; ?>">
+                <input type="hidden" name="redirect" value="<?php echo htmlspecialchars($redirect); ?>">
                 <h1>Register</h1>
                 <span>Usa tu email para registrarte</span>
-                <div class="input-group">
-                <input type="text" placeholder="Username" name="username" id="username" required>
-                <span id="usernameError" class="error-message"></span>
-                </div>
                 
+                <!-- Username -->
                 <div class="input-group">
-                <input type="email" placeholder="Email" name="mail" id="email" required>
-                <span id="emailError" class="error-message"></span>
+                    <input type="text" placeholder="Username" name="username" id="username" required>
+                    <span id="usernameError" class="error-message"></span>
                 </div>
-                
+
+                <!-- Email -->
                 <div class="input-group">
-                <img src="img/eye-open.svg" alt="Toggle Lock" class="lock-icon" id="toggleLock" onclick="togglePassword('password', 'toggleLock')">
-                <input type="password" placeholder="Password" name="clave" id="password" required>
+                    <input type="email" placeholder="Email" name="mail" id="email" required>
+                    <span id="emailError" class="error-message"></span>
                 </div>
-                
+
+                <!-- Password con ojito para mostrar/ocultar -->
+                <div class="input-group">
+                    <img src="img/eye-open.svg" alt="Toggle Lock" class="lock-icon" id="toggleLock1" onclick="togglePassword('password1','toggleLock1')">
+                    <input type="password" placeholder="Password" name="clave" id="password1" required>
+                    <span id="password-strength"></span>
+                </div>
+
                 <button type="submit" class="btn btn-primary" id="submitBtn">Crear Cuenta</button>
-                
             </form>
         </div>
 
+        <!-- Formulario de Login -->
+        <div class="form-container sign-in">
+            <form action="scripts/login_check.php" method="POST" id="loginForm">
+                <input type="hidden" name="csrf_token" value="<?php echo $_SESSION['csrf_token']; ?>">
+                <input type="hidden" name="redirect" value="<?php echo htmlspecialchars($redirect); ?>">
+                <h2>Login</h2>
+                <span>Usa tu email o contraseña</span>
 
-    <div class="form-container sign-in">
-        <form  action="scripts/login_check.php" method="POST" > 
-            <!-- Cambié el action -->
-            <h2>Login</h2>
-            <span>Usa tu email y contraseña</span>
-
-            <div class="input-group">
-            <input type="text" placeholder="Username" name="username" required>
+                <!-- Username -->
+                <div class="input-group">
+                    <input type="text" placeholder="Username" name="username" required>
                 </div>
+
+                <!-- Password con ojito para mostrar/ocultar -->
                 <div class="input-group">
                 <input type="password" placeholder="Password" name="password" id="password" required>
                 <img src="img/eye-open.svg" alt="Toggle Lock" class="lock-icon" id="toggleLock" onclick="togglePassword('password', 'toggleLock')">
+                <span id="password-strength"></span>
                 </div>
+
                 <div class="options">
-                <label>
-                    <input type="checkbox" name="remember"> Recordar Contraseña
-                </label>
-                
-            </div>
-            <a href="forgot_password.html" class="forgot-password">Olvidaste tu contraseña?</a>
+                    <label>
+                        <input type="checkbox" name="remember"> Recordar Contraseña
+                    </label>
+                </div>
+
+                <a href="forgot_password.html" class="forgot-password">¿Olvidaste tu contraseña?</a>
                 <button type="submit" class="btn-login">Login</button>
-        </form>
-    </div>
+            </form>
+        </div>
 
-       
-
-    <div class="toggle-container">
+        <!-- Contenedor de Cambios entre Formulario de Login y Registro -->
+        <div class="toggle-container">
             <div class="toggle">
                 <div class="toggle-panel toggle-left">
                     <h1>Bienvenido de vuelta!</h1>
@@ -183,22 +143,35 @@ document.addEventListener('DOMContentLoaded', function() {
         </div>
     </div>
 
+    <!-- Scripts -->
     <script src="../js/login.js"></script>
- 
     <script>
-        function checkFormValidity() {
-            const usernameError = document.getElementById('usernameError').textContent;
-            const emailError = document.getElementById('emailError').textContent;
-            const submitBtn = document.getElementById('submitBtn');
 
-            if (usernameError === 'El nombre de usuario está disponible.' && emailError === 'El correo electrónico está disponible.') {
-                submitBtn.disabled = false;
+        
+        // Medidor de fuerza de contraseña
+        document.getElementById('password').addEventListener('input', function() {
+            var result = zxcvbn(this.value);
+            var strength = ['Muy débil', 'Débil', 'Regular', 'Fuerte', 'Muy fuerte'];
+            document.getElementById('password-strength').textContent = 'Fortaleza de la contraseña: ' + strength[result.score];
+        });
+
+        // Función para mostrar/ocultar contraseñas
+        function togglePassword(passwordId, toggleId) {
+            const passwordField = document.getElementById(passwordId);
+            const lockIcon = document.getElementById(toggleId);
+
+            if (passwordField.type === 'password') {
+                passwordField.type = 'text';
+                lockIcon.src = 'img/eye-close.svg'; // Cambia a ícono de ojo cerrado
+                lockIcon.classList.add('rotate');
             } else {
-                submitBtn.disabled = true;
+                passwordField.type = 'password';
+                lockIcon.src = 'img/eye-open.svg'; // Cambia a ícono de ojo abierto
+                lockIcon.classList.remove('rotate');
             }
         }
 
-
+        // Verificación de nombre de usuario
         document.getElementById('username').addEventListener('input', function() {
             const username = this.value;
             const usernameError = document.getElementById('usernameError');
@@ -209,89 +182,35 @@ document.addEventListener('DOMContentLoaded', function() {
                 xhr.setRequestHeader('Content-type', 'application/x-www-form-urlencoded');
 
                 xhr.onreadystatechange = function() {
-                    if (this.readyState === 4) {
-                        if (this.status === 200) {
-                            if (this.responseText === 'taken') {
-                                usernameError.textContent = 'El nombre de usuario ya está en uso. Elige otro.';
-                                usernameError.style.color = '#c12646';
-                            } else {
-                                usernameError.textContent = 'El nombre de usuario está disponible.';
-                                usernameError.style.color = '#00bcff';
-                            }
-                            checkFormValidity(); // Llama a la función para verificar el estado del formulario
-                        } else {
-                            usernameError.textContent = 'Error al verificar el nombre de usuario. Inténtalo más tarde.';
-                            usernameError.style.color = '#c12646';
-                            checkFormValidity(); // Llama a la función para deshabilitar el botón
-                        }
+                    if (this.readyState === 4 && this.status === 200) {
+                        usernameError.textContent = this.responseText === 'taken' ? 'El nombre de usuario ya está en uso. Elige otro.' : 'El nombre de usuario está disponible.';
+                        usernameError.style.color = this.responseText === 'taken' ? '#c0392b' : '#27ae60';
                     }
                 };
-
-                xhr.onerror = function() {
-                    usernameError.textContent = 'Error al conectar con el servidor. Inténtalo más tarde.';
-                    usernameError.style.color = '#c12646';
-                    checkFormValidity(); // Llama a la función para deshabilitar el botón
-                };
-
                 xhr.send('username=' + encodeURIComponent(username));
-            } else {
-                usernameError.textContent = '';
-                checkFormValidity(); // Llama a la función para deshabilitar el botón
             }
         });
 
+        // Verificación de email
         document.getElementById('email').addEventListener('input', function() {
             const email = this.value;
             const emailError = document.getElementById('emailError');
 
-            // Expresión regular para validar el formato del correo electrónico
-            const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-
             if (email.length > 0) {
-                if (!emailPattern.test(email)) {
-                    emailError.textContent = 'Formato de correo electrónico no válido.';
-                    emailError.style.color = '#c12646';
-                    checkFormValidity(); // Llama a la función para deshabilitar el botón
-                } else {
-                    const xhr = new XMLHttpRequest();
-                    xhr.open('POST', 'scripts/check_email.php', true);
-                    xhr.setRequestHeader('Content-type', 'application/x-www-form-urlencoded');
+                const xhr = new XMLHttpRequest();
+                xhr.open('POST', 'scripts/check_email.php', true);
+                xhr.setRequestHeader('Content-type', 'application/x-www-form-urlencoded');
 
-                    xhr.onreadystatechange = function() {
-                        if (this.readyState === 4) {
-                            if (this.status === 200) {
-                                if (this.responseText === 'invalid') {
-                                    emailError.textContent = 'Formato de correo electrónico no válido.';
-                                    emailError.style.color = '#c12646';
-                                } else if (this.responseText === 'taken') {
-                                    emailError.textContent = 'El correo electrónico ya está en uso. Elige otro.';
-                                    emailError.style.color = '#c12646';
-                                } else {
-                                    emailError.textContent = 'El correo electrónico está disponible.';
-                                    emailError.style.color = '#00bcff';
-                                }
-                                checkFormValidity(); // Llama a la función para verificar el estado del formulario
-                            } else {
-                                emailError.textContent = 'Error al verificar el correo electrónico. Inténtalo más tarde.';
-                                emailError.style.color = '#c12646';
-                                checkFormValidity(); // Llama a la función para deshabilitar el botón
-                            }
-                        }
-                    };
-
-                    xhr.onerror = function() {
-                        emailError.textContent = 'Error al conectar con el servidor. Inténtalo más tarde.';
-                        emailError.style.color = '#c12646';
-                        checkFormValidity(); // Llama a la función para deshabilitar el botón
-                    };
-
-                    xhr.send('email=' + encodeURIComponent(email));
-                }
-            } else {
-                emailError.textContent = '';
-                checkFormValidity(); // Llama a la función para deshabilitar el botón
+                xhr.onreadystatechange = function() {
+                    if (this.readyState === 4 && this.status === 200) {
+                        emailError.textContent = this.responseText === 'taken' ? 'El correo electrónico ya está en uso.' : 'El correo electrónico está disponible.';
+                        emailError.style.color = this.responseText === 'taken' ? '#c0392b' : '#27ae60';
+                    }
+                };
+                xhr.send('email=' + encodeURIComponent(email));
             }
         });
     </script>
 </body>
+
 </html>

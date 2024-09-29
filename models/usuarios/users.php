@@ -49,7 +49,7 @@
                     if ($result->num_rows > 0) {
                         while ($row = $result->fetch_assoc()) {
                             echo '<div class="user-item" data-user-id="' . $row["id_usuario"] . '">';
-                            echo '<img src="../../uploads/' . $row["foto"] . '" alt="User Image">';
+                            echo '<img src="../../uploads/' . (empty($row["foto"]) ? '../../img/usuario.png' : $row["foto"]) . '" alt="User Image">';
                             echo '<div class="user-details">';
                             echo '<h2>' . $row["nombre"] . " " . $row['apellido']  . '</h2>';
                             echo '<p>' . $row["tipo_usuario"] . '</p>';

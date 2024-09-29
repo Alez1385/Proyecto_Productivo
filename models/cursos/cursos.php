@@ -129,7 +129,7 @@
                     if ($result->num_rows > 0) {
                         while ($row = $result->fetch_assoc()) {
                             echo '<div class="course-item" data-course-id="' . $row["id_curso"] . '">';
-                            echo '<img src="../../uploads/icons/' . $row["icono"] . '" alt="Course Image">';
+                            echo '<img src="../../uploads/icons/' . (empty($row["icono"]) ? '/img/usuario.png' : $row["icono"]) . '" alt="Course Image">';
                             echo '<div class="course-content">';
                             echo '<div class="course-details">';
                             echo '<h2>' . $row["nombre_curso"] . '</h2>';

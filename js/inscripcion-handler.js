@@ -417,12 +417,12 @@
         if (data.ya_inscrito) {
           showError("Ya estás inscrito en este curso.");
         } else {
-          window.location.href = `inscripcion/inscripcion_completa.php?curso_id=${encodeURIComponent(
+          window.location.href = `/inscripcion/inscripcion_completa.php?curso_id=${encodeURIComponent(
             courseId
           )}`;
         }
       } else if (data.status === "no_logueado") {
-        window.location.href = `login/login.php?redirect=inscripcion_completa.php&curso_id=${encodeURIComponent(
+        window.location.href = `/login/login.php?redirect=/inscripcion/inscripcion_completa.php?curso_id=${encodeURIComponent(
           courseId
         )}`;
       } else {
