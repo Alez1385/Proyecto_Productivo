@@ -39,7 +39,8 @@
                          LEFT JOIN categoria_curso cc ON c.id_categoria = cc.id_categoria
                          LEFT JOIN horarios h ON c.id_curso = h.id_curso
                          WHERE c.estado = 'activo' AND c.id_curso NOT IN (
-                             SELECT id_curso FROM inscripciones WHERE id_estudiante = ?
+                             SELECT id_curso FROM inscripciones WHERE id_estudiante = ? 
+                             AND estado IN ('pendiente', 'aprobado', 'rechazado')
                          )
                          GROUP BY c.id_curso";
         $stmt_cursos = $conn->prepare($query_cursos);

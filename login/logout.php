@@ -1,7 +1,21 @@
 <?php
+include('../scripts/conexion.php');
+include('../scripts/functions.php');
 // Iniciar la sesión
-session_start();
+// Eliminar la cookie 'remember_token'
+if (isset($_COOKIE['remember_token'])) {
+    removeRememberToken($_COOKIE['id_usuario']);
+}
 
+// Eliminar la cookie 'login_success'
+if (isset($_COOKIE['login_success'])) {
+    setcookie('login_success', '', time() - 3600, "/");
+}
+
+session_start();
+if (isset($_SESSION['id_usuario'])) {
+    removeRememberToken($_SESSION['id_usuario']);
+}
 // Destruir todas las variables de sesión
 $_SESSION = array();
 

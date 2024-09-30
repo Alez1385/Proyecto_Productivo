@@ -1,37 +1,9 @@
 <?php
-session_start();
-require_once('conexion.php');
-require_once('config.php');
-
-// Redirect if not logged in
-if (!isset($_SESSION['username'])) {
-    header("Location: " . BASE_URL . "login/login.php");
-    exit();
-}
-
-$username = $_SESSION['username'];
-
-// Get user information
-function getUserInfo($conn, $username) {
-    $sql = "SELECT u.*, t.nombre AS tipo_nombre FROM usuario u 
-            JOIN tipo_usuario t ON u.id_tipo_usuario = t.id_tipo_usuario 
-            WHERE u.username = ?";
-    $stmt = $conn->prepare($sql);
-    if (!$stmt) {
-        throw new Exception('Error preparing user query: ' . $conn->error);
-    }
-    $stmt->bind_param("s", $username);
-    if (!$stmt->execute()) {
-        throw new Exception('Error executing user query: ' . $stmt->error);
-    }
-    $result = $stmt->get_result();
-    if ($result->num_rows === 0) {
-        throw new Exception('User not found.');
-    }
-    $user = $result->fetch_assoc();
-    $stmt->close();
-    return $user;
-}
+// sidebar.php
+require_once 'conexion.php';
+require_once 'config.php';
+require_once 'functions.php';
+require_once 'auth.php';
 
 // Get modules for user type
 function getModules($conn, $userTypeId) {
@@ -54,9 +26,15 @@ function getModules($conn, $userTypeId) {
 }
 
 try {
-    $user = getUserInfo($conn, $username);
+    if (!isset($_SESSION['username'])) {
+        error_log("User ID not found in session. Session data: " . print_r($_SESSION, true));
+        throw new Exception('User ID not found in session.');
+    }
+    
+    $user = getUserInfo($conn, $_SESSION['id_usuario']);
     $modules = getModules($conn, $user['id_tipo_usuario']);
 } catch (Exception $e) {
+    error_log('Error in dashboard: ' . $e->getMessage());
     die('Error: ' . $e->getMessage());
 }
 ?>
@@ -68,6 +46,19 @@ try {
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link href="https://fonts.googleapis.com/icon?family=Material+Icons+Sharp" rel="stylesheet">
     <link rel="stylesheet" href="<?php echo BASE_URL; ?>dashboard/css/style.css">
+    <script src="<?php echo BASE_URL; ?>js/auth-debug.js"></script>
+    <script>
+        window.addEventListener('load', () => {
+            logAuthInfo('Dashboard loaded');
+            logCookies();
+            logSessionStorage();
+            
+            // Log PHP session data
+            <?php
+            echo "logAuthInfo('PHP Session: " . json_encode($_SESSION) . "');";
+            ?>
+        });
+    </script>
 </head>
 <body>
     <aside>

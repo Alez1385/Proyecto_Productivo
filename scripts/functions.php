@@ -72,11 +72,48 @@ function generateRememberToken() {
 function storeRememberToken($userId, $token) {
     global $conn;
     $hashedToken = password_hash($token, PASSWORD_DEFAULT);
-    $stmt = $conn->prepare("INSERT INTO password_resets (id_usuario, token, created_at) VALUES (?, ?, NOW())");
+    $sql = "INSERT INTO remember_tokens (id_usuario, token, expires_at) VALUES (?, ?, DATE_ADD(NOW(), INTERVAL 30 DAY))";
+    $stmt = $conn->prepare($sql);
     $stmt->bind_param("is", $userId, $hashedToken);
     $stmt->execute();
-    $stmt->close();
 }
+
+/**
+ * Validates a remember token
+ *
+ * @param int $id_usuario The user ID
+ * @param string $token The remember token
+ * @return bool True if the token is valid, false otherwise
+ */
+
+ function validateRememberToken($id_usuario, $token) {
+    global $conn;
+    $sql = "SELECT token FROM remember_tokens WHERE id_usuario = ? AND expires_at > NOW() ORDER BY created_at DESC LIMIT 1";
+    $stmt = $conn->prepare($sql);
+    $stmt->bind_param("i", $id_usuario);
+    $stmt->execute();
+    $result = $stmt->get_result();
+    if ($row = $result->fetch_assoc()) {
+        return password_verify($token, $row['token']);
+    }
+    return false;
+}
+
+/**
+ * Removes a remember token from the database
+ *
+ * @param int $id_usuario The user ID
+ */
+function removeRememberToken($id_usuario) {
+    global $conn;
+    $sql = "DELETE FROM remember_tokens WHERE id_usuario = ?";
+    $stmt = $conn->prepare($sql);
+    $stmt->bind_param("i", $id_usuario);
+    $stmt->execute();
+    setcookie('remember_token', '', time() - 3600, '/', '', isset($_SERVER["HTTPS"]) && $_SERVER["HTTPS"] === 'on', true);
+}
+
+
 /**
  * Hashes a password using a secure algorithm (Argon2id)
  *
@@ -195,6 +232,68 @@ function isPasswordStrong($password) {
            $hasUpper && $hasLower && $hasNumber && $hasSpecial &&
            !in_array(strtolower($password), $commonPasswords);
 }
+
+function getUserIdFromToken($token) {
+    global $conn;
+    $sql = "SELECT id_usuario FROM remember_tokens WHERE token = ? AND expires_at > NOW() ORDER BY created_at DESC LIMIT 1";
+    $stmt = $conn->prepare($sql);
+    $stmt->bind_param("s", $token);
+    $stmt->execute();
+    $result = $stmt->get_result();
+    if ($row = $result->fetch_assoc()) {
+        return $row['id_usuario'];
+    }
+    return null;
+}
+
+function getUserInfo($conn, $id_usuario) {
+    $sql = "SELECT u.*, t.nombre AS tipo_nombre FROM usuario u 
+            JOIN tipo_usuario t ON u.id_tipo_usuario = t.id_tipo_usuario 
+            WHERE u.id_usuario = ?";
+    $stmt = $conn->prepare($sql);
+    if (!$stmt) {
+        error_log("Error preparing user query: " . $conn->error);
+        throw new Exception('Error preparing user query: ' . $conn->error);
+    }
+    $stmt->bind_param("i", $id_usuario);
+    if (!$stmt->execute()) {
+        error_log("Error executing user query: " . $stmt->error);
+        throw new Exception('Error executing user query: ' . $stmt->error);
+    }
+    $result = $stmt->get_result();
+    if ($result->num_rows === 0) {
+        error_log("User not found for ID: $id_usuario");
+        throw new Exception('User not found.');
+    }
+    $user = $result->fetch_assoc();
+    $stmt->close();
+    return $user;
+}
+
+
+function getUserById($id_usuario) {
+    global $conn;
+    $sql = "SELECT * FROM usuario WHERE id_usuario = ?";
+    $stmt = $conn->prepare($sql);
+    if (!$stmt) {
+        error_log("Error preparing statement: " . $conn->error);
+        return null;
+    }
+    $stmt->bind_param("i", $id_usuario);
+    if (!$stmt->execute()) {
+        error_log("Error executing statement: " . $stmt->error);
+        return null;
+    }
+    $result = $stmt->get_result();
+    if ($result->num_rows === 0) {
+        error_log("No user found with ID: $id_usuario");
+        return null;
+    }
+    $user = $result->fetch_assoc();
+    $stmt->close();
+    return $user;
+}
+
 
 /**
  * Generates a secure random password reset token

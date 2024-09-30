@@ -1,8 +1,12 @@
 <?php
-// index.php
+// login.php
 ini_set('session.cookie_httponly', 1);
 ini_set('session.cookie_secure', 1);
 session_start();
+require_once('../scripts/conexion.php');
+require_once('../scripts/functions.php');
+
+// Set security headers
 header("Strict-Transport-Security: max-age=31536000; includeSubDomains");
 header("Content-Security-Policy: default-src 'self'; script-src 'self' https://cdnjs.cloudflare.com; style-src 'self' https://cdnjs.cloudflare.com; img-src 'self' data:;");
 header("X-Frame-Options: DENY");
@@ -10,8 +14,7 @@ header("X-XSS-Protection: 1; mode=block");
 header("X-Content-Type-Options: nosniff");
 header("Referrer-Policy: strict-origin-when-cross-origin");
 
-require_once('../scripts/conexion.php');
-require_once('../scripts/functions.php');
+
 
 // Force HTTPS
 if (!in_array($_SERVER['SERVER_NAME'], ['localhost', '127.0.0.1'])) {
@@ -19,6 +22,52 @@ if (!in_array($_SERVER['SERVER_NAME'], ['localhost', '127.0.0.1'])) {
         header("Location: https://" . $_SERVER['HTTP_HOST'] . $_SERVER['REQUEST_URI'], true, 301);
         exit();
     }
+}
+
+// Si ya hay una sesión activa, redirigir al dashboard
+if (isset($_SESSION['username'])) {
+    header("Location: /dashboard/dashboard.php");
+    exit();
+}
+
+// Verificar si la cookie de "recordarme" está establecida
+if (isset($_COOKIE['remember_token'])) {
+    error_log("Remember token encontrado: " . $_COOKIE['remember_token']);
+    // Recuperar el token de la cookie
+    $rememberToken = $_COOKIE['remember_token'];
+
+    // Verificar el token en la base de datos
+    $sql = "SELECT u.*, t.nombre AS tipo_nombre
+            FROM usuario u
+            JOIN tipo_usuario t ON u.id_tipo_usuario = t.id_tipo_usuario
+            WHERE u.remember_token = ?";
+    
+    $stmt = $conn->prepare($sql);
+    $stmt->bind_param("s", $rememberToken);
+    $stmt->execute();
+    $result = $stmt->get_result();
+
+    if ($result->num_rows > 0) {
+        // Usuario encontrado, iniciar sesión
+        $user = $result->fetch_assoc();
+        $_SESSION['id_usuario'] = $user['id_usuario'];
+        $_SESSION['username'] = $user['username'];
+        $_SESSION['user_role'] = $user['tipo_nombre'];
+        
+        // Regenerar ID de sesión por seguridad
+        session_regenerate_id(true);
+        
+        // Redirigir al dashboard
+        header("Location: /dashboard/dashboard.php");
+        exit();
+    } else {
+        // El token no es válido, eliminar la cookie
+        setcookie('remember_token', '', time() - 3600, "/");
+    }
+    
+    $stmt->close();
+} else {
+    error_log("No se encontró remember token");
 }
 
 // CSRF Token generation
@@ -36,6 +85,7 @@ $error = '';
 if (isset($_GET['error'])) {
     $error = htmlspecialchars($_GET['error'], ENT_QUOTES, 'UTF-8');
 }
+
 ?>
 <!DOCTYPE html>
 <html lang="en">
@@ -48,7 +98,26 @@ if (isset($_GET['error'])) {
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
     <link rel="icon" href="img/favicon.ico" type="image/x-icon">
     <script src="https://cdnjs.cloudflare.com/ajax/libs/zxcvbn/4.4.2/zxcvbn.js" integrity="sha512-TZlMGFY9xKj38t/5m2FzJ+RM/aD5alMHDe26p0mYUMoCF5G7ibfHUQILq0qQPV3wlsnCwL+TPRNK4vIWGLOkUQ==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
-    <script src="scripts/password.js"></script>
+    <script src="../js/auth-debug.js"></script>
+    <script>
+        // Log form submission
+        document.addEventListener('DOMContentLoaded', () => {
+            const form = document.querySelector('form');
+            form.addEventListener('submit', (e) => {
+                logAuthInfo('Login form submitted');
+                logAuthInfo(`Username: ${form.username.value}`);
+                logAuthInfo(`Remember me: ${form.remember.checked}`);
+            });
+        });
+
+        document.addEventListener('DOMContentLoaded', function() {
+            // Log session data
+            console.log('Session data:', <?php echo json_encode($_SESSION); ?>);
+
+            // Log cookies
+            console.log('Cookies:', document.cookie);
+        });
+    </script>
 </head>
 
 <body>
@@ -60,7 +129,7 @@ if (isset($_GET['error'])) {
                 <input type="hidden" name="redirect" value="<?php echo htmlspecialchars($redirect); ?>">
                 <h1>Register</h1>
                 <span>Usa tu email para registrarte</span>
-                
+
                 <!-- Username -->
                 <div class="input-group">
                     <input type="text" placeholder="Username" name="username" id="username" required>
@@ -75,9 +144,9 @@ if (isset($_GET['error'])) {
 
                 <!-- Password con ojito para mostrar/ocultar -->
                 <div class="input-group">
-                    <img src="img/eye-open.svg" alt="Toggle Lock" class="lock-icon" id="toggleLock1" onclick="togglePassword('password1','toggleLock1')">
-                    <input type="password" placeholder="Password" name="clave" id="password1" required>
-                    <span id="password-strength"></span>
+                    <input type="password" placeholder="Password" name="clave" id="clave" required>
+                    <img src="img/eye-open.svg" alt="Toggle Lock" class="lock-icon" id="register-lock-icon" onclick="togglePassword('clave','register-lock-icon')">
+                    <span id="register-password-strength" class="password-strength"></span>
                 </div>
 
                 <button type="submit" class="btn btn-primary" id="submitBtn">Crear Cuenta</button>
@@ -99,9 +168,9 @@ if (isset($_GET['error'])) {
 
                 <!-- Password con ojito para mostrar/ocultar -->
                 <div class="input-group">
-                <input type="password" placeholder="Password" name="password" id="password" required>
-                <img src="img/eye-open.svg" alt="Toggle Lock" class="lock-icon" id="toggleLock" onclick="togglePassword('password', 'toggleLock')">
-                <span id="password-strength"></span>
+                    <input type="password" placeholder="Password" name="password" id="password" required>
+                    <img src="img/eye-open.svg" alt="Toggle Lock" class="lock-icon" id="login-lock-icon" onclick="togglePassword('password', 'login-lock-icon')">
+                    <span id="login-password-strength" class="password-strength"></span>
                 </div>
 
                 <div class="options">
@@ -146,15 +215,6 @@ if (isset($_GET['error'])) {
     <!-- Scripts -->
     <script src="../js/login.js"></script>
     <script>
-
-        
-        // Medidor de fuerza de contraseña
-        document.getElementById('password').addEventListener('input', function() {
-            var result = zxcvbn(this.value);
-            var strength = ['Muy débil', 'Débil', 'Regular', 'Fuerte', 'Muy fuerte'];
-            document.getElementById('password-strength').textContent = 'Fortaleza de la contraseña: ' + strength[result.score];
-        });
-
         // Función para mostrar/ocultar contraseñas
         function togglePassword(passwordId, toggleId) {
             const passwordField = document.getElementById(passwordId);
@@ -170,6 +230,28 @@ if (isset($_GET['error'])) {
                 lockIcon.classList.remove('rotate');
             }
         }
+
+        // Función para medir la fuerza de la contraseña
+        function checkPasswordStrength(password, strengthElementId) {
+            const result = zxcvbn(password);
+            const strength = ['Muy débil', 'Débil', 'Regular', 'Fuerte', 'Muy fuerte'];
+            const strengthElement = document.getElementById(strengthElementId);
+            strengthElement.textContent = 'Fortaleza de la contraseña: ' + strength[result.score];
+
+            // Añadir clases de color basadas en la puntuación
+            strengthElement.className = 'password-strength'; // Resetear clases
+            strengthElement.classList.add('strength-' + result.score);
+        }
+
+        // Aplicar medidor de fuerza de contraseña para el formulario de registro
+        document.getElementById('clave').addEventListener('input', function() {
+            checkPasswordStrength(this.value, 'register-password-strength');
+        });
+
+        // Aplicar medidor de fuerza de contraseña para el formulario de login
+        document.getElementById('password').addEventListener('input', function() {
+            checkPasswordStrength(this.value, 'login-password-strength');
+        });
 
         // Verificación de nombre de usuario
         document.getElementById('username').addEventListener('input', function() {

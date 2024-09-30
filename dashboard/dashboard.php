@@ -1,34 +1,62 @@
-    <!DOCTYPE html>
-    <html lang="es">
+    <?php
+    require_once "../scripts/conexion.php";
+    require_once "../scripts/auth.php";
 
-    <head>
-        <meta charset="UTF-8">
-        <meta name="viewport" content="width=device-width, initial-scale=1.0">
-        <title>Dashboard - Inicio</title>
-        <link rel="stylesheet" href="css/dash.css">
-        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.1.1/css/all.min.css">
-        <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-    </head>
+    requireLogin();
+    checkPermission('admin');
 
-    <body>
-        <div class="dashboard-container">
-            <?php
-            include "../scripts/conexion.php";
-            include "../scripts/sidebar.php";
+    // Definir $username desde la sesión
+    if (isset($_SESSION['username'])) {
+        $username = $_SESSION['username'];
+    } else {
+        die("Error: No se ha encontrado el nombre de usuario en la sesión.");
+    }
 
+    // Función para obtener datos de la base de datos
+    function getDatabaseData($conn, $query)
+    {
+        $result = $conn->query($query);
+        if (!$result) {
+            die("Error al ejecutar la consulta: " . $conn->error);
+        }
+        return $result->fetch_all(MYSQLI_ASSOC);
+    }
 
-            // Función para obtener datos de la base de datos
-            function getDatabaseData($conn, $query)
-            {
-                $result = $conn->query($query);
-                if (!$result) {
-                    die("Error al ejecutar la consulta: " . $conn->error);
-                }
-                return $result->fetch_all(MYSQLI_ASSOC);
-            }
+    $user = getUserInfo($conn, $_SESSION['id_usuario']);
 
-            // Obtener cursos más populares
-            $popular_courses = getDatabaseData($conn, "
+    // Obtener estadísticas generales
+    $total_users = $conn->query("SELECT COUNT(*) as count FROM usuario");
+    if (!$total_users) {
+        die("Error al obtener total de usuarios: " . $conn->error);
+    }
+    $total_users = $total_users->fetch_assoc()['count'];
+
+    $total_courses = $conn->query("SELECT COUNT(*) as count FROM cursos");
+    if (!$total_courses) {
+        die("Error al obtener total de cursos: " . $conn->error);
+    }
+    $total_courses = $total_courses->fetch_assoc()['count'];
+
+    $total_students = $conn->query("SELECT COUNT(*) as count FROM estudiante");
+    if (!$total_students) {
+        die("Error al obtener total de estudiantes: " . $conn->error);
+    }
+    $total_students = $total_students->fetch_assoc()['count'];
+
+    $total_teachers = $conn->query("SELECT COUNT(*) as count FROM profesor");
+    if (!$total_teachers) {
+        die("Error al obtener total de profesores: " . $conn->error);
+    }
+    $total_teachers = $total_teachers->fetch_assoc()['count'];
+
+    $total_inscriptions = $conn->query("SELECT COUNT(*) as count FROM inscripciones");
+    if (!$total_inscriptions) {
+        die("Error al obtener total de inscripciones: " . $conn->error);
+    }
+    $total_inscriptions = $total_inscriptions->fetch_assoc()['count'];
+
+    // Obtener cursos más populares
+    $popular_courses = getDatabaseData($conn, "
     SELECT c.nombre_curso, COUNT(i.id_inscripcion) as inscripciones
     FROM cursos c
     LEFT JOIN inscripciones i ON c.id_curso = i.id_curso
@@ -67,77 +95,27 @@
 "
             );
 
-            // Manejo de errores en la conexión
-            if (!$conn) {
-                die("Error de conexión: " . mysqli_connect_error());
-            }
 
-            // Obtener información del usuario
-            $sql = "SELECT u.*, t.nombre AS tipo_usuario FROM usuario u 
-            JOIN tipo_usuario t ON u.id_tipo_usuario = t.id_tipo_usuario 
-            WHERE u.username = ?";
-            $stmt = $conn->prepare($sql);
+    ?>
+    <!DOCTYPE html>
+    <html lang="es">
 
-            if (!$stmt) {
-                die("Error en la preparación de la consulta: " . $conn->error);
-            }
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>Dashboard - Inicio</title>
+        <link rel="stylesheet" href="css/dash.css">
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.1.1/css/all.min.css">
+        <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.9.4/Chart.js"></script>
+    </head>
 
-            $stmt->bind_param("s", $username);
-            $stmt->execute();
-            $result = $stmt->get_result();
-
-            if (!$result) {
-                die("Error al ejecutar la consulta: " . $stmt->error);
-            }
-
-            $user = $result->fetch_assoc();
-
-            // Manejo de errores si no se encuentra el usuario
-            if (!$user) {
-                die("Usuario no encontrado");
-            }
-
-            // Obtener estadísticas generales
-            $total_users = $conn->query("SELECT COUNT(*) as count FROM usuario");
-            if (!$total_users) {
-                die("Error al obtener total de usuarios: " . $conn->error);
-            }
-            $total_users = $total_users->fetch_assoc()['count'];
-
-            $total_courses = $conn->query("SELECT COUNT(*) as count FROM cursos");
-            if (!$total_courses) {
-                die("Error al obtener total de cursos: " . $conn->error);
-            }
-            $total_courses = $total_courses->fetch_assoc()['count'];
-
-            $total_students = $conn->query("SELECT COUNT(*) as count FROM estudiante");
-            if (!$total_students) {
-                die("Error al obtener total de estudiantes: " . $conn->error);
-            }
-            $total_students = $total_students->fetch_assoc()['count'];
-
-            $total_teachers = $conn->query("SELECT COUNT(*) as count FROM profesor");
-            if (!$total_teachers) {
-                die("Error al obtener total de profesores: " . $conn->error);
-            }
-            $total_teachers = $total_teachers->fetch_assoc()['count'];
-
-            // Obtener cursos más populares
-            $popular_courses = $conn->query("
-        SELECT c.nombre_curso, COUNT(i.id_inscripcion) as inscripciones
-        FROM cursos c
-        LEFT JOIN inscripciones i ON c.id_curso = i.id_curso
-        GROUP BY c.id_curso
-        ORDER BY inscripciones DESC
-        LIMIT 5
-    ");
-
-            if (!$popular_courses) {
-                die("Error al obtener cursos populares: " . $conn->error);
-            }
-            $popular_courses = $popular_courses->fetch_all(MYSQLI_ASSOC);
-
+    <body>
+        <div class="dashboard-container">
+            <?php
+            include "../scripts/sidebar.php";
             ?>
+
             <div class="main-content">
                 <header class="header">
 
@@ -149,7 +127,7 @@
                             <div>
                                 <p><strong>Nombre:</strong> <?php echo htmlspecialchars($user['nombre'] . ' ' . $user['apellido']); ?></p>
                                 <p><strong>Email:</strong> <?php echo htmlspecialchars($user['mail']); ?></p>
-                                <p><strong>Tipo de Usuario:</strong> <?php echo htmlspecialchars($user['tipo_usuario']); ?></p>
+                                <p><strong>Tipo de Usuario:</strong> <?php echo htmlspecialchars($user['tipo_nombre']); ?></p>
                                 <p><strong>Último Acceso:</strong> <?php echo htmlspecialchars(date('d/m/Y H:i:s', strtotime($user['ultimo_acceso']))); ?></p>
                             </div>
                         </div>
@@ -311,3 +289,6 @@
     </body>
 
     </html>
+    <?php
+    $conn->close();
+    ?>
