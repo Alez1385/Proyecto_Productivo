@@ -15,14 +15,14 @@ function authenticateUser() {
     error_log("Attempting to authenticate user");
     error_log("Session data: " . print_r($_SESSION, true));
    
-    if (isset($_SESSION['id_usuario'])) {
+    if (isset($_SESSION['username'])) {
         /*
          * Si el usuario ha iniciado sesión, obtener sus datos de la base de datos
          * y verificar si el usuario existe
          */
-        $user = getUserById($_SESSION['id_usuario']);
+        $user = getUserByUsernameOrEmail($_SESSION['username']);
         if ($user) {
-            echo "<script>logAuthInfo('User authenticated via session: {$_SESSION['id_usuario']}');</script>";
+            echo "<script>logAuthInfo('User authenticated via session: {$_SESSION['username']}');</script>";
             return true;
         } else {
             /*

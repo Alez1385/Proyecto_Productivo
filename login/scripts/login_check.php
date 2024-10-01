@@ -108,8 +108,8 @@ if ($result->num_rows > 0) {
                 'expires' => time() + (86400 * 30),
                 'path' => '/',
                 'secure' => $secure, // Asegúrate de que esto esté correcto
-                'httponly' => true,
-                'samesite' => 'Strict' // O 'Lax' si la cookie es usada en subdominios
+                'httponly' => false,
+                'samesite' => 'lax' // O 'Lax' si la cookie es usada en subdominios
             ]);            
 
 

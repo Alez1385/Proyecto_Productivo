@@ -263,7 +263,7 @@ function getUserInfo($conn, $id_usuario) {
     $result = $stmt->get_result();
     if ($result->num_rows === 0) {
         error_log("User not found for ID: $id_usuario");
-        throw new Exception('User not found.');
+        return null;
     }
     $user = $result->fetch_assoc();
     $stmt->close();

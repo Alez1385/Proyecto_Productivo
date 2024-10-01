@@ -37,19 +37,10 @@ if (isset($_COOKIE['remember_token'])) {
     $rememberToken = $_COOKIE['remember_token'];
 
     // Verificar el token en la base de datos
-    $sql = "SELECT u.*, t.nombre AS tipo_nombre
-            FROM usuario u
-            JOIN tipo_usuario t ON u.id_tipo_usuario = t.id_tipo_usuario
-            WHERE u.remember_token = ?";
-    
-    $stmt = $conn->prepare($sql);
-    $stmt->bind_param("s", $rememberToken);
-    $stmt->execute();
-    $result = $stmt->get_result();
+    $user = getUserInfo($conn, getUserIdFromToken($rememberToken));
 
-    if ($result->num_rows > 0) {
+    if (isset($user)) {
         // Usuario encontrado, iniciar sesión
-        $user = $result->fetch_assoc();
         $_SESSION['id_usuario'] = $user['id_usuario'];
         $_SESSION['username'] = $user['username'];
         $_SESSION['user_role'] = $user['tipo_nombre'];
@@ -62,10 +53,9 @@ if (isset($_COOKIE['remember_token'])) {
         exit();
     } else {
         // El token no es válido, eliminar la cookie
-        setcookie('remember_token', '', time() - 3600, "/");
-    }
-    
-    $stmt->close();
+        // setcookie('remember_token', '', time() - 3600, "/");
+        echo $user;
+    }   
 } else {
     error_log("No se encontró remember token");
 }
