@@ -233,8 +233,7 @@ function isPasswordStrong($password) {
            !in_array(strtolower($password), $commonPasswords);
 }
 
-function getUserIdFromToken($token) {
-    global $conn;
+function getUserIdFromToken($token, $conn) {
     $sql = "SELECT id_usuario FROM remember_tokens WHERE token = ? AND expires_at > NOW() ORDER BY created_at DESC LIMIT 1";
     $stmt = $conn->prepare($sql);
     $stmt->bind_param("s", $token);
@@ -271,8 +270,7 @@ function getUserInfo($conn, $id_usuario) {
 }
 
 
-function getUserById($id_usuario) {
-    global $conn;
+function getUserById($conn, $id_usuario) {
     $sql = "SELECT * FROM usuario WHERE id_usuario = ?";
     $stmt = $conn->prepare($sql);
     if (!$stmt) {
