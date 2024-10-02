@@ -37,7 +37,7 @@ if (isset($_COOKIE['remember_token'])) {
     $rememberToken = $_COOKIE['remember_token'];
 
     // Verificar el token en la base de datos
-    $user = getUserInfo($conn, getUserIdFromToken($rememberToken));
+    $user = getUserInfo($conn, getUserIdFromToken($conn, $rememberToken));
 
     if (isset($user)) {
         // Usuario encontrado, iniciar sesión
