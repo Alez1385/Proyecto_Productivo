@@ -8727,13 +8727,12 @@ h1, h2, h3, h4, h5,
     outline: none; }
   .btn.btn-primary {
     background: #4a90e2;
-    transition: all 0.3s ease;
-    
-    color: #000000 !important; }
+    transition: all 0.3s ease; 
+    color: #fff !important; }
     .btn.btn-primary:hover {
       
       background-color: #3a7bc8;
-      color: #000000 !important; }
+      color: #fff !important; }
     .btn.btn-primary.btn-outline-primary {
       border: 2px solid #ffbd39 !important;
       background: transparent !important;
@@ -9760,23 +9759,10 @@ textarea.form-control {
     
       .services-1 {
         position: relative;
-        padding-top: 80px; /* Ajusta este valor según sea necesario */
+     
     }
     
-    .course-icon {
-        position: absolute;
-        top: 0;
-        width: 50%; /* Ajusta el tamaño según sea necesario */
-        height: 80px;
-        background-color: #f8f9fa; /* O el color que prefieras */
-        display: flex;
-        left: 25%;
-        justify-content: center;
-        background-color: transparent;
-        align-items: center;
-        overflow: hidden;
-        transition: all 0.3s ease;
-    }
+
     
     .course-icon-img {
       max-width: 100%;
