@@ -32,33 +32,47 @@ if (isset($_SESSION['username'])) {
 
 // Verificar si la cookie de "recordarme" está establecida
 if (isset($_COOKIE['remember_token'])) {
-    error_log("Remember token encontrado: " . $_COOKIE['remember_token']);
-    // Recuperar el token de la cookie
+    error_log("Remember token found: " . $_COOKIE['remember_token']);
+    
+    // Retrieve the token from the cookie
     $rememberToken = $_COOKIE['remember_token'];
-
-    // Verificar el token en la base de datos
-    $user = getUserInfo($conn, getUserIdFromToken($conn, $rememberToken));
-
-    if (isset($user)) {
-        // Usuario encontrado, iniciar sesión
-        $_SESSION['id_usuario'] = $user['id_usuario'];
-        $_SESSION['username'] = $user['username'];
-        $_SESSION['user_role'] = $user['tipo_nombre'];
-        
-        // Regenerar ID de sesión por seguridad
-        session_regenerate_id(true);
-        
-        // Redirigir al dashboard
-        header("Location: /dashboard/dashboard.php");
-        exit();
-    } else {
-        // El token no es válido, eliminar la cookie
-        // setcookie('remember_token', '', time() - 3600, "/");
-        echo $user;
-    }   
+    
+    // Get the user ID associated with the token
+    $userId = getUserIdFromToken($rememberToken, $conn);
+    
+    if ($userId) {
+        // Validate the remember token
+        if (validateRememberToken($userId, $rememberToken)) {
+            // Get user information
+            $user = getUserInfo($conn, $userId);
+            
+            if ($user) {
+                // User found, start session
+                $_SESSION['id_usuario'] = $user['id_usuario'];
+                $_SESSION['username'] = $user['username'];
+                $_SESSION['user_role'] = $user['tipo_nombre'];
+                
+                // Regenerate session ID for security
+                session_regenerate_id(true);
+                
+                // Update last access timestamp
+                updateLastAccess($userId);
+                
+                // Redirect to dashboard
+                header("Location: /dashboard/dashboard.php");
+                exit();
+            }
+        }
+    }
+    
+    // If we reach here, the token is invalid or expired
+    removeRememberToken($userId);
+    error_log("Invalid or expired remember token");
 } else {
-    error_log("No se encontró remember token");
+    error_log("No remember token found");
 }
+
+
 
 // CSRF Token generation
 if (empty($_SESSION['csrf_token'])) {

@@ -8,4 +8,4 @@ define('BASE_URL', '/');
 
 // Definir la ruta absoluta en el sistema de archivos del servidor
 // dirname(__FILE__) obtiene el directorio donde se encuentra este archivo
-define('BASE_PATH', dirname(__FILE__) . '/');
+define('BASE_PATH', dirname(dirname(__FILE__)) . '/');

@@ -101,7 +101,6 @@ if ($result->num_rows > 0) {
         // Remember user with cookies if selected
         if ($remember) {
             $token = generateRememberToken();
-            storeRememberToken($user['id_usuario'], $token);
 
             $secure = false; // Para pruebas locales, cambia esto a true en producción
             setcookie('remember_token', $token, [
@@ -111,7 +110,7 @@ if ($result->num_rows > 0) {
                 'httponly' => false,
                 'samesite' => 'lax' // O 'Lax' si la cookie es usada en subdominios
             ]);            
-
+            storeRememberToken($user['id_usuario'], $token);
 
             error_log("Remember token set: $token");
         } else {
@@ -143,7 +142,7 @@ if ($result->num_rows > 0) {
         if (!checkLoginAttempts($_SERVER['REMOTE_ADDR'])) {
             error_log("Too many failed attempts. Locking account.");
             lockUserAccount($user['id_usuario']);
-            sendLockoutNotificationEmail($user['mail']);    
+            sendEmail($user['mail'], 'lockout');    
             logSecurityEvent('Failed login attempt', $user['username']);
             redirectWithError('account_locked');
         }

@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Servidor: 127.0.0.1
--- Tiempo de generación: 01-10-2024 a las 01:05:24
+-- Tiempo de generación: 03-10-2024 a las 03:40:06
 -- Versión del servidor: 10.4.32-MariaDB
 -- Versión de PHP: 8.2.12
 
@@ -193,15 +193,6 @@ CREATE TABLE `historial_inscripciones` (
   `id_usuario_cambio` int(11) DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
---
--- Volcado de datos para la tabla `historial_inscripciones`
---
-
-INSERT INTO `historial_inscripciones` (`id_historial`, `id_inscripcion`, `estado_anterior`, `estado_nuevo`, `fecha_cambio`, `id_usuario_cambio`) VALUES
-(72, 33, 'pendiente', 'cancelada', '2024-09-30 19:02:44', 36),
-(73, 34, 'pendiente', 'cancelada', '2024-09-30 19:02:46', 36),
-(74, 35, 'pendiente', 'cancelada', '2024-09-30 19:07:02', 36);
-
 -- --------------------------------------------------------
 
 --
@@ -233,15 +224,6 @@ CREATE TABLE `inscripciones` (
   `comprobante_pago` varchar(255) DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
---
--- Volcado de datos para la tabla `inscripciones`
---
-
-INSERT INTO `inscripciones` (`id_inscripcion`, `id_curso`, `id_estudiante`, `id_preinscripcion`, `fecha_inscripcion`, `estado`, `fecha_actualizacion`, `comprobante_pago`) VALUES
-(33, 1, 1, NULL, '2024-09-30', 'cancelada', '2024-09-30 19:02:44', NULL),
-(34, 2, 1, NULL, '2024-09-30', 'cancelada', '2024-09-30 19:02:46', NULL),
-(35, 1, 1, NULL, '2024-09-30', 'cancelada', '2024-09-30 19:07:02', NULL);
-
 -- --------------------------------------------------------
 
 --
@@ -253,18 +235,6 @@ CREATE TABLE `login_attempts` (
   `ip` varchar(45) NOT NULL,
   `timestamp` datetime NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
-
---
--- Volcado de datos para la tabla `login_attempts`
---
-
-INSERT INTO `login_attempts` (`id`, `ip`, `timestamp`) VALUES
-(6, '127.0.0.1', '2024-09-29 16:12:56'),
-(7, '127.0.0.1', '2024-09-29 16:14:44'),
-(8, '127.0.0.1', '2024-09-29 17:46:43'),
-(9, '127.0.0.1', '2024-09-30 14:07:15'),
-(10, '127.0.0.1', '2024-09-30 14:27:47'),
-(11, '127.0.0.1', '2024-09-30 16:40:21');
 
 -- --------------------------------------------------------
 
@@ -330,27 +300,9 @@ CREATE TABLE `password_resets` (
 --
 
 INSERT INTO `password_resets` (`id`, `email`, `token`, `created_at`, `id_usuario`) VALUES
-(21, '', '$2y$10$CO3IA8FNbsjrS3Sx5agp1uzj4zqtMoA/nfJvFEUDSwVY4sMqX6qQy', '2024-09-29 16:10:52', 53),
-(22, '', '$2y$10$MxWmaUfYheSiQUdqsrot2e369BQ1pVAS17b4g2AaoFNscVckB198.', '2024-09-29 16:20:27', 36),
-(23, '', '$2y$10$ImM5KNdnWesi1sfuo.TJeuYMx3ANNvoOZHzk7XYgTRmjAtKVGpa6.', '2024-09-29 16:21:30', 36),
-(24, '', '$2y$10$QQxR8ym94.p72YjRMGCg9ebP1xe.1E0ux8DpLM/8JIAYndfuor49S', '2024-09-29 16:31:25', 53),
-(25, '', '$2y$10$T3yB6SgzBl8nQ5jTX7dS5eOVhiJfr8wWd3e8f0L2pJS/Q7wxFQdoy', '2024-09-29 16:37:37', 36),
-(26, '', '$2y$10$Krlo7Z/X4E/3kxQf3H/2nuA5J/qirfiR.ykf5QTSILWcDGhGboAK2', '2024-09-29 16:43:58', 53),
-(27, '', '$2y$10$qhFhYSeVQzvpqQCPX9djyOAqcRBZdjGn8kqFD4wkoGtf9Y65ik1Vy', '2024-09-29 16:45:01', 53),
-(28, '', '$2y$10$rfEZUdBaPiuoCn.iBP6MsuuyA5fB661L3vCBbMEUv6MZ7oaJ6P4Du', '2024-09-29 16:45:24', 53),
-(29, '', '$2y$10$zS2c/8cVGk8hvlWJ4tNXJeEzLf3poXgdAHdwFI3Pkn.nYI6Gx6IOO', '2024-09-29 16:58:01', 53),
-(30, '', '$2y$10$0LUGL4/dFoUtn3fyHrqzX.Y6sS8OoUFlppQrS.3LyR2X7Bzw/sQRa', '2024-09-29 17:04:44', 53),
-(31, '', '$2y$10$qgkOHjwQgQGa5kmSDn/ZE.Jd2/LO/E1FTDz.uPsT8oA417y3BuZEK', '2024-09-29 17:09:19', 53),
-(32, '', '$2y$10$2LxhlaO2MOW7Olnaicg4MumFiZ.RFqt3dNTScAT3akeqOtrOZYKe.', '2024-09-29 17:13:17', 53),
-(33, '', '$2y$10$krAwC.ANFOO71I52XQ0jIOfdMczj1Eej4ept9/rg2Rg6/6R1xkyaa', '2024-09-29 17:16:22', 53),
-(34, '', '$2y$10$c7m22cjAl0mvuV.yGHRBJ.G2oULL4.xRYK7mpMu7pCnRHDSJZ9oWW', '2024-09-29 17:18:59', 53),
-(35, '', '$2y$10$XcGDX/4nRgLitEn0bb8GVOJeAoXmqlsxarYE57CGpZJe24gKqtMQS', '2024-09-29 17:28:00', 53),
-(36, '', '$2y$10$Dqo8doWmoXVpuMUPmeGI6uF7wB0bt49nH0krty1mPVPsMXEo0.n/e', '2024-09-29 17:32:20', 53),
-(37, '', '$2y$10$IhPjueV17jfgLW60g6.E1.2rc2Jxm31Rpi7wC9ca9XJ/R4H1ENaR2', '2024-09-29 17:46:51', 53),
-(38, '', '$2y$10$pgaikJZGpQeXAfkrEhQd5OvJgaT0Uzo8PpCH2cqdxEPJpFGDvqA3a', '2024-09-29 17:49:47', 53),
-(39, '', '$2y$10$JK0ncSISUGkLK9bo1KMOxeKLcBCgnc2uu5kHJUz.2czFvruUBiMSO', '2024-09-30 13:53:14', 53),
-(40, '', '$2y$10$O5yLotejesD0xb/16bdcK.8vpEYD.qmmSJmpb.NpLXkbLtmU3PzB6', '2024-09-30 14:00:56', 53),
-(41, '', '$2y$10$PohGaxCWdgiSbywB6CxQ5exgtc5FfnkzCupmiocm/hoOoTAXdL/iG', '2024-09-30 14:01:16', 53);
+(46, 'santiagocaponf@gmail.com', 'ab62cf32778dfe063a7afd8c87081bebcccd15900ac0ffbb98f56b4fee6c8aca', '2024-10-02 19:32:34', 36),
+(47, 'santiagocaponf@gmail.com', '3a43fab6750869f508850169d66ff43bdfb0ca059381c17a99ec2f5c3a24f0e8', '2024-10-02 19:40:44', 36),
+(48, 'santiagocaponf@gmail.com', 'bcad622b7b016e3a263de308641be51c29abc94d02709f462882eb2b0e44bb10', '2024-10-02 19:40:47', 36);
 
 -- --------------------------------------------------------
 
@@ -375,13 +327,9 @@ CREATE TABLE `preinscripciones` (
 --
 
 INSERT INTO `preinscripciones` (`id_preinscripcion`, `id_curso`, `nombre`, `email`, `telefono`, `fecha_preinscripcion`, `estado`, `token`, `id_usuario`) VALUES
-(26, 2, 'Juanito Alimaña', 'juanit@gmail.com', '5233456345', '2024-09-21 19:39:12', 'pendiente', '94b595118998e3e11995c4b83072064c', 53),
-(27, 2, 'Juanito Alimaña', 'juanit@gmail.com', '5233456345', '2024-09-21 21:17:33', 'pendiente', '787ccefb8827a1c9344c9ef8b8042c81', 53),
-(28, 2, 'Juanito Alimaña', 'juanit@gmail.com', '5233456345', '2024-09-22 01:47:58', 'pendiente', '85614afa65dad23bc45a5e694f47f43e', 53),
-(29, 2, 'Juanito Alimaña', 'juanit@gmail.com', '5233456345', '2024-09-22 01:54:04', 'pendiente', '01d33114c1d5540208ad13a6667fa41b', 53),
-(30, 2, 'Juanito Alimaña', 'juanit@gmail.com', '5233456345', '2024-09-22 01:58:06', 'pendiente', '39527d96fdf6cd60180736d8fa1acae1', 53),
-(31, 2, 'Santiagoe Capon', 'santiagocaponf@gmail.com', '32452345', '2024-09-29 00:47:29', 'pendiente', '738011986a37cf5b380c163e1cff33da', 36),
-(32, 2, 'Santiagoe Capon', 'santiagocaponf@gmail.com', '32452345', '2024-09-29 00:47:36', 'pendiente', 'e3ec8b702ae93b469f347d105ef10216', 36);
+(34, 2, 'Juanito Alimaña', 'juanit@gmail.com', '5233456345', '2024-10-03 01:30:13', 'pendiente', 'a8ce2bd9dcd09a1ce82513e6b9610484', 53),
+(35, 8, 'Juanito Alimaña', 'juanit@gmail.com', '5233456345', '2024-10-03 01:31:40', 'pendiente', 'e79afefdcf21ed88d8c6c39b591e1f88', 53),
+(36, 1, 'Juanito Alimaña', 'juanit@gmail.com', '5233456345', '2024-10-03 01:33:02', 'pendiente', '0a4d64b82e29e156e6730eb3bf5ede59', 53);
 
 -- --------------------------------------------------------
 
@@ -409,15 +357,6 @@ CREATE TABLE `remember_tokens` (
   `created_at` timestamp NOT NULL DEFAULT current_timestamp(),
   `expires_at` timestamp NOT NULL DEFAULT current_timestamp()
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
-
---
--- Volcado de datos para la tabla `remember_tokens`
---
-
-INSERT INTO `remember_tokens` (`id`, `id_usuario`, `token`, `created_at`, `expires_at`) VALUES
-(12, 36, '$2y$10$brgfG83ho1rBil76MLHSo.UOcv8JMgXgOpWmCUka3ifW/EwyNBI8u', '2024-09-30 22:52:58', '2024-10-30 22:52:58'),
-(13, 36, '$2y$10$YYykz7Lv383t3du8o2nWUuHeJRQ4PuQD6BdY5acdDdYfWik.STEDy', '2024-09-30 22:59:29', '2024-10-30 22:59:29'),
-(14, 36, '$2y$10$XZ.nuY2UFD.zicUi59ujMuoJGlTXkLnU4V1deF2lOdv/qG6IIaeJm', '2024-09-30 23:03:08', '2024-10-30 23:03:08');
 
 -- --------------------------------------------------------
 
@@ -495,7 +434,7 @@ CREATE TABLE `usuario` (
 --
 
 INSERT INTO `usuario` (`id_usuario`, `nombre`, `apellido`, `tipo_doc`, `documento`, `fecha_nac`, `foto`, `mail`, `telefono`, `direccion`, `id_tipo_usuario`, `username`, `clave`, `fecha_registro`, `estado`, `ultimo_acceso`, `is_locked`, `lock_timestamp`) VALUES
-(36, 'Santiago', 'Capon', 'ID', '12341235234', '2345-03-12', 'WhatsApp Image 2024-07-23 at 4.49.07 PM.jpeg', 'santiagocaponf@gmail.com', '32452345', 'CL 18 A NORTE 2 72', 1, 'alez', '$2y$10$64T2Qk8yptB8y8Rk6Kq26uhnbT3Ias.JH.EXcin2d1BPQCzAvHiM6', '2024-08-25 17:43:54', 'activo', '2024-09-14 21:59:17', 0, NULL),
+(36, 'Santiago', 'Capon', 'ID', '12341235234', '2345-03-12', 'WhatsApp Image 2024-07-23 at 4.49.07 PM.jpeg', 'santiagocaponf@gmail.com', '32452345', 'CL 18 A NORTE 2 72', 1, 'alez', '$2y$10$64T2Qk8yptB8y8Rk6Kq26uhnbT3Ias.JH.EXcin2d1BPQCzAvHiM6', '2024-08-25 17:43:54', 'activo', '2024-10-02 18:35:00', 0, NULL),
 (42, 'chad', 'sexteto', 'ID', '523456346', '3654-04-23', '66d273c33d474_Recurso 9europe.jpg', 'luisillo@gmail.com', '4563475674', 'CL 18 A NORTE 2 72', 1, 'alez23', '$2y$10$FrpZXvgI3WrL22y9MxNtfuQsyQSgCJ7Jm4VPUv3Aa4qEn2HCKdxsK', '2024-08-29 16:26:44', 'activo', NULL, 0, NULL),
 (51, 'antonela', 'sepulveda', 'ID', '342352345', '0005-04-23', '66d23c1021bab_f7c0528d915ec3b38dd89bf7beb2a194.jpg', 'scflorez@corsaje.edu.co', '42352345', 'CL 18 A NORTE 2 72', 1, 'mientras', '$2y$10$KJU2liHj854T1T9M.6/EK.xDYy4sfLf2XEwCldj230rdreZmC.3KC', '2024-08-30 16:39:28', 'activo', NULL, 0, NULL),
 (53, 'Juanito', 'Alimaña', 'ID', '43523634', '0634-06-02', '66d2441faa705_pngwing.com.png', 'juanit@gmail.com', '5233456345', 'CL 18 A NORTE 2 72', 3, 'alez123123', '$2y$10$p.bJhCL9d2VM1IjUCnC63.Edj5Pg87KZgKGTFyedUHPusUd.QSDAK', '2024-08-30 17:13:51', 'activo', NULL, 0, NULL),
@@ -722,7 +661,7 @@ ALTER TABLE `inscripciones`
 -- AUTO_INCREMENT de la tabla `login_attempts`
 --
 ALTER TABLE `login_attempts`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=12;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=13;
 
 --
 -- AUTO_INCREMENT de la tabla `modulos`
@@ -740,13 +679,13 @@ ALTER TABLE `pagos`
 -- AUTO_INCREMENT de la tabla `password_resets`
 --
 ALTER TABLE `password_resets`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=42;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=49;
 
 --
 -- AUTO_INCREMENT de la tabla `preinscripciones`
 --
 ALTER TABLE `preinscripciones`
-  MODIFY `id_preinscripcion` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=33;
+  MODIFY `id_preinscripcion` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=37;
 
 --
 -- AUTO_INCREMENT de la tabla `profesor`
@@ -758,7 +697,7 @@ ALTER TABLE `profesor`
 -- AUTO_INCREMENT de la tabla `remember_tokens`
 --
 ALTER TABLE `remember_tokens`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=15;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=26;
 
 --
 -- AUTO_INCREMENT de la tabla `resume_cursos`

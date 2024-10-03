@@ -24,16 +24,6 @@ if (!$curso) {
 $stmt->close();
 ?>
 
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Editar Curso</title>
-    <link rel="stylesheet" href="../../css/form.css">
-    <link rel="stylesheet" href="https://fonts.googleapis.com/icon?family=Material+Icons+Sharp">
-</head>
-<body>
     <div class="form-container">
         <form class="course-form" action="scripts/update.php" method="post" enctype="multipart/form-data">
             <h2>Editar Curso</h2>
@@ -105,5 +95,4 @@ $stmt->close();
             <button type="submit" class="btn btn-primary">Guardar Cambios</button>
         </form>
     </div>
-</body>
-</html>
+

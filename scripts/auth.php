@@ -12,22 +12,16 @@ require_once('functions.php');
  * @return bool true si el usuario ha iniciado sesión, false en caso contrario
  */
 function authenticateUser() {
+    global $conn; // Asegúrate de que $conn esté disponible
     error_log("Attempting to authenticate user");
     error_log("Session data: " . print_r($_SESSION, true));
-   
+
     if (isset($_SESSION['username'])) {
-        /*
-         * Si el usuario ha iniciado sesión, obtener sus datos de la base de datos
-         * y verificar si el usuario existe
-         */
         $user = getUserByUsernameOrEmail($_SESSION['username']);
         if ($user) {
             echo "<script>logAuthInfo('User authenticated via session: {$_SESSION['username']}');</script>";
             return true;
         } else {
-            /*
-             * Si el usuario no se encontró en la base de datos, limpiar la sesión
-             */
             session_unset();
             session_destroy();
             error_log("User not found in database. Session cleared.");
@@ -35,32 +29,31 @@ function authenticateUser() {
         }
     }
 
+    // Manejo del token de recordar sesión
     if (isset($_COOKIE['remember_token'])) {
         echo "<script>logAuthInfo('Remember token found: {$_COOKIE['remember_token']}');</script>";
         $token = $_COOKIE['remember_token'];
         $id_usuario = getUserIdFromToken($token);
         error_log("User ID from token: " . ($id_usuario ?: 'Not found'));
+
         if ($id_usuario && validateRememberToken($id_usuario, $token)) {
             error_log("Remember token validated successfully");
 
-            $user = getUserById($id_usuario);
+            $user = getUserById($conn, $id_usuario); // Asegúrate de pasar $conn
             if ($user) {
                 echo "<script>logAuthInfo('User authenticated via remember token');</script>";
                 $_SESSION['id_usuario'] = $user['id_usuario'];
                 $_SESSION['username'] = $user['username'];
                 $_SESSION['user_role'] = $user['role'];
-               
+
                 error_log("Session data set: " . print_r($_SESSION, true));
-           
-                /*
-                 * Generar un nuevo token de recordatorio y guardarlo en la base de datos
-                 * y en la cookie
-                 */
+
+                // Generar un nuevo token de recordar sesión
                 $newToken = generateRememberToken();
                 storeRememberToken($id_usuario, $newToken);
                 setcookie('remember_token', $newToken, time() + (86400 * 30), "/", "", isset($_SERVER["HTTPS"]) && $_SERVER["HTTPS"] === 'on', true);
                 error_log("New remember token set: $newToken");
-           
+
                 return true;
             } else {
                 error_log("User not found in database for ID: $id_usuario");
@@ -73,6 +66,7 @@ function authenticateUser() {
     } else {
         error_log("No remember token found in cookies");
     }
+
     error_log("Authentication failed");
     return false;
 }
@@ -92,8 +86,6 @@ function checkPermission($requiredRole) {
     error_log("Current user role: " . ($_SESSION['user_role'] ?? 'Not set'));
     if (!isset($_SESSION['user_role']) || $_SESSION['user_role'] !== $requiredRole) {
         error_log("Permission denied. Redirecting to access denied page");
-        // Redirect to access denied page
-
         header('Location: ' . BASE_URL . 'scripts/access-denied.php?role=' . $requiredRole);
         exit;
     }

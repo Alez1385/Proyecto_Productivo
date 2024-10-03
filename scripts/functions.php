@@ -1,56 +1,42 @@
 <?php
-// functions.php
 require_once 'conexion.php';
+require_once 'config.php';
+require_once BASE_PATH . 'vendor/autoload.php';
+use PHPMailer\PHPMailer\PHPMailer;
+use PHPMailer\PHPMailer\Exception;
 
-/**
- * Validates a redirect URL to prevent open redirects
- *
- * @param string $url The URL to validate
- * @return bool True if the URL is valid, false otherwise
- */
 function isValidRedirect($url) {
-    // Ensure the URL is not empty and is a string
     if (empty($url) || !is_string($url)) {
         return false;
     }
 
-    // Parse the URL to validate its components
     $parsedUrl = parse_url($url);
 
-    // Check if the path is a valid absolute path
     if (isset($parsedUrl['path'])) {
         $basePath = strtok($parsedUrl['path'], '?');
         if (strpos($basePath, '/') === 0) {
-            // List of allowed paths
             $allowedPaths = [
                 '/dashboard/dashboard.php',
                 '/inscripcion/inscripcion_completa.php',
-                // Add other allowed paths here
             ];
             
-            // Check if the base path is in the list of allowed paths
             if (in_array($basePath, $allowedPaths)) {
                 return true;
             }
         }
     }
     
-    // Check if we're in a local development environment
     $isLocalDevelopment = in_array($_SERVER['SERVER_NAME'], ['localhost', '127.0.0.1']);
 
-    // Validate URLs with a host (for local or production environments)
     if (isset($parsedUrl['host'])) {
         if ($isLocalDevelopment) {
-            // For local development, allow localhost and 127.0.0.1
             return in_array($parsedUrl['host'], ['localhost', '127.0.0.1']);
         } else {
-            // For production, ensure the host matches allowed domains
-            $allowedHosts = ['yourdomain.com', 'www.yourdomain.com']; // Add your allowed production domains
+            $allowedHosts = ['yourdomain.com', 'www.yourdomain.com'];
             return in_array($parsedUrl['host'], $allowedHosts);
         }
     }
 
-    // If no valid path or host was found, reject the URL
     return false;
 }
 
@@ -233,43 +219,55 @@ function isPasswordStrong($password) {
            !in_array(strtolower($password), $commonPasswords);
 }
 
-function getUserIdFromToken($token, $conn) {
-    $sql = "SELECT id_usuario FROM remember_tokens WHERE token = ? AND expires_at > NOW() ORDER BY created_at DESC LIMIT 1";
+function getUserIdFromToken($token) {
+    global $conn;
+    $sql = "SELECT id_usuario, token FROM remember_tokens WHERE expires_at > NOW() ORDER BY created_at DESC LIMIT 1";
     $stmt = $conn->prepare($sql);
-    $stmt->bind_param("s", $token);
     $stmt->execute();
     $result = $stmt->get_result();
-    if ($row = $result->fetch_assoc()) {
-        return $row['id_usuario'];
+    
+    while ($row = $result->fetch_assoc()) {
+        if (password_verify($token, $row['token'])) {
+            return $row['id_usuario'];
+        }
     }
-    return null;
+    return false;
 }
+
 
 function getUserInfo($conn, $id_usuario) {
-    $sql = "SELECT u.*, t.nombre AS tipo_nombre FROM usuario u 
-            JOIN tipo_usuario t ON u.id_tipo_usuario = t.id_tipo_usuario 
-            WHERE u.id_usuario = ?";
-    $stmt = $conn->prepare($sql);
-    if (!$stmt) {
-        error_log("Error preparing user query: " . $conn->error);
-        throw new Exception('Error preparing user query: ' . $conn->error);
-    }
-    $stmt->bind_param("i", $id_usuario);
-    if (!$stmt->execute()) {
-        error_log("Error executing user query: " . $stmt->error);
-        throw new Exception('Error executing user query: ' . $stmt->error);
-    }
-    $result = $stmt->get_result();
-    if ($result->num_rows === 0) {
-        error_log("User not found for ID: $id_usuario");
+    try {
+        $sql = "SELECT u.*, t.nombre AS tipo_nombre FROM usuario u 
+                JOIN tipo_usuario t ON u.id_tipo_usuario = t.id_tipo_usuario 
+                WHERE u.id_usuario = ?";
+        $stmt = $conn->prepare($sql);
+        if (!$stmt) {
+            throw new Exception('Error preparing user query: ' . $conn->error);
+        }
+        $stmt->bind_param("i", $id_usuario);
+        if (!$stmt->execute()) {
+            throw new Exception('Error executing user query: ' . $stmt->error);
+        }
+        $result = $stmt->get_result();
+        if ($result->num_rows === 0) {
+            return null;
+        }
+        $user = $result->fetch_assoc();
+        $stmt->close();
+        return $user;
+    } catch (Exception $e) {
+        error_log($e->getMessage());
         return null;
     }
-    $user = $result->fetch_assoc();
-    $stmt->close();
-    return $user;
 }
 
 
+/**
+ * Summary of getUserById
+ * @param mixed $conn
+ * @param mixed $id_usuario
+ * @return mixed
+ */
 function getUserById($conn, $id_usuario) {
     $sql = "SELECT * FROM usuario WHERE id_usuario = ?";
     $stmt = $conn->prepare($sql);
@@ -336,22 +334,57 @@ function validatePasswordResetToken($email, $token) {
     return $isValid;
 }
 
-/**
- * Sends a password reset email
- *
- * @param string $email The recipient's email address
- * @param string $token The password reset token
- */
-function sendPasswordResetEmail($email, $token) {
-    $resetLink = "https://yourdomain.com/reset_password.php?token=" . urlencode($token) . "&email=" . urlencode($email);
-    $subject = "Password Reset Request";
-    $message = "Click the following link to reset your password: $resetLink";
-    $headers = "From: noreply@yourdomain.com\r\n";
-    $headers .= "Reply-To: noreply@yourdomain.com\r\n";
-    $headers .= "X-Mailer: PHP/" . phpversion();
+function sendEmail($email, $type, $token = null, $additionalData = []) {
+    $mail = new PHPMailer(true);
+    try {
+        $mail->isSMTP();
+        $mail->Host = 'smtp.gmail.com';
+        $mail->SMTPAuth = true;
+        $mail->Username = 'alejo13852@gmail.com'; // Tu correo de Gmail
+        $mail->Password = 'nqpg trtb sidj awvg';  // Tu contraseña de aplicación de Gmail
+        $mail->SMTPSecure = PHPMailer::ENCRYPTION_STARTTLS;
+        $mail->Port = 587;
+        $mail->setFrom('alejo13852@gmail.com', 'CorsaCor');
+        $mail->addAddress($email);
 
-    mail($email, $subject, $message, $headers);
+        switch ($type) {
+            case 'reset':
+                if ($token === null) {
+                    throw new Exception('Token is required for password reset emails');
+                }
+                $resetLink = "https://yourdomain.com/reset_password.php?token=" . urlencode($token) . "&email=" . urlencode($email);
+                $subject = "Password Reset Request";
+                $message = "Click the following link to reset your password: $resetLink";
+                break;
+
+            case 'lockout':
+                $subject = "Account Locked - Unusual Activity Detected";
+                $message = "Your account has been temporarily locked due to multiple failed login attempts. If this wasn't you, please contact our support team.";
+                break;
+
+            case 'preinscription':
+                $subject = "Preinscripción Confirmada";
+                $courseName = $additionalData['courseName'] ?? 'el curso';
+                $message = "Gracias por preinscribirte en $courseName. Tu preinscripción ha sido recibida y está siendo procesada.";
+                if (isset($additionalData['tempPassword'])) {
+                    $message .= "\n\nComo nuevo usuario, tu contraseña temporal es: " . $additionalData['tempPassword'] . "\nPor favor, cambia esta contraseña la próxima vez que inicies sesión.";
+                }
+                break;
+
+            default:
+                throw new Exception('Invalid email type');
+        }
+
+        $mail->isHTML(true);
+        $mail->Subject = $subject;
+        $mail->Body    = $message;
+        $mail->AltBody = strip_tags($message);
+        $mail->send();
+    } catch (Exception $e) {
+        throw new Exception('Failed to send email: ' . $mail->ErrorInfo);
+    }
 }
+
 
 /**
  * Locks a user account
@@ -379,20 +412,7 @@ function unlockUserAccount($userId) {
     $stmt->close();
 }
 
-/**
- * Sends a lockout notification email
- *
- * @param string $email The recipient's email address
- */
-function sendLockoutNotificationEmail($email) {
-    $subject = "Account Locked - Unusual Activity Detected";
-    $message = "Your account has been temporarily locked due to multiple failed login attempts. If this wasn't you, please contact our support team.";
-    $headers = "From: noreply@yourdomain.com\r\n";
-    $headers .= "Reply-To: support@yourdomain.com\r\n";
-    $headers .= "X-Mailer: PHP/" . phpversion();
 
-    mail($email, $subject, $message, $headers);
-}
 
 /**
  * Checks if a user account is locked
@@ -449,19 +469,24 @@ function getUserByUsernameOrEmail($usernameOrEmail) {
  */
 function createUser($userData) {
     global $conn;
-    $stmt = $conn->prepare("INSERT INTO usuario (nombre, apellido, mail, telefono, id_tipo_usuario, username, clave) VALUES (?, ?, ?, ?, ?, ?, ?)");
-    $hashedPassword = hashPassword($userData['password']);
-    $stmt->bind_param("ssssiss", $userData['nombre'], $userData['apellido'], $userData['mail'], $userData['telefono'], $userData['id_tipo_usuario'], $userData['username'], $hashedPassword);
-    
-    if ($stmt->execute()) {
-        $newUserId = $stmt->insert_id;
-        $stmt->close();
-        return $newUserId;
-    } else {
-        $stmt->close();
+    try {
+        $stmt = $conn->prepare("INSERT INTO usuario (nombre, apellido, mail, telefono, id_tipo_usuario, username, clave) VALUES (?, ?, ?, ?, ?, ?, ?)");
+        $hashedPassword = hashPassword($userData['password']);
+        $stmt->bind_param("ssssiss", $userData['nombre'], $userData['apellido'], $userData['mail'], $userData['telefono'], $userData['id_tipo_usuario'], $userData['username'], $hashedPassword);
+        
+        if ($stmt->execute()) {
+            $newUserId = $stmt->insert_id;
+            $stmt->close();
+            return $newUserId;
+        } else {
+            throw new Exception("Error creating user: " . $stmt->error);
+        }
+    } catch (Exception $e) {
+        error_log($e->getMessage());
         return false;
     }
 }
+
 
 /**
  * Updates user information

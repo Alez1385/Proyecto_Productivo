@@ -1,9 +1,7 @@
 <?php
-// File: scripts/send_reset_link.php (previously request_reset.php)
+// File: scripts/send_reset_link.php
 require_once '../../scripts/conexion.php';
-require_once '../../vendor/autoload.php';
-use PHPMailer\PHPMailer\PHPMailer;
-use PHPMailer\PHPMailer\Exception;
+require_once '../../scripts/functions.php';
 
 header('Content-Type: application/json');
 
@@ -22,7 +20,8 @@ if (!filter_var($email, FILTER_VALIDATE_EMAIL)) {
 
 try {
     $token = bin2hex(random_bytes(32));
-    
+
+    // Verificar si el correo existe en la base de datos
     $stmt = $conn->prepare("SELECT id_usuario FROM usuario WHERE mail = ?");
     $stmt->bind_param("s", $email);
     $stmt->execute();
@@ -34,34 +33,22 @@ try {
         exit;
     }
     
-    $stmt = $conn->prepare("INSERT INTO password_resets (email, token, created_at) VALUES (?, ?, NOW()) ON DUPLICATE KEY UPDATE token = VALUES(token), created_at = NOW()");
-    $stmt->bind_param("ss", $email, $token);
+    // Obtener el id_usuario del resultado
+    $userData = $result->fetch_assoc();
+    $id_usuario = $userData['id_usuario'];
+    
+    // Insertar o actualizar el token en la base de datos
+    $stmt = $conn->prepare("INSERT INTO password_resets (email, token, created_at, id_usuario) VALUES (?, ?, NOW(), ?) ON DUPLICATE KEY UPDATE token = VALUES(token), created_at = NOW()");
+    $stmt->bind_param("ssi", $email, $token, $id_usuario);
     $stmt->execute();
+    
     
     if ($stmt->affected_rows === 0) {
         throw new Exception('Failed to save reset token');
     }
     
-    $resetLink = "https://corsacor.com/login/reset_password.php?token=" . urlencode($token);
-    $subject = "Password Reset Request";
-    $message = "Click the following link to reset your password: $resetLink";
-    
-    $mail = new PHPMailer(true);
-    $mail->isSMTP();
-    $mail->Host = 'smtp.gmail.com';
-    $mail->SMTPAuth = true;
-    $mail->Username = 'alejo13852@gmail.com';
-    $mail->Password = 'nqpg trtb sidj awvg';
-    $mail->SMTPSecure = PHPMailer::ENCRYPTION_STARTTLS;
-    $mail->Port = 587;
-    $mail->setFrom('alejo13852@gmail.com', 'CorsaCor');
-    $mail->addAddress($email);
-    $mail->isHTML(true);
-    $mail->Subject = $subject;
-    $mail->Body    = $message;
-    $mail->AltBody = strip_tags($message);
-    
-    $mail->send();
+    // Enviar el correo de restablecimiento de contraseña
+    sendEmail($email, 'reset', $token);
     
     http_response_code(200);
     echo json_encode(['message' => 'Password reset link sent successfully']);

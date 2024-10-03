@@ -6,13 +6,35 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Gestión de Cursos</title>
     <link rel="stylesheet" href="cursos.css">
+    <script type="module">
+        import SidebarManager from '../../js/form_side.js';
+
+        // Exponer al ámbito global
+        window.toggleSidebar = SidebarManager.toggle;
+        window.openSidebar = SidebarManager.open;
+
+        document.addEventListener('DOMContentLoaded', SidebarManager.init);
+        // Ahora puedes usar SidebarManager.toggle() y SidebarManager.open(url) donde sea necesario
+    </script>
 </head>
 
 <body>
+    <div id="overlay"></div>
+    <div id="sidebar">
+        <button class="sidebar-close" onclick="toggleSidebar()">&times;</button>
+        <div id="sidebar-content">
+            <!-- El contenido del formulario se cargará dinámicamente aquí -->
+        </div>
+        <div id="sidebar-resizer"></div>
+    </div>
     <div class="dashboard-container">
         <?php
+        include "../../scripts/functions.php";
         include "../../scripts/sidebar.php";
         include "../../scripts/conexion.php";
+        
+        requireLogin();
+        checkPermission('admin');
 
         // Definir los filtros iniciales
         $selectedCategoryId = isset($_GET['category']) ? $_GET['category'] : '';
@@ -55,7 +77,7 @@
                 </div>
                 <div class="header-right">
                     <button class="add-course-btn" onclick="window.location.href='../categoria_curso/modificar_categorias.php'">Modificar Categorías</button>
-                    <button class="add-course-btn" onclick="window.location.href='crear_curso.php'">+ Añadir nuevo curso</button>
+                    <button class="add-course-btn" onclick="openSidebar('crear_curso.php')">+ Añadir nuevo curso</button>
                 </div>
             </header>
             <section class="content">
@@ -74,7 +96,7 @@
                         $categoriesArray = [];
                         while ($row = $categories->fetch_assoc()) {
                             $categoriesArray[$row["id_categoria"]] = $row["nombre_categoria"];
-                            ?>
+                        ?>
                             <option value="<?php echo $row["id_categoria"]; ?>" <?php echo $selectedCategoryId == $row["id_categoria"] ? 'selected' : ''; ?>>
                                 <?php echo $row["nombre_categoria"]; ?>
                             </option>
