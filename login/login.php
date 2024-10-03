@@ -218,23 +218,8 @@ if (isset($_GET['error'])) {
 
     <!-- Scripts -->
     <script src="../js/login.js"></script>
+    <script src="../scripts/password.js"></script>
     <script>
-        // Función para mostrar/ocultar contraseñas
-        function togglePassword(passwordId, toggleId) {
-            const passwordField = document.getElementById(passwordId);
-            const lockIcon = document.getElementById(toggleId);
-
-            if (passwordField.type === 'password') {
-                passwordField.type = 'text';
-                lockIcon.src = 'img/eye-close.svg'; // Cambia a ícono de ojo cerrado
-                lockIcon.classList.add('rotate');
-            } else {
-                passwordField.type = 'password';
-                lockIcon.src = 'img/eye-open.svg'; // Cambia a ícono de ojo abierto
-                lockIcon.classList.remove('rotate');
-            }
-        }
-
         // Función para medir la fuerza de la contraseña
         function checkPasswordStrength(password, strengthElementId) {
             const result = zxcvbn(password);

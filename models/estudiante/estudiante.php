@@ -4,103 +4,137 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Cursos Disponibles</title>
-    <link rel="stylesheet" href="css/estudiante.css">
+    <title>Gestión de Estudiantes</title>
+    <link rel="stylesheet" href="css/student.css">
+    <link rel="stylesheet" href="https://fonts.googleapis.com/icon?family=Material+Icons+Sharp">
+    <script type="module">
+        import SidebarManager from '../../js/form_side.js';
+
+        window.toggleSidebar = SidebarManager.toggle;
+        window.openSidebar = SidebarManager.open;
+
+        document.addEventListener('DOMContentLoaded', SidebarManager.init);
+    </script>
 </head>
 
 <body>
+    <div id="overlay"></div>
+    <div id="sidebar">
+        <button class="sidebar-close" onclick="toggleSidebar()">&times;</button>
+        <div id="sidebar-content">
+            <!-- El contenido del formulario se cargará dinámicamente aquí -->
+        </div>
+        <div id="sidebar-resizer"></div>
+    </div>
+
     <div class="dashboard-container">
-        <?php
-        include "../../scripts/sidebar.php";
-        include "../../scripts/conexion.php";
-
-        // Obtener el id_estudiante basado en el username
-        $username = $_SESSION['username'];
-        $query = "SELECT e.id_estudiante FROM estudiante e 
-                  INNER JOIN usuario u ON e.id_usuario = u.id_usuario 
-                  WHERE u.username = ?";
-        $stmt = $conn->prepare($query);
-        $stmt->bind_param("s", $username);
-        $stmt->execute();
-        $result = $stmt->get_result();
-
-        if ($result->num_rows === 0) {
-            echo '<h2 class="no-eres-estudiante">Lo sentimos, no eres un estudiante.</h2>';
-            exit;
-        }
-
-        $row = $result->fetch_assoc();
-        $id_estudiante = $row['id_estudiante'];
-
-        // Obtener los cursos disponibles
-        $query_cursos = "SELECT c.*, cc.nombre_categoria, 
-                         GROUP_CONCAT(DISTINCT CONCAT(h.dia_semana, ' ', h.hora_inicio, '-', h.hora_fin) SEPARATOR ', ') AS horarios
-                         FROM cursos c
-                         LEFT JOIN categoria_curso cc ON c.id_categoria = cc.id_categoria
-                         LEFT JOIN horarios h ON c.id_curso = h.id_curso
-                         WHERE c.estado = 'activo' AND c.id_curso NOT IN (
-                             SELECT id_curso FROM inscripciones WHERE id_estudiante = ? 
-                             AND estado IN ('pendiente', 'aprobado', 'rechazado')
-                         )
-                         GROUP BY c.id_curso";
-        $stmt_cursos = $conn->prepare($query_cursos);
-        $stmt_cursos->bind_param("i", $id_estudiante);
-        $stmt_cursos->execute();
-        $result_cursos = $stmt_cursos->get_result();
-
-        // Procesar la inscripción
-        if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['inscribir'])) {
-            $id_curso = $_POST['id_curso'];
-
-            $query_inscribir = "INSERT INTO inscripciones (id_curso, id_estudiante, fecha_inscripcion, estado) VALUES (?, ?, CURDATE(), 'pendiente')";
-            $stmt_inscribir = $conn->prepare($query_inscribir);
-            $stmt_inscribir->bind_param("ii", $id_curso, $id_estudiante);
-
-            if ($stmt_inscribir->execute()) {
-                $mensaje = "Inscripción realizada con éxito. Espere la aprobación.";
-            } else {
-                $mensaje = "Error al realizar la inscripción: " . $conn->error;
-            }
-        }
-        ?>
-
-        <!-- Main Content -->
+        <?php include "../../scripts/sidebar.php"; ?>
         <div class="main-content">
             <header class="header">
-                <h1>Cursos Disponibles</h1>
+                <div class="header-left">
+                    <h1>Control de Estudiantes</h1>
+                </div>
+                <div class="header-right">
+                    <button class="add-student-btn" onclick="openSidebar('new_student.php')">+ Agregar Nuevo Estudiante</button>
+                </div>
             </header>
-            <section class="content">
-                <?php if (isset($mensaje)) : ?>
-                    <div class="alert alert-info"><?php echo $mensaje; ?></div>
-                <?php endif; ?>
 
-                <div class="course-list">
-                    <?php while ($curso = $result_cursos->fetch_assoc()) : ?>
-                        <div class="course-item">
-                            <img src="../../uploads/icons/<?php echo $curso['icono']; ?>" alt="<?php echo $curso['nombre_curso']; ?>">
-                            <div class="course-content">
-                                <div class="course-details">
-                                    <h2><?php echo $curso['nombre_curso']; ?></h2>
-                                    <p><?php echo $curso['descripcion']; ?></p>
-                                    <p><strong>Categoría:</strong> <?php echo $curso['nombre_categoria']; ?></p>
-                                    <p><strong>Nivel:</strong> <?php echo $curso['nivel_educativo']; ?></p>
-                                    <p><strong>Duración:</strong> <?php echo $curso['duracion']; ?> semanas</p>
-                                    <p><strong>Horarios:</strong> <?php echo $curso['horarios']; ?></p>
-                                </div>
-                                <div class="course-actions">
-                                    <form method="POST">
-                                        <input type="hidden" name="id_curso" value="<?php echo $curso['id_curso']; ?>">
-                                        <button type="submit" name="inscribir" class="inscribir-btn">Inscribirse</button>
-                                    </form>
-                                </div>
-                            </div>
-                        </div>
-                    <?php endwhile; ?>
+            <section class="content">
+                <!-- Barra de búsqueda -->
+                <div class="search-bar">
+                    <span class="material-icons-sharp search-icon">search</span>
+                    <input type="text" id="searchInput" placeholder="Buscar estudiantes..." onkeyup="filterStudents()">
+                </div>
+
+                <!-- Lista de estudiantes -->
+                <div class="student-list">
+                    <?php
+                    include "../../scripts/conexion.php";
+
+                    $sql = "SELECT e.id_estudiante, u.nombre, u.apellido, e.genero, e.fecha_registro, e.estado, e.nivel_educativo, e.observaciones 
+                            FROM estudiante e
+                            JOIN usuario u ON e.id_usuario = u.id_usuario";
+                    $result = $conn->query($sql);
+
+                    if ($result->num_rows > 0) {
+                        while ($row = $result->fetch_assoc()) {
+                            echo '<div class="student-item" data-student-id="' . $row["id_estudiante"] . '">';
+                            echo '<img src="../../uploads/' . (empty($row["foto"]) ? '../../img/usuario.png' : $row["foto"]) . '" alt="Student Image">';
+                            echo '<div class="student-details">';
+                            echo '<h2>' . $row["nombre"] . " " . $row['apellido'] . '</h2>';
+                            echo '<p>Género: ' . $row["genero"] . '</p>';
+                            echo '<p>Nivel Educativo: ' . $row["nivel_educativo"] . '</p>';
+                            echo '<p>Estado: ' . $row["estado"] . '</p>';
+                            echo '<p>Fecha de Registro: ' . $row["fecha_registro"] . '</p>';
+                            echo '</div>';
+                            echo '<div class="student-actions">';
+                            echo '<button onclick="openSidebar(\'edit_student.php?id_estudiante=' . $row["id_estudiante"] . '\')" class="edit-btn">Editar</button>';
+                            echo '<button onclick="deleteStudent(' . $row["id_estudiante"] . ')" class="delete-btn">Eliminar</button>';
+                            echo '</div>';
+                            echo '</div>';
+                        }
+                    } else {
+                        echo "No hay estudiantes registrados.";
+                    }
+                    $conn->close();
+                    ?>
                 </div>
             </section>
         </div>
     </div>
-    <script src="scripts/cursos_disponibles.js"></script>
+
+    <script>
+        function deleteStudent(studentId) {
+            if (confirm("¿Estás seguro de que deseas eliminar este estudiante?")) {
+                fetch('delete_student.php', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/x-www-form-urlencoded',
+                        },
+                        body: 'id_estudiante=' + studentId
+                    })
+                    .then(response => response.json())
+                    .then(data => {
+                        if (data.success) {
+                            document.querySelector(`[data-student-id="${studentId}"]`).remove();
+                            alert('Estudiante eliminado con éxito');
+                        } else {
+                            alert('Error eliminando el estudiante: ' + data.message);
+                        }
+                    })
+                    .catch(error => {
+                        console.error('Error:', error);
+                        alert('Ocurrió un error al eliminar el estudiante.');
+                    });
+            }
+        }
+
+        function filterStudents() {
+            const input = document.getElementById('searchInput');
+            const filter = input.value.toLowerCase();
+            const studentList = document.querySelector('.student-list');
+            const students = studentList.getElementsByClassName('student-item');
+
+            for (let i = 0; i < students.length; i++) {
+                const studentDetails = students[i].getElementsByClassName('student-details')[0];
+                const name = studentDetails.getElementsByTagName('h2')[0].textContent.toLowerCase();
+                const details = studentDetails.getElementsByTagName('p');
+                let textContent = name;
+
+                for (let j = 0; j < details.length; j++) {
+                    textContent += ' ' + details[j].textContent.toLowerCase();
+                }
+
+                if (textContent.indexOf(filter) > -1) {
+                    students[i].style.display = '';
+                } else {
+                    students[i].style.display = 'none';
+                }
+            }
+        }
+
+        document.getElementById('overlay').addEventListener('click', toggleSidebar);
+    </script>
 </body>
 
 </html>
