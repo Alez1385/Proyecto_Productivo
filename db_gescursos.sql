@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Servidor: 127.0.0.1
--- Tiempo de generación: 03-10-2024 a las 03:40:06
+-- Tiempo de generación: 03-10-2024 a las 21:40:23
 -- Versión del servidor: 10.4.32-MariaDB
 -- Versión de PHP: 8.2.12
 
@@ -64,7 +64,8 @@ INSERT INTO `asig_modulo` (`id_asig_modulo`, `id_modulo`, `id_tipo_usuario`, `fe
 (18, 6, 1, NULL),
 (19, 7, 1, NULL),
 (20, 8, 1, NULL),
-(21, 3, 3, NULL);
+(21, 3, 3, NULL),
+(22, 9, 1, NULL);
 
 -- --------------------------------------------------------
 
@@ -259,7 +260,8 @@ INSERT INTO `modulos` (`id_modulo`, `nom_modulo`, `url`, `icono`) VALUES
 (5, 'Usuarios', '../models/usuarios/users.php', 'person'),
 (6, 'Cursos', 'models/cursos/cursos.php', 'assignment'),
 (7, 'Modulos', 'models/modulos/modulos.php', 'event'),
-(8, 'Inscripciones', 'models/inscripciones/inscripciones.php', 'card_travel');
+(8, 'Inscripciones', 'models/inscripciones/inscripciones.php', 'card_travel'),
+(9, 'Index', 'models/admin_index/admin_index.php', 'home');
 
 -- --------------------------------------------------------
 
@@ -607,7 +609,7 @@ ALTER TABLE `asignacion_curso`
 -- AUTO_INCREMENT de la tabla `asig_modulo`
 --
 ALTER TABLE `asig_modulo`
-  MODIFY `id_asig_modulo` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=22;
+  MODIFY `id_asig_modulo` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=23;
 
 --
 -- AUTO_INCREMENT de la tabla `asistencia`
@@ -667,7 +669,7 @@ ALTER TABLE `login_attempts`
 -- AUTO_INCREMENT de la tabla `modulos`
 --
 ALTER TABLE `modulos`
-  MODIFY `id_modulo` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=9;
+  MODIFY `id_modulo` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=10;
 
 --
 -- AUTO_INCREMENT de la tabla `pagos`
