@@ -47,150 +47,180 @@
       if (document.getElementById("enrollmentStyles")) return;
 
       const styles = `
-              #loading-spinner {
-      position: fixed;
-      top: 0;
-      left: 0;
-      width: 100%;
-      height: 100%;
-      background-color: rgba(0, 0, 0, 0.5);
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      z-index: 9999;
-  }
+             /* Base styles */
 
-  #loading-spinner::after {
-      content: '';
-      width: 50px;
-      height: 50px;
-      border: 5px solid #f3f3f3;
-      border-top: 5px solid #3498db;
-      border-radius: 50%;
-      animation: spin 1s linear infinite;
-  }
 
-  @keyframes spin {
-      0% { transform: rotate(0deg); }
-      100% { transform: rotate(360deg); }
-  }
+/* Loading spinner */
+#loading-spinner {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(255, 255, 255, 0.8);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 9999;
+}
 
-  .mensaje {
-      position: fixed;
-      top: 20px;
-      left: 50%;
-      transform: translateX(-50%);
-      padding: 15px;
-      border-radius: 5px;
-      box-shadow: 0 2px 10px rgba(0,0,0,0.2);
-      z-index: 9999;
-      text-align: center;
-      max-width: 80%;
-  }
+#loading-spinner::after {
+    content: '';
+    width: 40px;
+    height: 40px;
+    border: 3px solid #f3f3f3;
+    border-top: 3px solid #3498db;
+    border-radius: 50%;
+    animation: spin 0.8s linear infinite;
+}
 
-  .error-mensaje {
-      background-color: #f44336;
-      color: white;
-  }
+@keyframes spin {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+}
 
-  .success-mensaje {
-      background-color: #4CAF50;
-      color: white;
-  }
+/* Message styles */
+.mensaje {
+    position: fixed;
+    top: 20px;
+    left: 50%;
+    transform: translateX(-50%);
+    padding: 12px 20px;
+    border-radius: 4px;
+    box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+    z-index: 9999;
+    text-align: center;
+    max-width: 80%;
+    font-size: 14px;
+    transition: opacity 0.3s ease-in-out;
+}
 
-  .modal {
-      display: none;
-      position: fixed;
-      z-index: 1000;
-      left: 0;
-      top: 0;
-      width: 100%;
-      height: 100%;
-      overflow: hidden;
-      background-color: rgba(0,0,0,0.4);
-      backdrop-filter: blur(5px);
-  }
+.error-mensaje {
+    background-color: #ff4d4d;
+    color: white;
+}
 
-  .modal-content {
-      background-color: #fefefe;
-      margin: auto;
-      padding: 20px;
-      border: 1px solid #888;
-      width: 80%;
-      max-width: 500px;
-      max-height: 80vh;
-      overflow-y: auto;
-      position: fixed;
-      top: 50%;
-      left: 50%;
-      transform: translate(-50%, -50%);
-      border-radius: 8px;
-      box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-  }
+.success-mensaje {
+    background-color: #4CAF50;
+    color: white;
+}
 
-  .close {
-      color: #aaa;
-      float: right;
-      font-size: 28px;
-      font-weight: bold;
-      cursor: pointer;
-  }
+/* Modal styles */
+.modal {
+    display: none;
+    position: fixed;
+    z-index: 1000;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    overflow: hidden;
+    background-color: rgba(0,0,0,0.4);
+    backdrop-filter: blur(5px);
+}
 
-  .close:hover,
-  .close:focus {
-      color: black;
-      text-decoration: none;
-      cursor: pointer;
-  }
+.modal-content {
+    background-color: #ffffff;
+    margin: auto;
+    padding: 25px;
+    border: none;
+    width: 90%;
+    max-width: 500px;
+    max-height: 80vh;
+    overflow-y: auto;
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    border-radius: 8px;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+}
 
-  .btn {
-      display: inline-block;
-      padding: 10px 20px;
-      margin: 10px 0;
-      border: none;
-      cursor: pointer;
-      text-align: center;
-      text-decoration: none;
-      outline: none;
-      color: #fff;
-      background-color: #4CAF50;
-      border-radius: 5px;
-      transition: background-color 0.3s;
-  }
+.close {
+    color: #999;
+    float: right;
+    font-size: 24px;
+    font-weight: bold;
+    cursor: pointer;
+    transition: color 0.3s ease;
+}
 
-  .btn:hover {
-      background-color: #45a049;
-  }
+.close:hover,
+.close:focus {
+    color: #333;
+    text-decoration: none;
+}
 
-  .btn:active {
-      background-color: #3e8e41;
-      transform: translateY(1px);
-  }
+/* Button styles */
+.btn {
+    display: inline-block;
+    padding: 10px 20px;
+    margin: 10px 0;
+    border: none;
+    cursor: pointer;
+    text-align: center;
+    text-decoration: none;
+    outline: none;
+    color: #fff;
+    background-color: #4CAF50;
+    border-radius: 4px;
+    transition: background-color 0.3s, transform 0.1s;
+    font-size: 14px;
+    font-weight: 500;
+}
 
-  .btn-primary {
-      background-color: #008CBA;
-  }
+.btn:hover {
+    background-color: #45a049;
+}
 
-  .btn-secondary {
-      background-color: #555555;
-  }
+.btn:active {
+    background-color: #3e8e41;
+    transform: translateY(1px);
+}
 
-  .form-group {
-      margin-bottom: 15px;
-  }
+.btn-primary {
+    background-color: #007bff;
+}
 
-  .form-group label {
-      display: block;
-      margin-bottom: 5px;
-  }
+.btn-primary:hover {
+    background-color: #0056b3;
+}
 
-  .form-group input {
-      width: 100%;
-      padding: 8px;
-      border: 1px solid #ddd;
-      border-radius: 4px;
-      box-sizing: border-box;
-  }
+.btn-secondary {
+    background-color: #6c757d;
+}
+
+.btn-secondary:hover {
+    background-color: #545b62;
+}
+
+/* Form styles */
+.form-group {
+    margin-bottom: 20px;
+}
+
+.form-group label {
+    display: block;
+    margin-bottom: 8px;
+    font-weight: 500;
+    color: #555;
+}
+
+.form-group input {
+    width: 100%;
+    padding: 10px;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    box-sizing: border-box;
+    font-size: 14px;
+    transition: border-color 0.3s ease;
+}
+
+.form-group input:focus {
+    border-color: #007bff;
+    outline: none;
+    box-shadow: 0 0 0 2px rgba(0, 123, 255, 0.25);
+}
       `;
 
       const styleElement = document.createElement("style");
@@ -225,7 +255,7 @@
       }
     };
 
-    const showEnrollmentModal = (courseId) => {
+    const showEnrollmentModal = (courseId) => { 
       const modalHTML = `
               <div class="modal" id="inscripcionModal">
                   <div class="modal-content">

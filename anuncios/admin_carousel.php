@@ -36,35 +36,42 @@ $result = $conn->query("SELECT * FROM carousel ORDER BY order_index ASC");
     <link rel="stylesheet" href="styles.css">
 </head>
 <body>
-    <div class="container">
+<class="container">
+    
         <h1>Administra el Carousel</h1>
-        
-        <!-- Formulario para agregar un nuevo slid_carrousele -->
-        <form action="" method="post" enctype="multipart/form-data" class="fade-in">
-            <div>
-                <label for="title">Título</label>
-                <input type="text" id="title" name="title" maxlength="30" required>
-                <small><span id="title-count">0</span>/30 caracteres</small>
-            </div>
-            <div>
-                <label for="description">Descripción</label>
-                <textarea id="description" name="description" rows="3" maxlength="90" required></textarea>
-                <small><span id="description-count">0</span>/ 90 caracteres</small>
-            </div>
-            <div>
-                <label for="fecha_curso_inicio">Fecha de Inicio</label>
-                <input type="date" id="fecha_curso_inicio" name="fecha_curso_inicio" required>
-            </div>
-            <div>
-                <label for="fecha_curso_fin">Fecha de Fin</label>
-                <input type="date" id="fecha_curso_fin" name="fecha_curso_fin" required>
-            </div>
-            <div>
-                <label for="image">Imagen</label>
-                <input type="file" id="image" name="image" required>
-            </div>
-            <button type="submit" name="add_slid_carrousele">Agregar anuncio</button>
-        </form>
+    </div>
+   
+    <!-- Formulario para agregar un nuevo slid_carrousele -->
+    <form action="" method="post" enctype="multipart/form-data" class="fade-in">
+    <div class="header">
+    <a href="../models/admin_index/admin_index.php" id="back-button" class="btn btn-secondary">
+    <i class="fas fa-arrow-left"></i> Volver
+</a><br></div>
+        <div class="form-group">
+            <label for="title">Título</label>
+            <input type="text" id="title" name="title" maxlength="30" required>
+            <small><span id="title-count">0</span>/30 caracteres</small>
+        </div>
+        <div class="form-group">
+            <label for="description">Descripción</label>
+            <textarea id="description" name="description" rows="3" maxlength="90" required></textarea>
+            <small><span id="description-count">0</span>/ 90 caracteres</small>
+        </div>
+        <div class="form-group">
+            <label for="fecha_curso_inicio">Fecha de Inicio</label>
+            <input type="date" id="fecha_curso_inicio" name="fecha_curso_inicio" required>
+        </div>
+        <div class="form-group">
+            <label for="fecha_curso_fin">Fecha de Fin</label>
+            <input type="date" id="fecha_curso_fin" name="fecha_curso_fin" required>
+        </div>
+        <div class="form-group">
+            <label for="image">Imagen</label>
+            <input type="file" id="image" name="image" required>
+        </div>
+        <button type="submit" name="add_slid_carrousele" class="btn btn-primary">Agregar anuncio</button>
+    </form>
+
         
         <!-- Lista de slid_carrouseles existentes -->
         <table class="fade-in">

@@ -90,13 +90,15 @@ $cursos = $conn->query("SELECT * FROM resume_cursos");
 </head>
 <body>
 
+<h1>Administrar Cursos</h1>
 <div class="container">
-    <h1>Administrar Cursos</h1>
-    
-    <!-- Formulario para agregar/editar curso -->
-    <div class="form-wrap">
-        <h2><?= $action == 'edit' ? 'Editar' : 'Agregar' ?> Curso</h2>
+    <div class="form-wrap"> 
         <form id="cursoForm" action="admin_resume_cursos.php<?= $action == 'edit' ? "?action=edit&id=$id" : '?action=add' ?>" method="post">
+        <div class="header">
+        <a href="../models/admin_index/admin_index.php" id="back-button" class="btn btn-secondary">
+        <i class="fas fa-arrow-left"></i> Volver</a><br></div>
+       
+   
             <div class="form-group">
                 <label for="dia">Día:</label>
                 <input type="text" id="dia" name="dia" value="<?= $curso['dia'] ?? '' ?>" required>
