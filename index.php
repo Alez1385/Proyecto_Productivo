@@ -165,7 +165,7 @@ if (!$result) {
             <?php if ($result->num_rows > 0): ?>
                 <?php while($row = $result->fetch_assoc()): ?>
                     <div class="col-md-6">
-                        <div class="resume-wrap ftco-animate">
+                        <div class="resume-wrap ftco-animate ftco-animate-resume">
                             <span class="date"><?php echo htmlspecialchars($row['dia']); ?></span>
                             <h2><?php echo htmlspecialchars($row['nombre']); ?></h2>
                             <span class="position"><?php echo htmlspecialchars($row['lugar']); ?></span>

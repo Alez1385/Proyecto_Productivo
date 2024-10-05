@@ -9074,7 +9074,16 @@ textarea.form-control {
 
 .ftco-animate {
   opacity: 0;
-  visibility: hidden; }
+  visibility: hidden; 
+}
+
+.ftco-animate-resume {
+  opacity: 0;
+  visibility: hidden; 
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  background-color: #ffffff;
+  border-radius: 12px;
+}
 
 .bg-primary {
   background: #ffbd39 !important; }
