@@ -7,6 +7,7 @@
     <title>Gestión de Usuarios</title>
     <link rel="stylesheet" href="user.css">
     <link rel="stylesheet" href="https://fonts.googleapis.com/icon?family=Material+Icons+Sharp">
+    <script src="https://cdn.tailwindcss.com"></script>
     <script type="module">
         import SidebarManager from '../../js/form_side.js';
 
@@ -15,7 +16,6 @@
         window.openSidebar = SidebarManager.open;
 
         document.addEventListener('DOMContentLoaded', SidebarManager.init);
-        // Ahora puedes usar SidebarManager.toggle() y SidebarManager.open(url) donde sea necesario
     </script>
 </head>
 
@@ -37,7 +37,12 @@
                     <h1>Control de Usuarios</h1>
                 </div>
                 <div class="header-right">
-                    <button class="add-user-btn" onclick="openSidebar('new_user.php')">+ Add New User</button>
+                    <button class="bg-green-500 hover:bg-green-600 text-white px-4 py-2 rounded-md flex items-center" onclick="openSidebar('new_user.php')">
+                        <svg class="mr-2 h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M18 9v3m0 0v3m0-3h3m-3 0h-3m-2-5a4 4 0 11-8 0 4 4 0 018 0M3 20v1c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2v-1c0-.6-.4-1-1-1H3c-.6 0-1 .4-1 1v1c0 .6.4 1 1 1h16c.6 0 1-.4 1-1V7a4 4 0 00-8 0v13c0 .6-.4 1-1 1H3c-.6 0-1-.4-1-1V3c0-.6.4-1 1-1h16c.6 0 1 .4 1 1v1c0 .6-.4 1-1 1H3z"></path>
+                        </svg>
+                        Agregar Usuario
+                    </button>
                 </div>
             </header>
 
@@ -48,18 +53,41 @@
                     <input type="text" id="searchInput" placeholder="Buscar usuarios..." onkeyup="filterUsers()">
                 </div>
 
+                <!-- Barra de filtros -->
+                <div class="filter-bar">
+                    <select id="typeFilter" onchange="filterUsers()">
+                        <option value="">Tipo de Usuario</option>
+                        <?php
+                        include "../../scripts/conexion.php";
+                        $sql_types = "SELECT DISTINCT id_tipo_usuario, nombre FROM tipo_usuario";
+                        $types = $conn->query($sql_types);
+                        while ($row = $types->fetch_assoc()) {
+                            echo "<option value='" . $row['id_tipo_usuario'] . "'>" . $row['nombre'] . "</option>";
+                        }
+                        ?>
+                    </select>
+
+                    <!-- Puedes agregar más filtros aquí si es necesario -->
+
+                    <!-- Filtros aplicados -->
+                    <div id="appliedFilters">
+                        <!-- Los filtros aplicados se mostrarán aquí dinámicamente -->
+                    </div>
+                    <button id="resetFilters" onclick="resetFilters()">Resetear Filtros</button>
+                </div>
+
                 <!-- Lista de usuarios -->
+                <div class="user-list-container">
                 <div class="user-list">
                     <?php
-                    include "../../scripts/conexion.php";
-
-                    $sql = "SELECT t.nombre as tipo_usuario, u.id_usuario, u.nombre, u.apellido, u.mail, u.foto FROM usuario u
-                    JOIN tipo_usuario t ON u.id_tipo_usuario = t.id_tipo_usuario ";
+                    $sql = "SELECT t.nombre as tipo_usuario, t.id_tipo_usuario, u.id_usuario, u.nombre, u.apellido, u.mail, u.foto 
+                            FROM usuario u
+                            JOIN tipo_usuario t ON u.id_tipo_usuario = t.id_tipo_usuario";
                     $result = $conn->query($sql);
 
                     if ($result->num_rows > 0) {
                         while ($row = $result->fetch_assoc()) {
-                            echo '<div class="user-item" data-user-id="' . $row["id_usuario"] . '">';
+                            echo '<div class="user-item" data-user-id="' . $row["id_usuario"] . '" data-user-type="' . $row["id_tipo_usuario"] . '">';
                             echo '<img src="../../uploads/' . (empty($row["foto"]) ? '../../img/usuario.png' : $row["foto"]) . '" alt="User Image">';
                             echo '<div class="user-details">';
                             echo '<h2>' . $row["nombre"] . " " . $row['apellido']  . '</h2>';
@@ -77,6 +105,7 @@
                     }
                     $conn->close();
                     ?>
+                </div>
                 </div>
             </section>
         </div>
@@ -109,161 +138,65 @@
         }
 
         function filterUsers() {
-            const input = document.getElementById('searchInput');
-            const filter = input.value.toLowerCase();
-            const userList = document.querySelector('.user-list');
-            const users = userList.getElementsByClassName('user-item');
+            const searchInput = document.getElementById('searchInput').value.toLowerCase();
+            const typeFilter = document.getElementById('typeFilter').value;
+            const users = document.querySelectorAll('.user-item');
 
-            for (let i = 0; i < users.length; i++) {
-                const userDetails = users[i].getElementsByClassName('user-details')[0];
-                const name = userDetails.getElementsByTagName('h2')[0].textContent.toLowerCase();
-                const email = userDetails.getElementsByTagName('p')[1].textContent.toLowerCase();
+            users.forEach(user => {
+                const userName = user.querySelector('h2').textContent.toLowerCase();
+                const userEmail = user.querySelector('p:nth-child(3)').textContent.toLowerCase();
+                const userType = user.getAttribute('data-user-type');
 
-                if (name.indexOf(filter) > -1 || email.indexOf(filter) > -1) {
-                    users[i].style.display = '';
+                const matchesSearch = userName.includes(searchInput) || userEmail.includes(searchInput);
+                const matchesType = typeFilter === '' || userType === typeFilter;
+
+                if (matchesSearch && matchesType) {
+                    user.style.display = '';
                 } else {
-                    users[i].style.display = 'none';
+                    user.style.display = 'none';
                 }
+            });
+
+            updateAppliedFilters();
+        }
+
+        function updateAppliedFilters() {
+            const appliedFilters = document.getElementById('appliedFilters');
+            appliedFilters.innerHTML = '';
+
+            const typeFilter = document.getElementById('typeFilter');
+            if (typeFilter.value) {
+                const filterTag = document.createElement('div');
+                filterTag.className = 'filter-tag';
+                filterTag.setAttribute('data-filter', 'type');
+                filterTag.innerHTML = `
+                    <span>${typeFilter.options[typeFilter.selectedIndex].text}</span>
+                    <span class="filter-close" onclick="removeFilter('type')">&times;</span>
+                `;
+                appliedFilters.appendChild(filterTag);
             }
+
+            // Puedes agregar más filtros aquí si es necesario
+        }
+
+        function removeFilter(filterType) {
+            if (filterType === 'type') {
+                document.getElementById('typeFilter').value = '';
+            }
+            // Agregar más casos aquí si se añaden más filtros
+
+            filterUsers();
+        }
+
+        function resetFilters() {
+            document.getElementById('searchInput').value = '';
+            document.getElementById('typeFilter').value = '';
+            // Resetear más filtros aquí si se añaden
+
+            filterUsers();
         }
 
         document.getElementById('overlay').addEventListener('click', toggleSidebar);
-
-        function setupFormValidation() {
-            // Verificar si el campo de nombre de usuario existe antes de agregar el event listener
-            const usernameField = document.getElementById('username');
-            if (usernameField) {
-                usernameField.addEventListener('input', function() {
-                    const username = this.value;
-                    const usernameError = document.getElementById('usernameError');
-                    const submitBtn = document.getElementById('submitBtn');
-
-                    if (username.length > 0) {
-                        const xhr = new XMLHttpRequest();
-                        xhr.open('POST', '../../login/scripts/check_username.php', true);
-                        xhr.setRequestHeader('Content-type', 'application/x-www-form-urlencoded');
-
-                        xhr.onreadystatechange = function() {
-                            if (this.readyState === 4) {
-                                console.log('Estado de la solicitud:', this.status);
-                                console.log('Respuesta del servidor:', this.responseText);
-                                if (this.status === 200) {
-                                    if (this.responseText === 'taken') {
-                                        usernameError.textContent = 'El nombre de usuario ya está en uso. Elige otro.';
-                                        usernameError.style.color = '#c12646';
-                                    } else {
-                                        usernameError.textContent = 'El nombre de usuario está disponible.';
-                                        usernameError.style.color = '#00bcff';
-                                        submitBtn.disabled = false;
-                                    }
-                                } else {
-                                    usernameError.textContent = 'Error al verificar el nombre de usuario. Inténtalo más tarde.';
-                                    usernameError.style.color = '#c12646';
-                                }
-                            }
-                        };
-
-                        xhr.onerror = function() {
-                            usernameError.textContent = 'Error al conectar con el servidor. Inténtalo más tarde.';
-                            usernameError.style.color = '#c12646';
-                        };
-
-                        xhr.send('username=' + encodeURIComponent(username));
-                    } else {
-                        usernameError.textContent = '';
-                    }
-                });
-            }
-
-            // Verificar si el campo de email existe antes de agregar el event listener
-            const emailField = document.getElementById('email');
-            if (emailField) {
-                emailField.addEventListener('input', function() {
-                    const email = this.value;
-                    const emailError = document.getElementById('emailError');
-
-                    // Expresión regular para validar el formato del correo electrónico
-                    const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-
-                    if (emailPattern.test(email)) {
-                        const xhr = new XMLHttpRequest();
-                        xhr.open('POST', '../../login/scripts/check_email.php', true);
-                        xhr.setRequestHeader('Content-type', 'application/x-www-form-urlencoded');
-
-                        xhr.onreadystatechange = function() {
-                            if (this.readyState === 4) {
-                                console.log('Estado de la solicitud:', this.status);
-                                console.log('Respuesta del servidor:', this.responseText);
-                                if (this.status === 200) {
-                                    if (this.responseText === 'taken') {
-                                        emailError.textContent = 'El correo electrónico ya está en uso. Elige otro.';
-                                        emailError.style.color = '#c12646';
-                                    } else {
-                                        emailError.textContent = 'El correo electrónico está disponible.';
-                                        emailError.style.color = '#00bcff';
-                                        submitBtn.disabled = false;
-                                    }
-                                } else {
-                                    emailError.textContent = 'Error al verificar el correo electrónico. Inténtalo más tarde.';
-                                    emailError.style.color = '#c12646';
-                                }
-                            }
-                        };
-
-                        xhr.onerror = function() {
-                            emailError.textContent = 'Error al conectar con el servidor. Inténtalo más tarde.';
-                            emailError.style.color = '#c12646';
-                        };
-
-                        xhr.send('email=' + encodeURIComponent(email));
-                    } else {
-                        emailError.textContent = 'Introduce un formato de correo electrónico válido.';
-                        emailError.style.color = '#c12646';
-                    }
-                });
-            }
-        }
-
-        function togglePassword(passwordId, toggleId) {
-            const passwordField = document.getElementById(passwordId);
-            const lockIcon = document.getElementById(toggleId);
-
-            if (passwordField.type === 'password') {
-                passwordField.type = 'text';
-                lockIcon.src = '../../login/img/eye-close.svg';
-                lockIcon.classList.add('rotate');
-            } else {
-                passwordField.type = 'password';
-                lockIcon.src = '../../login/img/eye-open.svg';
-                lockIcon.classList.remove('rotate');
-            }
-        }
-
-        function previewImage(input) {
-            var preview = document.getElementById('previewImg');
-            var file = input.files[0];
-            var reader = new FileReader();
-
-            reader.onloadend = function() {
-                if (preview) {
-                    preview.src = reader.result;
-                } else {
-                    var img = document.createElement('img');
-                    img.src = reader.result;
-                    img.width = 100;
-                    img.id = 'previewImg';
-                    document.getElementById('imagePreview').appendChild(img);
-                }
-            }
-
-            if (file) {
-                reader.readAsDataURL(file);
-            } else {
-                if (preview) {
-                    preview.src = "";
-                }
-            }
-        }
     </script>
 </body>
 

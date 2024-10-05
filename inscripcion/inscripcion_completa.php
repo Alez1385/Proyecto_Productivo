@@ -1,111 +1,60 @@
 <?php
-session_start();
 require_once '../scripts/conexion.php';
+require_once '../scripts/functions.php';
+require_once '../scripts/auth.php';
 
-// Verificar si el usuario está autenticado
-if (!isset($_SESSION['username'])) {
-    header('Location: ../login/login.php?error=notauthenticated&redirect=' . urlencode($_SERVER['REQUEST_URI']));
-    exit;
-}
+// Ensure user is logged in
+requireLogin();
 
-$username = $_SESSION['username'];
-$stmt = $conn->prepare("SELECT id_usuario FROM usuario WHERE username = ?");
-$stmt->bind_param("s", $username);
-$stmt->execute();
-$result = $stmt->get_result();
-$user = $result->fetch_assoc();
+// Get user details
+$id_usuario = $_SESSION['id_usuario'] ?? '';
+$user = getUserInfo($conn, $id_usuario);
 
 if (!$user) {
     die('Error: Usuario no encontrado. Por favor, contacte al administrador.');
 }
 
 $id_usuario = $user['id_usuario'];
-$curso_id = $_GET['curso_id'] ?? null;
+$curso_id = filter_input(INPUT_GET, 'curso_id', FILTER_VALIDATE_INT);
 
 if (!$curso_id) {
-    die('Error: No se especificó un curso.');
+    die('Error: No se especificó un curso válido.');
 }
 
-// Función para obtener detalles del curso
-function getCursoDetails($conn, $curso_id)
-{
+// Function to get course details
+function getCursoDetails($conn, $curso_id) {
     $stmt = $conn->prepare("SELECT * FROM cursos WHERE id_curso = ?");
     $stmt->bind_param("i", $curso_id);
     $stmt->execute();
     return $stmt->get_result()->fetch_assoc();
 }
 
-// Función para obtener detalles del usuario
-function getUserDetails($conn, $user_id)
-{
-    $stmt = $conn->prepare("SELECT nombre, apellido, mail, telefono, direccion FROM usuario WHERE id_usuario = ?");
-    $stmt->bind_param("i", $user_id);
-    $stmt->execute();
-    return $stmt->get_result()->fetch_assoc();
-}
+// Process registration form
+$error_message = '';
+$success_message = '';
 
-// Procesar el formulario de inscripción
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-    // Recoger y validar los datos del formulario
-    $nombre = $_POST['nombre'] ?? '';
-    $email = $_POST['email'] ?? '';
-    $telefono = $_POST['telefono'] ?? '';
+    $nombre = filter_input(INPUT_POST, 'nombre', FILTER_SANITIZE_STRING);
+    $email = filter_input(INPUT_POST, 'email', FILTER_VALIDATE_EMAIL);
+    $telefono = filter_input(INPUT_POST, 'telefono', FILTER_SANITIZE_STRING);
 
-    // Validaciones
-    if (empty($nombre) || empty($email) || empty($telefono)) {
-        $error_message = 'Error: Todos los campos son obligatorios.';
-    } elseif (!filter_var($email, FILTER_VALIDATE_EMAIL)) {
-        $error_message = 'Error: El email proporcionado no es válido.';
+    if (!$nombre || !$email || !$telefono) {
+        $error_message = 'Error: Todos los campos son obligatorios y deben ser válidos.';
     } else {
-        // Procesar el archivo subido
         $target_dir = "../uploads/comprobantes/";
         $file_name = basename($_FILES["comprobante"]["name"]);
         $target_file = $target_dir . time() . '_' . $file_name;
-        $uploadOk = 1;
         $imageFileType = strtolower(pathinfo($target_file, PATHINFO_EXTENSION));
 
-        // Comprobar si el archivo es una imagen real o un archivo falso
-        if (isset($_POST["submit"])) {
-            $check = getimagesize($_FILES["comprobante"]["tmp_name"]);
-            if ($check !== false) {
-                $uploadOk = 1;
-            } else {
-                $error_message = "El archivo no es una imagen.";
-                $uploadOk = 0;
-            }
-        }
+        // Validate file
+        $uploadOk = validateFile($_FILES["comprobante"], $imageFileType);
 
-        // Comprobar el tamaño del archivo
-        if ($_FILES["comprobante"]["size"] > 500000) {
-            $error_message = "Lo siento, tu archivo es demasiado grande.";
-            $uploadOk = 0;
-        }
-
-        // Permitir ciertos formatos de archivo
-        if (
-            $imageFileType != "jpg" && $imageFileType != "png" && $imageFileType != "jpeg"
-            && $imageFileType != "gif"
-        ) {
-            $error_message = "Lo siento, solo se permiten archivos JPG, JPEG, PNG & GIF.";
-            $uploadOk = 0;
-        }
-
-        // Comprobar si $uploadOk está establecido en 0 por un error
-        if ($uploadOk == 0) {
-            $error_message = "Lo siento, tu archivo no fue subido.";
-            // Si todo está bien, intenta subir el archivo
-        } else {
+        if ($uploadOk) {
             if (move_uploaded_file($_FILES["comprobante"]["tmp_name"], $target_file)) {
-                // Archivo subido correctamente, proceder con la inscripción
-                $stmt = $conn->prepare("INSERT INTO inscripciones (id_curso, id_estudiante, fecha_inscripcion, estado, fecha_actualizacion, comprobante_pago) VALUES (?, ?, NOW(), 'pendiente', NOW(), ?)");
-                $stmt->bind_param("iis", $curso_id, $id_usuario, $target_file);
-
-                if ($stmt->execute()) {
-                    $inscripcion_id = $stmt->insert_id;
-                    $success_message = "Inscripción completada con éxito. ID de inscripción: " . $inscripcion_id;
-                    // Aquí puedes agregar lógica para enviar un email de confirmación
+                if (processInscripcion($conn, $curso_id, $id_usuario, $target_file)) {
+                    $success_message = "Inscripción completada con éxito.";
                 } else {
-                    $error_message = "Error al procesar la inscripción: " . $stmt->error;
+                    $error_message = "Error al procesar la inscripción.";
                 }
             } else {
                 $error_message = "Lo siento, hubo un error al subir tu archivo.";
@@ -114,31 +63,52 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     }
 }
 
-// Obtener detalles del curso y del usuario
+// Get course and user details
 $curso = getCursoDetails($conn, $curso_id);
-$usuario = getUserDetails($conn, $id_usuario);
+
+// Helper functions
+function validateFile($file, $fileType) {
+    $maxFileSize = 500000; // 500KB
+    $allowedTypes = ['jpg', 'jpeg', 'png', 'gif'];
+
+    if (!in_array($fileType, $allowedTypes)) {
+        return false;
+    }
+
+    if ($file['size'] > $maxFileSize) {
+        return false;
+    }
+
+    $check = getimagesize($file["tmp_name"]);
+    return $check !== false;
+}
+
+function processInscripcion($conn, $curso_id, $id_usuario, $comprobante) {
+    $stmt = $conn->prepare("INSERT INTO inscripciones (id_curso, id_estudiante, fecha_inscripcion, estado, fecha_actualizacion, comprobante_pago) VALUES (?, ?, NOW(), 'pendiente', NOW(), ?)");
+    $stmt->bind_param("iis", $curso_id, $id_usuario, $comprobante);
+    return $stmt->execute();
+}
 
 ?>
+
 <!DOCTYPE html>
 <html lang="es">
-
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Inscripción al Curso</title>
     <link rel="stylesheet" href="css/styles.css">
     <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700&display=swap" rel="stylesheet">
+    <script src="scripts/logAuthinfo.js"></script>
 </head>
-
 <body>
     <div class="dashboard-container">
-        <!-- Sidebar -->
-        <?php if (isset($error_message)): ?>
-            <div class="message error"><?php echo $error_message; ?></div>
+        <?php if ($error_message): ?>
+            <div class="message error"><?php echo htmlspecialchars($error_message); ?></div>
         <?php endif; ?>
 
-        <?php if (isset($success_message)): ?>
-            <div class="message success"><?php echo $success_message; ?></div>
+        <?php if ($success_message): ?>
+            <div class="message success"><?php echo htmlspecialchars($success_message); ?></div>
         <?php endif; ?>
 
         <h1>Inscripción al Curso</h1>
@@ -157,20 +127,20 @@ $usuario = getUserDetails($conn, $id_usuario);
             </div>
         </div>
 
-        <form action="scripts/save_ins.php?curso_id=<?php echo $curso_id; ?>" method="post" enctype="multipart/form-data">
+        <form action="<?php echo htmlspecialchars($_SERVER['PHP_SELF']) . '?curso_id=' . $curso_id; ?>" method="post" enctype="multipart/form-data">
             <div class="form-group">
                 <label for="nombre">Nombre completo:</label>
-                <input type="text" id="nombre" name="nombre" value="<?php echo htmlspecialchars($usuario['nombre'] . ' ' . $usuario['apellido']); ?>" required>
+                <input type="text" id="nombre" name="nombre" value="<?php echo htmlspecialchars($user['nombre'] . ' ' . $user['apellido']); ?>" required>
             </div>
 
             <div class="form-group">
                 <label for="email">Correo electrónico:</label>
-                <input type="email" id="email" name="email" value="<?php echo htmlspecialchars($usuario['mail']); ?>" required>
+                <input type="email" id="email" name="email" value="<?php echo htmlspecialchars($user['mail']); ?>" required>
             </div>
 
             <div class="form-group">
                 <label for="telefono">Teléfono:</label>
-                <input type="tel" id="telefono" name="telefono" value="<?php echo htmlspecialchars($usuario['telefono']); ?>" required>
+                <input type="tel" id="telefono" name="telefono" value="<?php echo htmlspecialchars($user['telefono']); ?>" required>
             </div>
 
             <div class="form-group">
@@ -208,5 +178,4 @@ $usuario = getUserDetails($conn, $id_usuario);
         });
     </script>
 </body>
-
 </html>

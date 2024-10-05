@@ -1,112 +1,109 @@
 <?php
-include_once('../../scripts/conexion.php');
+require_once('../../scripts/conexion.php');
+require_once('../../scripts/functions.php');
+require_once('../../scripts/auth.php');
 
-// Inicializar variables de error y éxito
+// Ensure user is logged in
+requireLogin();
+
+// Initialize variables
 $error_message = '';
 $success_message = '';
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-    // Recoger y validar los datos del formulario
-    $nombre = trim($_POST['nombre'] ?? '');
-    $email = trim($_POST['email'] ?? '');
-    $telefono = trim($_POST['telefono'] ?? '');
-    $curso_id = trim($_GET['curso_id'] ?? '');
+    // Collect and validate form data
+    $nombre = filter_input(INPUT_POST, 'nombre', FILTER_SANITIZE_STRING);
+    $email = filter_input(INPUT_POST, 'email', FILTER_VALIDATE_EMAIL);
+    $telefono = filter_input(INPUT_POST, 'telefono', FILTER_SANITIZE_STRING);
+    $curso_id = filter_input(INPUT_GET, 'curso_id', FILTER_VALIDATE_INT);
     
-    $username = trim($_SESSION['username'] ?? '');
-    $stmt = $conn->prepare("SELECT id_usuario FROM usuario WHERE username = ?");
-        $stmt->bind_param("s", $username);
-        $stmt->execute();
-        $result = $stmt->get_result();
-        $row = $result->fetch_assoc();
+    // Get user ID
+    $username = $_SESSION['username'] ?? '';
+    $user = getUserDetails($conn, $username);
 
-        if ($row) {
-            $id_usuario = $row['id_usuario'];
-            $stmt = $conn->prepare("SELECT id_estudiante FROM estudiante WHERE id_usuario = ?");
-            $stmt->bind_param("i", $id_usuario);
-            $stmt->execute();
-            $result = $stmt->get_result();
-            $row = $result->fetch_assoc();
-            if ($row) {
-                $id_estudiante = $row['id_estudiante'];
-            }
-        } else {
-            $error_message = "Error: No se pudo encontrar el usuario.";
-        }
+    if (!$user) {
+        respondWithError("Error: No se pudo encontrar el usuario.");
+    }
 
-    // Validaciones
-    if (empty($nombre) || empty($email) || empty($telefono)) {
-        $error_message = 'Error: Todos los campos son obligatorios.';
-    } elseif (!filter_var($email, FILTER_VALIDATE_EMAIL)) {
-        $error_message = 'Error: El email proporcionado no es válido.';
-    } else {
-        // Procesar el archivo subido
-        $target_dir = "../../uploads/comprobantes/";
-        $file_name = basename($_FILES["comprobante"]["name"]);
-        $target_file = $target_dir . time() . '_' . $file_name;
-        $uploadOk = 1;
-        $imageFileType = strtolower(pathinfo($target_file, PATHINFO_EXTENSION));
+    $id_estudiante = $user['id_estudiante'];
 
-        // Comprobar si el archivo es una imagen real o un archivo falso
-        $check = getimagesize($_FILES["comprobante"]["tmp_name"]);
-        if ($check === false) {
-            $error_message = "El archivo no es una imagen.";
-            $uploadOk = 0;
-        }
+    // Validations
+    if (!$nombre || !$email || !$telefono || !$curso_id) {
+        respondWithError('Error: Todos los campos son obligatorios y deben ser válidos.');
+    }
 
-        // Comprobar el tamaño del archivo
-        if ($_FILES["comprobante"]["size"] > 500000) {
-            $error_message = "Lo siento, tu archivo es demasiado grande.";
-            $uploadOk = 0;
-        }
+    // Process file upload
+    $target_dir = "../../uploads/comprobantes/";
+    $file_name = basename($_FILES["comprobante"]["name"]);
+    $target_file = $target_dir . time() . '_' . $file_name;
+    $imageFileType = strtolower(pathinfo($target_file, PATHINFO_EXTENSION));
 
-        // Permitir ciertos formatos de archivo
-        if (!in_array($imageFileType, ['jpg', 'jpeg', 'png', 'gif'])) {
-            $error_message = "Lo siento, solo se permiten archivos JPG, JPEG, PNG & GIF.";
-            $uploadOk = 0;
-        }
+    // Validate file
+    $uploadOk = validateFile($_FILES["comprobante"], $imageFileType);
 
-        // Comprobar si $uploadOk está establecido en 0 por un error
-        if ($uploadOk == 0) {
-            $error_message = "Lo siento, tu archivo no fue subido.";
-        } else {
-            // Intentar mover el archivo a la carpeta de destino
-            if (move_uploaded_file($_FILES["comprobante"]["tmp_name"], $target_file)) {
-                try {
-                    // Iniciar la transacción
-                    $conn->begin_transaction();
+    if ($uploadOk) {
+        if (move_uploaded_file($_FILES["comprobante"]["tmp_name"], $target_file)) {
+            try {
+                // Start transaction
+                $conn->begin_transaction();
 
-                    // Preparar la consulta para guardar la inscripción
-                    $stmt = $conn->prepare("INSERT INTO inscripciones (id_curso, id_estudiante, fecha_inscripcion, estado, fecha_actualizacion, comprobante_pago) VALUES (?, ?, NOW(), 'pendiente', NOW(), ?)");
-                    $stmt->bind_param("iis", $curso_id, $id_estudiante, $file_name);
+                // Save inscription
+                $stmt = $conn->prepare("INSERT INTO inscripciones (id_curso, id_estudiante, fecha_inscripcion, estado, fecha_actualizacion, comprobante_pago) VALUES (?, ?, NOW(), 'pendiente', NOW(), ?)");
+                $stmt->bind_param("iis", $curso_id, $id_estudiante, $file_name);
 
-                    // Ejecutar la consulta
-                    if ($stmt->execute()) {
-                        // Commit de la transacción
-                        $conn->commit();
+                if ($stmt->execute()) {
+                    // Commit transaction
+                    $conn->commit();
 
-                        $inscripcion_id = $stmt->insert_id;
-                        $success_message = "Inscripción completada con éxito. ID de inscripción: " . $inscripcion_id;
+                    $inscripcion_id = $stmt->insert_id;
+                    $success_message = "Inscripción completada con éxito. ID de inscripción: " . $inscripcion_id;
 
-                        // Redirigir tras el éxito
-                        header("Location: ../../dashboard/dashboard.php");
-                        exit;
-                    } else {
-                        throw new Exception("Error al procesar la inscripción: " . $stmt->error);
-                    }
-                } catch (Exception $e) {
-                    // Rollback en caso de error
-                    $conn->rollback();
-                    $error_message = "Error en la inscripción: " . $e->getMessage();
+                    // Redirect after success
+                    header("Location: ../../dashboard/dashboard.php?success=" . urlencode($success_message));
+                    exit;
+                } else {
+                    throw new Exception("Error al procesar la inscripción: " . $stmt->error);
                 }
-            } else {
-                $error_message = "Lo siento, hubo un error al subir tu archivo.";
+            } catch (Exception $e) {
+                // Rollback in case of error
+                $conn->rollback();
+                respondWithError("Error en la inscripción: " . $e->getMessage());
             }
+        } else {
+            respondWithError("Lo siento, hubo un error al subir tu archivo.");
         }
+    } else {
+        respondWithError("El archivo no cumple con los requisitos.");
     }
 }
 
-// Enviar mensaje de error si existe
-if (!empty($error_message)) {
-    echo json_encode(['error' => $error_message]);
+// Helper functions
+function validateFile($file, $fileType) {
+    $maxFileSize = 500000; // 500KB
+    $allowedTypes = ['jpg', 'jpeg', 'png', 'gif'];
+
+    if (!in_array($fileType, $allowedTypes)) {
+        return false;
+    }
+
+    if ($file['size'] > $maxFileSize) {
+        return false;
+    }
+
+    $check = getimagesize($file["tmp_name"]);
+    return $check !== false;
+}
+
+function respondWithError($message) {
+    echo json_encode(['error' => $message]);
+    exit;
+}
+
+function getUserDetails($conn, $username) {
+    $stmt = $conn->prepare("SELECT u.id_usuario, e.id_estudiante FROM usuario u LEFT JOIN estudiante e ON u.id_usuario = e.id_usuario WHERE u.username = ?");
+    $stmt->bind_param("s", $username);
+    $stmt->execute();
+    $result = $stmt->get_result();
+    return $result->fetch_assoc();
 }
 ?>

@@ -92,15 +92,6 @@ function checkPermission($requiredRole) {
     error_log("Permission granted");
 }
 
-// Implementar protección contra CSRF
-if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-    error_log("POST request detected. Checking CSRF token");
-    if (!isset($_POST['csrf_token']) || $_POST['csrf_token'] !== $_SESSION['csrf_token']) {
-        error_log("CSRF token validation failed");
-        die('CSRF token validation failed');
-    }
-    error_log("CSRF token validated successfully");
-}
 
 // Generar CSRF token si no existe
 if (!isset($_SESSION['csrf_token'])) {

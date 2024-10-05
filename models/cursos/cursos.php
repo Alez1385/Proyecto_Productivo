@@ -1,3 +1,9 @@
+<?php
+require_once '../../scripts/conexion.php';
+require_once '../../scripts/auth.php';
+requireLogin();
+checkPermission('admin');
+?>
 <!DOCTYPE html>
 <html lang="en">
 
@@ -14,7 +20,6 @@
         window.openSidebar = SidebarManager.open;
 
         document.addEventListener('DOMContentLoaded', SidebarManager.init);
-        // Ahora puedes usar SidebarManager.toggle() y SidebarManager.open(url) donde sea necesario
     </script>
 </head>
 
@@ -28,46 +33,7 @@
         <div id="sidebar-resizer"></div>
     </div>
     <div class="dashboard-container">
-        <?php
-        include "../../scripts/functions.php";
-        include "../../scripts/sidebar.php";
-        include "../../scripts/conexion.php";
-        
-        requireLogin();
-        checkPermission('admin');
-
-        // Definir los filtros iniciales
-        $selectedCategoryId = isset($_GET['category']) ? $_GET['category'] : '';
-        $selectedStatus = isset($_GET['status']) ? $_GET['status'] : '';
-        $selectedLevel = isset($_GET['level']) ? $_GET['level'] : '';
-
-        // Consulta para obtener los cursos con información adicional y aplicar filtros
-        $sql = "SELECT c.id_curso, c.nombre_curso, c.descripcion, c.nivel_educativo, c.duracion, c.estado, c.id_categoria, c.icono,
-                       u.nombre AS nombre_profesor, u.apellido AS apellido_profesor,
-                       GROUP_CONCAT(DISTINCT CONCAT(h.dia_semana, ' ', h.hora_inicio, '-', h.hora_fin) SEPARATOR ', ') AS horarios,
-                       COUNT(DISTINCT i.id_estudiante) AS num_estudiantes
-                FROM cursos c
-                LEFT JOIN asignacion_curso ac ON c.id_curso = ac.id_curso
-                LEFT JOIN profesor p ON ac.id_profesor = p.id_profesor
-                LEFT JOIN usuario u ON p.id_usuario = u.id_usuario
-                LEFT JOIN horarios h ON c.id_curso = h.id_curso
-                LEFT JOIN inscripciones i ON c.id_curso = i.id_curso
-                WHERE (c.id_categoria LIKE '%$selectedCategoryId%' OR '$selectedCategoryId' = '')
-                  AND (c.estado LIKE '%$selectedStatus%' OR '$selectedStatus' = '')
-                  AND (c.nivel_educativo LIKE '%$selectedLevel%' OR '$selectedLevel' = '')
-                GROUP BY c.id_curso";
-        $result = $conn->query($sql);
-
-        // Cargar opciones de filtro
-        $sql_categories = "SELECT id_categoria, nombre_categoria FROM categoria_curso";
-        $categories = $conn->query($sql_categories);
-
-        $sql_states = "SELECT DISTINCT estado FROM cursos";
-        $states = $conn->query($sql_states);
-
-        $sql_levels = "SELECT DISTINCT nivel_educativo FROM cursos";
-        $levels = $conn->query($sql_levels);
-        ?>
+        <?php include "../../scripts/sidebar.php"; ?>
 
         <!-- Main Content -->
         <div class="main-content">
@@ -92,65 +58,63 @@
                     <select id="categoryFilter" onchange="filterCourses()">
                         <option value="">Categoría</option>
                         <?php
-                        // Guardar las categorías en un array para usar más tarde
-                        $categoriesArray = [];
+                        include "../../scripts/conexion.php";
+                        $sql_categories = "SELECT id_categoria, nombre_categoria FROM categoria_curso";
+                        $categories = $conn->query($sql_categories);
                         while ($row = $categories->fetch_assoc()) {
-                            $categoriesArray[$row["id_categoria"]] = $row["nombre_categoria"];
+                            echo "<option value='" . $row['id_categoria'] . "'>" . $row['nombre_categoria'] . "</option>";
+                        }
                         ?>
-                            <option value="<?php echo $row["id_categoria"]; ?>" <?php echo $selectedCategoryId == $row["id_categoria"] ? 'selected' : ''; ?>>
-                                <?php echo $row["nombre_categoria"]; ?>
-                            </option>
-                        <?php } ?>
                     </select>
 
                     <select id="statusFilter" onchange="filterCourses()">
                         <option value="">Estado</option>
-                        <?php while ($row = $states->fetch_assoc()) { ?>
-                            <option value="<?php echo $row["estado"]; ?>" <?php echo $selectedStatus === $row["estado"] ? 'selected' : ''; ?>>
-                                <?php echo $row["estado"]; ?>
-                            </option>
-                        <?php } ?>
+                        <?php
+                        $sql_states = "SELECT DISTINCT estado FROM cursos";
+                        $states = $conn->query($sql_states);
+                        while ($row = $states->fetch_assoc()) {
+                            echo "<option value='" . $row['estado'] . "'>" . $row['estado'] . "</option>";
+                        }
+                        ?>
                     </select>
 
                     <select id="levelFilter" onchange="filterCourses()">
                         <option value="">Nivel Educativo</option>
-                        <?php while ($row = $levels->fetch_assoc()) { ?>
-                            <option value="<?php echo $row["nivel_educativo"]; ?>" <?php echo $selectedLevel === $row["nivel_educativo"] ? 'selected' : ''; ?>>
-                                <?php echo $row["nivel_educativo"]; ?>
-                            </option>
-                        <?php } ?>
+                        <?php
+                        $sql_levels = "SELECT DISTINCT nivel_educativo FROM cursos";
+                        $levels = $conn->query($sql_levels);
+                        while ($row = $levels->fetch_assoc()) {
+                            echo "<option value='" . $row['nivel_educativo'] . "'>" . $row['nivel_educativo'] . "</option>";
+                        }
+                        ?>
                     </select>
 
                     <!-- Filtros aplicados -->
                     <div id="appliedFilters">
-                        <?php if ($selectedCategoryId) { ?>
-                            <div class="filter-tag" data-filter="category">
-                                <span><?php echo $categoriesArray[$selectedCategoryId] ?? 'Categoría'; ?></span>
-                                <span class="filter-close" onclick="removeFilter('category')">&times;</span>
-                            </div>
-                        <?php } ?>
-                        <?php if ($selectedStatus) { ?>
-                            <div class="filter-tag" data-filter="status">
-                                <span><?php echo $selectedStatus; ?></span>
-                                <span class="filter-close" onclick="removeFilter('status')">&times;</span>
-                            </div>
-                        <?php } ?>
-                        <?php if ($selectedLevel) { ?>
-                            <div class="filter-tag" data-filter="level">
-                                <span><?php echo $selectedLevel; ?></span>
-                                <span class="filter-close" onclick="removeFilter('level')">&times;</span>
-                            </div>
-                        <?php } ?>
-                        <button id="resetFilters" onclick="resetFilters()">Resetear Filtros</button>
+                        <!-- Los filtros aplicados se mostrarán aquí dinámicamente -->
                     </div>
+                    <button id="resetFilters" onclick="resetFilters()">Resetear Filtros</button>
                 </div>
 
                 <!-- Lista de cursos -->
                 <div class="course-list">
                     <?php
+                    $sql = "SELECT c.id_curso, c.nombre_curso, c.descripcion, c.nivel_educativo, c.duracion, c.estado, c.id_categoria, c.icono,
+                                   u.nombre AS nombre_profesor, u.apellido AS apellido_profesor,
+                                   GROUP_CONCAT(DISTINCT CONCAT(h.dia_semana, ' ', h.hora_inicio, '-', h.hora_fin) SEPARATOR ', ') AS horarios,
+                                   COUNT(DISTINCT i.id_estudiante) AS num_estudiantes
+                            FROM cursos c
+                            LEFT JOIN asignacion_curso ac ON c.id_curso = ac.id_curso
+                            LEFT JOIN profesor p ON ac.id_profesor = p.id_profesor
+                            LEFT JOIN usuario u ON p.id_usuario = u.id_usuario
+                            LEFT JOIN horarios h ON c.id_curso = h.id_curso
+                            LEFT JOIN inscripciones i ON c.id_curso = i.id_curso
+                            GROUP BY c.id_curso";
+                    $result = $conn->query($sql);
+
                     if ($result->num_rows > 0) {
                         while ($row = $result->fetch_assoc()) {
-                            echo '<div class="course-item" data-course-id="' . $row["id_curso"] . '">';
+                            echo '<div class="course-item" data-course-id="' . $row["id_curso"] . '" data-category="' . $row["id_categoria"] . '" data-status="' . $row["estado"] . '" data-level="' . $row["nivel_educativo"] . '">';
                             echo '<img src="../../uploads/icons/' . (empty($row["icono"]) ? '/img/usuario.png' : $row["icono"]) . '" alt="Course Image">';
                             echo '<div class="course-content">';
                             echo '<div class="course-details">';
@@ -163,7 +127,7 @@
                             echo '<p><strong>Estudiantes inscritos: </strong>' . $row["num_estudiantes"] . '</p>';
                             echo '</div>';
                             echo '<div class="course-actions">';
-                            echo '<button onclick="window.location.href=\'editar_curso.php?id_curso=' . $row["id_curso"] . '\'" class="edit-btn">Editar</button>';
+                            echo '<button onclick="openSidebar(\'editar_curso.php?id_curso=' . $row["id_curso"] . '\')" class="edit-btn">Editar</button>';
                             echo '<button onclick="deleteCourse(' . $row["id_curso"] . ')" class="delete-btn">Eliminar</button>';
                             echo '</div>';
                             echo '</div>';

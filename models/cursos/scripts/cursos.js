@@ -1,58 +1,93 @@
 function deleteCourse(courseId) {
-    if (confirm("Estas seguro de eliminar el curso?")) {
-        fetch("./scripts/delete_courses.php", {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/x-www-form-urlencoded",
-          },
-          body: "id_curso=" + courseId,
-        })
-          .then((response) => response.json())
-          .then((data) => {
-            if (data.success) {
-              const courseElement = document.querySelector(
-                `[data-course-id="${courseId}"]`
-              );
-              if (courseElement) {
-                courseElement.remove();
-              }
-              alert("Curso eliminado correctamente");
-            } else {
-              alert("Error deleting course: " + data.message);
-            }
+  if (confirm("¿Estás seguro de que deseas eliminar este curso?")) {
+      fetch('delete_course.php', {
+              method: 'POST',
+              headers: {
+                  'Content-Type': 'application/x-www-form-urlencoded',
+              },
+              body: 'id_curso=' + courseId
           })
-          .catch((error) => {
-            console.error("Error:", error);
-            alert(
-              "Un error ocurrio al eliminar el curso: " + error.message
-            );
+          .then(response => response.json())
+          .then(data => {
+              if (data.success) {
+                  document.querySelector(`[data-course-id="${courseId}"]`).remove();
+                  alert('Curso eliminado con éxito');
+              } else {
+                  alert('Error eliminando el curso: ' + data.message);
+              }
+          })
+          .catch(error => {
+              console.error('Error:', error);
+              alert('Ocurrió un error al eliminar el curso.');
           });
-    }
+  }
 }
-
-
 
 function filterCourses() {
-    const category = document.getElementById('categoryFilter').value;
-    const status = document.getElementById('statusFilter').value;
-    const level = document.getElementById('levelFilter').value;
-    let url = 'cursos.php?';
+  const searchInput = document.getElementById('searchInput').value.toLowerCase();
+  const categoryFilter = document.getElementById('categoryFilter').value;
+  const statusFilter = document.getElementById('statusFilter').value;
+  const levelFilter = document.getElementById('levelFilter').value;
+  const courses = document.querySelectorAll('.course-item');
 
-    if (category) url += `category=${category}&`;
-    if (status) url += `status=${status}&`;
-    if (level) url += `level=${level}&`;
+  courses.forEach(course => {
+      const courseName = course.querySelector('h2').textContent.toLowerCase();
+      const courseDescription = course.querySelector('p').textContent.toLowerCase();
+      const courseCategory = course.getAttribute('data-category');
+      const courseStatus = course.getAttribute('data-status');
+      const courseLevel = course.getAttribute('data-level');
 
-    window.location.href = url;
+      const matchesSearch = courseName.includes(searchInput) || courseDescription.includes(searchInput);
+      const matchesCategory = categoryFilter === '' || courseCategory === categoryFilter;
+      const matchesStatus = statusFilter === '' || courseStatus === statusFilter;
+      const matchesLevel = levelFilter === '' || courseLevel === levelFilter;
+
+      if (matchesSearch && matchesCategory && matchesStatus && matchesLevel) {
+          course.style.display = '';
+      } else {
+          course.style.display = 'none';
+      }
+  });
+
+  updateAppliedFilters();
 }
 
-function removeFilter(filterType) {
-    const urlParams = new URLSearchParams(window.location.search);
-    urlParams.delete(filterType);
+function updateAppliedFilters() {
+  const appliedFilters = document.getElementById('appliedFilters');
+  appliedFilters.innerHTML = '';
 
-    const newUrl = `${window.location.pathname}?${urlParams.toString()}`;
-    window.location.href = newUrl;
+  const filters = [
+      { id: 'categoryFilter', name: 'Categoría' },
+      { id: 'statusFilter', name: 'Estado' },
+      { id: 'levelFilter', name: 'Nivel' }
+  ];
+
+  filters.forEach(filter => {
+      const filterElement = document.getElementById(filter.id);
+      if (filterElement.value) {
+          const filterTag = document.createElement('div');
+          filterTag.className = 'filter-tag';
+          filterTag.setAttribute('data-filter', filter.id);
+          filterTag.innerHTML = `
+              <span>${filter.name}: ${filterElement.options[filterElement.selectedIndex].text}</span>
+              <span class="filter-close" onclick="removeFilter('${filter.id}')">&times;</span>
+          `;
+          appliedFilters.appendChild(filterTag);
+      }
+  });
+}
+
+function removeFilter(filterId) {
+  document.getElementById(filterId).value = '';
+  filterCourses();
 }
 
 function resetFilters() {
-    window.location.href = 'cursos.php';
+  document.getElementById('searchInput').value = '';
+  document.getElementById('categoryFilter').value = '';
+  document.getElementById('statusFilter').value = '';
+  document.getElementById('levelFilter').value = '';
+  filterCourses();
 }
+
+document.getElementById('overlay').addEventListener('click', toggleSidebar);
