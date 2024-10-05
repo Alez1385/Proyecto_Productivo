@@ -28,8 +28,9 @@
                     <h1>Control de Módulos</h1>
                 </div>
                 <div class="header-right">
-                    <button onclick="window.location.href='new_modulo.php'">+ Agregar Nuevo Módulo</button>
-                    <button onclick="window.location.href='../asig_modulo/datos_personales/asignacion.php'" class="assign-btn">Asignar Módulos</button>
+                <button onclick="window.location.href='new_modulo.php'">+ Agregar Nuevo Módulo</button>
+                 <button onclick="window.location.href='../asig_modulo/datos_personales/asignacion.php'" class="assign-btn">Asignar Módulos</button>
+                <button onclick="window.location.href='change_order.php'" class="assign-btn">Cambiar Orden</button>
                 </div>
             </header>
 
