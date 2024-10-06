@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Servidor: 127.0.0.1
--- Tiempo de generación: 06-10-2024 a las 05:35:38
+-- Tiempo de generación: 06-10-2024 a las 20:47:12
 -- Versión del servidor: 10.4.32-MariaDB
 -- Versión de PHP: 8.0.30
 
@@ -160,6 +160,40 @@ INSERT INTO `cursos` (`id_curso`, `nombre_curso`, `descripcion`, `nivel_educativ
 -- --------------------------------------------------------
 
 --
+-- Estructura de tabla para la tabla `db_gescursoslecturas_mensajes`
+--
+
+CREATE TABLE `db_gescursoslecturas_mensajes` (
+  `id` int(11) NOT NULL,
+  `id_mensaje` int(11) NOT NULL,
+  `id_usuario` int(11) NOT NULL,
+  `fecha_lectura` timestamp NOT NULL DEFAULT current_timestamp() ON UPDATE current_timestamp()
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+--
+-- Volcado de datos para la tabla `db_gescursoslecturas_mensajes`
+--
+
+INSERT INTO `db_gescursoslecturas_mensajes` (`id`, `id_mensaje`, `id_usuario`, `fecha_lectura`) VALUES
+(1, 1, 56, '2024-10-06 18:23:01'),
+(2, 4, 56, '2024-10-06 18:22:04'),
+(3, 5, 56, '2024-10-06 18:21:59'),
+(4, 6, 56, '2024-10-06 18:21:59'),
+(5, 7, 56, '2024-10-06 18:37:23'),
+(6, 9, 56, '2024-10-06 18:46:24'),
+(14, 10, 56, '2024-10-06 18:46:28'),
+(15, 12, 56, '2024-10-06 18:46:27'),
+(23, 13, 56, '2024-10-06 18:34:53'),
+(28, 14, 56, '2024-10-06 18:22:01'),
+(30, 15, 56, '2024-10-06 18:36:18'),
+(31, 16, 56, '2024-10-06 18:22:03'),
+(32, 17, 56, '2024-10-06 18:22:03'),
+(45, 11, 56, '2024-10-06 18:37:59'),
+(101, 18, 56, '2024-10-06 18:34:24');
+
+-- --------------------------------------------------------
+
+--
 -- Estructura de tabla para la tabla `estudiante`
 --
 
@@ -247,6 +281,7 @@ CREATE TABLE `login_attempts` (
 CREATE TABLE `mensajes` (
   `id_mensaje` int(11) NOT NULL,
   `id_remitente` int(11) DEFAULT NULL,
+  `tipo_remitente` int(11) DEFAULT NULL,
   `tipo_destinatario` enum('todos','estudiantes','profesores','users','individual') DEFAULT NULL,
   `id_destinatario` int(11) DEFAULT NULL,
   `asunto` varchar(255) DEFAULT NULL,
@@ -258,20 +293,15 @@ CREATE TABLE `mensajes` (
 -- Volcado de datos para la tabla `mensajes`
 --
 
-INSERT INTO `mensajes` (`id_mensaje`, `id_remitente`, `tipo_destinatario`, `id_destinatario`, `asunto`, `contenido`, `fecha_envio`) VALUES
-(40, NULL, 'todos', NULL, 'asdas', 'asda', '2024-10-05 22:31:32'),
-(41, NULL, 'todos', NULL, 'asdas', 'asda', '2024-10-05 22:31:33'),
-(42, NULL, 'todos', NULL, 'asdas', 'asda', '2024-10-05 22:31:33'),
-(43, NULL, 'todos', NULL, 'asdas', 'asda', '2024-10-05 22:31:33'),
-(44, NULL, 'todos', NULL, 'asdas', 'asda', '2024-10-05 22:31:33'),
-(45, NULL, 'todos', NULL, 'asdas', 'asda', '2024-10-05 22:31:33'),
-(46, NULL, 'todos', NULL, 'asdas', 'asda', '2024-10-05 22:31:34'),
-(47, NULL, 'todos', NULL, 'asdas', 'asda', '2024-10-05 22:31:34'),
-(48, NULL, 'todos', NULL, 'asdas', 'asda', '2024-10-05 22:31:34'),
-(49, NULL, 'todos', NULL, 'asdas', 'asda', '2024-10-05 22:31:35'),
-(50, NULL, 'todos', NULL, 'asdas', 'asda', '2024-10-05 22:31:35'),
-(51, NULL, 'todos', NULL, 'asd', 'asd', '2024-10-05 22:34:15'),
-(52, NULL, 'todos', NULL, 'asd', 'asd', '2024-10-05 22:34:16');
+INSERT INTO `mensajes` (`id_mensaje`, `id_remitente`, `tipo_remitente`, `tipo_destinatario`, `id_destinatario`, `asunto`, `contenido`, `fecha_envio`) VALUES
+(1, 56, NULL, 'todos', NULL, '0', 'asdasdasd', '2024-10-06 11:34:57'),
+(4, 56, NULL, 'todos', NULL, 'asdas', 'dasd', '2024-10-06 11:41:14'),
+(5, 56, NULL, 'todos', NULL, 'asdasd', 'ad', '2024-10-06 11:43:44'),
+(6, 56, NULL, 'todos', NULL, 'dasd', 'asdasd', '2024-10-06 11:50:20'),
+(7, 56, NULL, 'todos', NULL, 'asd', 'asdasd', '2024-10-06 11:59:23'),
+(8, 56, NULL, 'individual', 36, 'asdas', 'dsad', '2024-10-06 12:01:55'),
+(10, 56, NULL, 'todos', NULL, 'asda', 'sdd', '2024-10-06 12:19:25'),
+(12, 56, NULL, 'todos', NULL, 'asd', 'asd', '2024-10-06 12:39:46');
 
 -- --------------------------------------------------------
 
@@ -542,6 +572,13 @@ ALTER TABLE `cursos`
   ADD KEY `fk_categoria` (`id_categoria`);
 
 --
+-- Indices de la tabla `db_gescursoslecturas_mensajes`
+--
+ALTER TABLE `db_gescursoslecturas_mensajes`
+  ADD PRIMARY KEY (`id`),
+  ADD UNIQUE KEY `id_mensaje` (`id_mensaje`,`id_usuario`);
+
+--
 -- Indices de la tabla `estudiante`
 --
 ALTER TABLE `estudiante`
@@ -690,6 +727,12 @@ ALTER TABLE `cursos`
   MODIFY `id_curso` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=9;
 
 --
+-- AUTO_INCREMENT de la tabla `db_gescursoslecturas_mensajes`
+--
+ALTER TABLE `db_gescursoslecturas_mensajes`
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=136;
+
+--
 -- AUTO_INCREMENT de la tabla `estudiante`
 --
 ALTER TABLE `estudiante`
@@ -723,7 +766,7 @@ ALTER TABLE `login_attempts`
 -- AUTO_INCREMENT de la tabla `mensajes`
 --
 ALTER TABLE `mensajes`
-  MODIFY `id_mensaje` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=53;
+  MODIFY `id_mensaje` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=19;
 
 --
 -- AUTO_INCREMENT de la tabla `modulos`
