@@ -190,9 +190,9 @@ fetch('get_message_content.php?id=' + id_mensaje)
                     <p><strong>Para:</strong> ${data.tipo_destinatario === 'individual' ? data.destinatario : data.tipo_destinatario}</p>
                     ${data.id_destinatario ? `<p><strong>ID Destinatario:</strong> ${data.id_destinatario}</p>` : ''}
                 </div>
-                <div class="message-content">
+                <div class="content-box">
                     <h3>Contenido:</h3>
-                    <div class="content-box">${data.contenido}</div>
+                    <div class="content-box-inner">${data.contenido}</div>
                 </div>
             </div>
         `;
@@ -251,53 +251,13 @@ window.onload = function() {
     loadMessages();
 };
 
-// Función para hacer la lista de mensajes redimensionable
-function makeResizable() {
-    const messageListWrapper = document.querySelector('.message-list-wrapper');
-    const messageList = document.querySelector('.message-list');
-    const resizeHandle = document.querySelector('.resize-handle');
-    const container = document.querySelector('.messaging-container');
 
-    let isResizing = false;
+window.addEventListener('load', () => {
+    makeResizable();
+    updateResizeHandlePosition(); // Asegúrate de que se llame aquí
+});
 
-    resizeHandle.addEventListener('mousedown', (e) => {
-        isResizing = true;
-        document.addEventListener('mousemove', resize);
-        document.addEventListener('mouseup', stopResize);
-    });
-
-    function resize(e) {
-        if (!isResizing) return;
-        const containerRect = container.getBoundingClientRect();
-        const newWidth = e.clientX - containerRect.left;
-        const maxWidth = container.offsetWidth * 0.8; // 80% del ancho del contenedor
-        const minWidth = 200; // Ancho mínimo
-
-        if (newWidth > minWidth && newWidth < maxWidth) {
-            messageListWrapper.style.width = `${newWidth}px`;
-        }
-    }
-
-    function stopResize() {
-        isResizing = false;
-        document.removeEventListener('mousemove', resize);
-        document.removeEventListener('mouseup', stopResize);
-    }
-
-    // Manejar el scroll horizontal
-    messageList.addEventListener('scroll', () => {
-        const scrollPercentage = messageList.scrollLeft / (messageList.scrollWidth - messageList.clientWidth);
-        const handlePosition = scrollPercentage * (messageListWrapper.clientWidth - resizeHandle.clientWidth);
-        resizeHandle.style.right = `${handlePosition}px`;
-    });
-}
-
-// Llamar a esta función cuando se carga la página
-window.addEventListener('load', makeResizable);
-loadMessages();
-
-
-
+// Función para buscar usuarios
 function buscarUsuarios() {
     var input = document.getElementById('destinatario');
     var a = document.getElementById('resultadosBusqueda');

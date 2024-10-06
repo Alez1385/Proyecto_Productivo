@@ -72,7 +72,6 @@ include "../../scripts/auth.php";
                     <!-- Mensajes cargados dinámicamente -->
                 </div>
             </div>
-           
             <div class="message-content" id="messageContent">
                 <div class="no-message">No has abierto ningún mensaje</div>
             </div>

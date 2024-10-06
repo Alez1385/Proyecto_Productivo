@@ -3,77 +3,88 @@
 include "../../scripts/conexion.php";
 include "../../scripts/auth.php";
 
+header('Content-Type: application/json');
+
 // Verifica si la solicitud es POST
-if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-    // Recoger datos del formulario
-    $tipo_destinatario = $_POST['tipo_destinatario'];
-    $destinatario = isset($_POST['destinatario']) ? $_POST['destinatario'] : null;
-    $asunto = $_POST['asunto'];
-    $contenido = $_POST['contenido'];
+if ($_SERVER['REQUEST_METHOD'] == 'POST') {
+    try {
+        // Obtener el id_usuario y el tipo de usuario actual
+        $id_remitente = $_SESSION['id_usuario'];
 
-    // Validar campos obligatorios
-    if (empty($asunto) || empty($contenido)) {
-        echo json_encode(['success' => false, 'message' => 'El asunto y el contenido son obligatorios.']);
-        exit;
-    }
+        // Recoger datos del formulario
+        $tipo_destinatario = $_POST['tipo_destinatario'];
+        $destinatario = isset($_POST['destinatario']) ? $_POST['destinatario'] : null;
+        $asunto = $_POST['asunto'];
+        $contenido = $_POST['contenido'];
 
-    // Obtener el id_usuario y el tipo de usuario actual
-    $id_usuario_actual = $_SESSION['id_usuario'];
+        // Validar campos obligatorios
+        if (empty($asunto) || empty($contenido)) {
+            throw new Exception('El asunto y el contenido son obligatorios.');
+        }
 
-    // Determinar el id_remitente (siempre será el usuario actual)
-    $id_remitente = $id_usuario_actual;
+        // Determinar el id_destinatario y el id_tipo_usuario
+        $id_destinatario = null;
+        $id_tipo_usuario = null;
 
-    // Preparar la consulta
-    $sql = "INSERT INTO mensajes (id_remitente, tipo_destinatario, id_destinatario, asunto, contenido, fecha_envio) 
-            VALUES (?, ?, ?, ?, ?, NOW())";
-
-    if ($stmt = $conn->prepare($sql)) {
-        // Manejar el tipo de destinatario
         switch ($tipo_destinatario) {
-            case 'todos':
-                $id_destinatario = null;
-                break;
-            case 'profesores':
-                $id_destinatario = 2; // ID para profesores
+            case 'individual':
+                $id_destinatario = $destinatario;
                 break;
             case 'estudiantes':
-                $id_destinatario = 3; // ID para estudiantes
+                $id_tipo_usuario = obtenerIdTipoUsuario('estudiante');
                 break;
-                case 'individual':
-                    // Verificar si el destinatario existe en la tabla usuario
-                    $check_sql = "SELECT id_usuario FROM usuario WHERE mail = ?";
-                    $check_stmt = $conn->prepare($check_sql);
-                    $check_stmt->bind_param("s", $destinatario);
-                    $check_stmt->execute();
-                    $check_result = $check_stmt->get_result();
-                    if ($check_result->num_rows === 0) {
-                        echo json_encode(['success' => false, 'message' => 'El correo electrónico especificado no existe.']);
-                        exit;
-                    } else {
-                        $id_destinatario = $check_result->fetch_assoc()['id_usuario'];
-                    }
-                    $check_stmt->close();
-                    break;
+            case 'profesores':
+                $id_tipo_usuario = obtenerIdTipoUsuario('profesor');
+                break;
+            case 'todos':
+                // Para 'todos', dejamos id_destinatario y id_tipo_usuario como null
+                break;
             default:
-                echo json_encode(['success' => false, 'message' => 'Tipo de destinatario no válido.']);
-                exit;
+                throw new Exception('Tipo de destinatario no válido.');
+        }
+
+        // Modificar la consulta SQL para incluir id_tipo_usuario
+        $query = "INSERT INTO mensajes (id_remitente, tipo_destinatario, id_tipo_usuario, id_destinatario, asunto, contenido) VALUES (?, ?, ?, ?, ?, ?)";
+        $stmt = $conn->prepare($query);
+
+        if (!$stmt) {
+            throw new Exception('Error en la preparación de la consulta: ' . $conn->error);
         }
 
         // Vincular parámetros
-        $stmt->bind_param("isiss", $id_remitente, $tipo_destinatario, $id_destinatario, $asunto, $contenido);
+        $stmt->bind_param("isiiss", $id_remitente, $tipo_destinatario, $id_tipo_usuario, $id_destinatario, $asunto, $contenido);
 
-        if ($stmt->execute()) {
-            echo json_encode(['success' => true, 'message' => 'Mensaje enviado correctamente.']);
-        } else {
-            echo json_encode(['success' => false, 'message' => 'Error al enviar el mensaje: ' . $stmt->error]);
+        if (!$stmt->execute()) {
+            throw new Exception('Error al ejecutar la consulta: ' . $stmt->error);
         }
-        $stmt->close();
-    } else {
-        echo json_encode(['success' => false, 'message' => 'Error en la preparación de la consulta: ' . $conn->error]);
-    }
 
-    $conn->close();
+        $stmt->close();
+        $conn->close();
+
+        echo json_encode(['success' => true, 'message' => 'Mensaje enviado correctamente.']);
+    } catch (Exception $e) {
+        echo json_encode(['success' => false, 'message' => 'Error: ' . $e->getMessage()]);
+    }
 } else {
     echo json_encode(['success' => false, 'message' => 'Método no permitido.']);
 }
-?>
+
+function obtenerIdTipoUsuario($tipo) {
+    global $conn;
+    $query = "SELECT id_tipo_usuario FROM tipo_usuario WHERE nombre = ?";
+    $stmt = $conn->prepare($query);
+    if (!$stmt) {
+        throw new Exception('Error al preparar la consulta para obtener id_tipo_usuario: ' . $conn->error);
+    }
+    $stmt->bind_param("s", $tipo);
+    if (!$stmt->execute()) {
+        throw new Exception('Error al ejecutar la consulta para obtener id_tipo_usuario: ' . $stmt->error);
+    }
+    $result = $stmt->get_result();
+    $row = $result->fetch_assoc();
+    $stmt->close();
+    if (!$row) {
+        throw new Exception('No se encontró el tipo de usuario: ' . $tipo);
+    }
+    return $row['id_tipo_usuario'];
+}

@@ -1,54 +1,49 @@
 <?php
-session_start();
 include "../../scripts/conexion.php";
+include "../../scripts/auth.php";
 
 header('Content-Type: application/json');
 
-// Verificar si el usuario está autenticado
-if (!isset($_SESSION['id_usuario'])) {
-    echo json_encode(['success' => false, 'message' => 'Usuario no autenticado']);
-    exit;
-}
+if ($_SERVER['REQUEST_METHOD'] == 'POST') {
+    try {
+        if (!isset($_SESSION['id_usuario'])) {
+            throw new Exception('Usuario no autenticado.');
+        }
 
-// Verificar si se proporcionó un ID de mensaje
-if (!isset($_POST['id_mensaje'])) {
-    echo json_encode(['success' => false, 'message' => 'ID de mensaje no proporcionado']);
-    exit;
-}
+        $id_usuario = $_SESSION['id_usuario'];
+        $id_mensaje = $_POST['id_mensaje'];
 
-$id_mensaje = intval($_POST['id_mensaje']);
-$id_usuario = $_SESSION['id_usuario'];
+        if (empty($id_mensaje)) {
+            throw new Exception('ID de mensaje no proporcionado.');
+        }
 
-// Primero, verificar si el usuario tiene permiso para eliminar este mensaje
-$check_query = "SELECT id_remitente FROM mensajes WHERE id_mensaje = ?";
-$check_stmt = $conn->prepare($check_query);
-$check_stmt->bind_param("i", $id_mensaje);
-$check_stmt->execute();
-$result = $check_stmt->get_result();
+        // Verificar si el mensaje ya está marcado como eliminado para este usuario
+        $query = "SELECT * FROM mensajes_eliminados WHERE id_usuario = ? AND id_mensaje = ?";
+        $stmt = $conn->prepare($query);
+        $stmt->bind_param("ii", $id_usuario, $id_mensaje);
+        $stmt->execute();
+        $result = $stmt->get_result();
 
-if ($result->num_rows === 0) {
-    echo json_encode(['success' => false, 'message' => 'Mensaje no encontrado']);
-    exit;
-}
+        if ($result->num_rows > 0) {
+            throw new Exception('El mensaje ya ha sido eliminado por este usuario.');
+        }
 
-$message = $result->fetch_assoc();
+        // Marcar el mensaje como eliminado para este usuario
+        $query = "INSERT INTO mensajes_eliminados (id_usuario, id_mensaje) VALUES (?, ?)";
+        $stmt = $conn->prepare($query);
+        $stmt->bind_param("ii", $id_usuario, $id_mensaje);
 
-// Verificar si el usuario actual es el remitente del mensaje
-if ($message['id_remitente'] != $id_usuario) {
-    echo json_encode(['success' => false, 'message' => 'No tienes permiso para eliminar este mensaje']);
-    exit;
-}
+        if (!$stmt->execute()) {
+            throw new Exception('Error al marcar el mensaje como eliminado: ' . $stmt->error);
+        }
 
-// Eliminar el mensaje
-$delete_query = "DELETE FROM mensajes WHERE id_mensaje = ?";
-$delete_stmt = $conn->prepare($delete_query);
-$delete_stmt->bind_param("i", $id_mensaje);
+        $stmt->close();
+        $conn->close();
 
-if ($delete_stmt->execute()) {
-    echo json_encode(['success' => true, 'message' => 'Mensaje eliminado con éxito']);
+        echo json_encode(['success' => true, 'message' => 'Mensaje eliminado correctamente.']);
+    } catch (Exception $e) {
+        echo json_encode(['success' => false, 'message' => 'Error: ' . $e->getMessage()]);
+    }
 } else {
-    echo json_encode(['success' => false, 'message' => 'Error al eliminar el mensaje: ' . $conn->error]);
+    echo json_encode(['success' => false, 'message' => 'Método no permitido.']);
 }
-
-$delete_stmt->close();
-$conn->close();
