@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Servidor: 127.0.0.1
--- Tiempo de generación: 06-10-2024 a las 00:31:38
+-- Tiempo de generación: 06-10-2024 a las 05:35:38
 -- Versión del servidor: 10.4.32-MariaDB
 -- Versión de PHP: 8.0.30
 
@@ -65,7 +65,8 @@ INSERT INTO `asig_modulo` (`id_asig_modulo`, `id_modulo`, `id_tipo_usuario`, `fe
 (19, 7, 1, NULL),
 (20, 8, 1, NULL),
 (21, 3, 3, NULL),
-(22, 9, 1, NULL);
+(22, 9, 1, NULL),
+(23, 10, 1, NULL);
 
 -- --------------------------------------------------------
 
@@ -240,6 +241,41 @@ CREATE TABLE `login_attempts` (
 -- --------------------------------------------------------
 
 --
+-- Estructura de tabla para la tabla `mensajes`
+--
+
+CREATE TABLE `mensajes` (
+  `id_mensaje` int(11) NOT NULL,
+  `id_remitente` int(11) DEFAULT NULL,
+  `tipo_destinatario` enum('todos','estudiantes','profesores','users','individual') DEFAULT NULL,
+  `id_destinatario` int(11) DEFAULT NULL,
+  `asunto` varchar(255) DEFAULT NULL,
+  `contenido` text DEFAULT NULL,
+  `fecha_envio` datetime DEFAULT current_timestamp()
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+--
+-- Volcado de datos para la tabla `mensajes`
+--
+
+INSERT INTO `mensajes` (`id_mensaje`, `id_remitente`, `tipo_destinatario`, `id_destinatario`, `asunto`, `contenido`, `fecha_envio`) VALUES
+(40, NULL, 'todos', NULL, 'asdas', 'asda', '2024-10-05 22:31:32'),
+(41, NULL, 'todos', NULL, 'asdas', 'asda', '2024-10-05 22:31:33'),
+(42, NULL, 'todos', NULL, 'asdas', 'asda', '2024-10-05 22:31:33'),
+(43, NULL, 'todos', NULL, 'asdas', 'asda', '2024-10-05 22:31:33'),
+(44, NULL, 'todos', NULL, 'asdas', 'asda', '2024-10-05 22:31:33'),
+(45, NULL, 'todos', NULL, 'asdas', 'asda', '2024-10-05 22:31:33'),
+(46, NULL, 'todos', NULL, 'asdas', 'asda', '2024-10-05 22:31:34'),
+(47, NULL, 'todos', NULL, 'asdas', 'asda', '2024-10-05 22:31:34'),
+(48, NULL, 'todos', NULL, 'asdas', 'asda', '2024-10-05 22:31:34'),
+(49, NULL, 'todos', NULL, 'asdas', 'asda', '2024-10-05 22:31:35'),
+(50, NULL, 'todos', NULL, 'asdas', 'asda', '2024-10-05 22:31:35'),
+(51, NULL, 'todos', NULL, 'asd', 'asd', '2024-10-05 22:34:15'),
+(52, NULL, 'todos', NULL, 'asd', 'asd', '2024-10-05 22:34:16');
+
+-- --------------------------------------------------------
+
+--
 -- Estructura de tabla para la tabla `modulos`
 --
 
@@ -261,7 +297,8 @@ INSERT INTO `modulos` (`id_modulo`, `nom_modulo`, `url`, `icono`) VALUES
 (6, 'Cursos', 'models/cursos/cursos.php', 'assignment'),
 (7, 'Modulos', 'models/modulos/modulos.php', 'event'),
 (8, 'Inscripciones', 'models/inscripciones/inscripciones.php', 'card_travel'),
-(9, 'Index', 'models/admin_index/admin_index.php', 'home');
+(9, 'Index', 'models/admin_index/admin_index.php', 'home'),
+(10, 'mensajeria ', 'models/mensajeria/mensajeria.php', 'question_answer');
 
 -- --------------------------------------------------------
 
@@ -543,6 +580,14 @@ ALTER TABLE `login_attempts`
   ADD PRIMARY KEY (`id`);
 
 --
+-- Indices de la tabla `mensajes`
+--
+ALTER TABLE `mensajes`
+  ADD PRIMARY KEY (`id_mensaje`),
+  ADD KEY `id_remitente` (`id_remitente`),
+  ADD KEY `id_destinatario` (`id_destinatario`);
+
+--
 -- Indices de la tabla `modulos`
 --
 ALTER TABLE `modulos`
@@ -618,7 +663,7 @@ ALTER TABLE `asignacion_curso`
 -- AUTO_INCREMENT de la tabla `asig_modulo`
 --
 ALTER TABLE `asig_modulo`
-  MODIFY `id_asig_modulo` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=23;
+  MODIFY `id_asig_modulo` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=24;
 
 --
 -- AUTO_INCREMENT de la tabla `asistencia`
@@ -675,10 +720,16 @@ ALTER TABLE `login_attempts`
   MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=13;
 
 --
+-- AUTO_INCREMENT de la tabla `mensajes`
+--
+ALTER TABLE `mensajes`
+  MODIFY `id_mensaje` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=53;
+
+--
 -- AUTO_INCREMENT de la tabla `modulos`
 --
 ALTER TABLE `modulos`
-  MODIFY `id_modulo` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=10;
+  MODIFY `id_modulo` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=11;
 
 --
 -- AUTO_INCREMENT de la tabla `pagos`
@@ -785,6 +836,13 @@ ALTER TABLE `inscripciones`
   ADD CONSTRAINT `inscripciones_ibfk_1` FOREIGN KEY (`id_curso`) REFERENCES `cursos` (`id_curso`),
   ADD CONSTRAINT `inscripciones_ibfk_2` FOREIGN KEY (`id_estudiante`) REFERENCES `estudiante` (`id_estudiante`),
   ADD CONSTRAINT `inscripciones_ibfk_3` FOREIGN KEY (`id_preinscripcion`) REFERENCES `preinscripciones` (`id_preinscripcion`);
+
+--
+-- Filtros para la tabla `mensajes`
+--
+ALTER TABLE `mensajes`
+  ADD CONSTRAINT `mensajes_ibfk_1` FOREIGN KEY (`id_remitente`) REFERENCES `usuario` (`id_usuario`),
+  ADD CONSTRAINT `mensajes_ibfk_2` FOREIGN KEY (`id_destinatario`) REFERENCES `usuario` (`id_usuario`);
 
 --
 -- Filtros para la tabla `pagos`
