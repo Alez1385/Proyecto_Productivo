@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Servidor: 127.0.0.1
--- Tiempo de generación: 06-10-2024 a las 20:47:12
+-- Tiempo de generación: 07-10-2024 a las 01:39:01
 -- Versión del servidor: 10.4.32-MariaDB
 -- Versión de PHP: 8.0.30
 
@@ -66,7 +66,8 @@ INSERT INTO `asig_modulo` (`id_asig_modulo`, `id_modulo`, `id_tipo_usuario`, `fe
 (20, 8, 1, NULL),
 (21, 3, 3, NULL),
 (22, 9, 1, NULL),
-(23, 10, 1, NULL);
+(23, 10, 1, NULL),
+(24, 10, 3, NULL);
 
 -- --------------------------------------------------------
 
@@ -175,21 +176,47 @@ CREATE TABLE `db_gescursoslecturas_mensajes` (
 --
 
 INSERT INTO `db_gescursoslecturas_mensajes` (`id`, `id_mensaje`, `id_usuario`, `fecha_lectura`) VALUES
-(1, 1, 56, '2024-10-06 18:23:01'),
-(2, 4, 56, '2024-10-06 18:22:04'),
-(3, 5, 56, '2024-10-06 18:21:59'),
-(4, 6, 56, '2024-10-06 18:21:59'),
-(5, 7, 56, '2024-10-06 18:37:23'),
+(1, 1, 56, '2024-10-06 22:49:36'),
+(2, 4, 56, '2024-10-06 22:49:36'),
+(3, 5, 56, '2024-10-06 22:49:33'),
+(4, 6, 56, '2024-10-06 22:49:35'),
+(5, 7, 56, '2024-10-06 23:12:36'),
 (6, 9, 56, '2024-10-06 18:46:24'),
-(14, 10, 56, '2024-10-06 18:46:28'),
-(15, 12, 56, '2024-10-06 18:46:27'),
+(14, 10, 56, '2024-10-06 23:09:52'),
+(15, 12, 56, '2024-10-06 23:37:17'),
 (23, 13, 56, '2024-10-06 18:34:53'),
 (28, 14, 56, '2024-10-06 18:22:01'),
 (30, 15, 56, '2024-10-06 18:36:18'),
 (31, 16, 56, '2024-10-06 18:22:03'),
 (32, 17, 56, '2024-10-06 18:22:03'),
 (45, 11, 56, '2024-10-06 18:37:59'),
-(101, 18, 56, '2024-10-06 18:34:24');
+(101, 18, 56, '2024-10-06 18:34:24'),
+(162, 19, 56, '2024-10-06 23:12:35'),
+(165, 20, 56, '2024-10-06 23:12:35'),
+(227, 22, 56, '2024-10-06 23:18:02'),
+(418, 26, 56, '2024-10-06 23:31:34'),
+(419, 26, 53, '2024-10-06 23:28:43'),
+(420, 24, 53, '2024-10-06 23:28:43'),
+(421, 22, 53, '2024-10-06 23:28:25'),
+(426, 20, 53, '2024-10-06 23:27:43'),
+(427, 6, 53, '2024-10-06 23:27:47'),
+(428, 4, 53, '2024-10-06 23:27:48'),
+(429, 5, 53, '2024-10-06 23:27:39'),
+(434, 19, 53, '2024-10-06 23:27:43'),
+(435, 7, 53, '2024-10-06 23:27:47'),
+(436, 12, 53, '2024-10-06 23:27:44'),
+(437, 10, 53, '2024-10-06 23:28:26'),
+(441, 1, 53, '2024-10-06 23:27:48'),
+(463, 37, 56, '2024-10-06 23:31:35'),
+(466, 38, 56, '2024-10-06 23:32:23'),
+(467, 38, 53, '2024-10-06 23:37:33'),
+(469, 39, 53, '2024-10-06 23:37:34'),
+(471, 40, 56, '2024-10-06 23:37:19'),
+(474, 39, 56, '2024-10-06 23:34:19'),
+(481, 40, 53, '2024-10-06 23:37:31'),
+(484, 41, 56, '2024-10-06 23:34:53'),
+(495, 42, 53, '2024-10-06 23:37:41'),
+(496, 42, 56, '2024-10-06 23:37:49');
 
 -- --------------------------------------------------------
 
@@ -286,22 +313,60 @@ CREATE TABLE `mensajes` (
   `id_destinatario` int(11) DEFAULT NULL,
   `asunto` varchar(255) DEFAULT NULL,
   `contenido` text DEFAULT NULL,
-  `fecha_envio` datetime DEFAULT current_timestamp()
+  `fecha_envio` datetime DEFAULT current_timestamp(),
+  `id_tipo_usuario` int(11) DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 --
 -- Volcado de datos para la tabla `mensajes`
 --
 
-INSERT INTO `mensajes` (`id_mensaje`, `id_remitente`, `tipo_remitente`, `tipo_destinatario`, `id_destinatario`, `asunto`, `contenido`, `fecha_envio`) VALUES
-(1, 56, NULL, 'todos', NULL, '0', 'asdasdasd', '2024-10-06 11:34:57'),
-(4, 56, NULL, 'todos', NULL, 'asdas', 'dasd', '2024-10-06 11:41:14'),
-(5, 56, NULL, 'todos', NULL, 'asdasd', 'ad', '2024-10-06 11:43:44'),
-(6, 56, NULL, 'todos', NULL, 'dasd', 'asdasd', '2024-10-06 11:50:20'),
-(7, 56, NULL, 'todos', NULL, 'asd', 'asdasd', '2024-10-06 11:59:23'),
-(8, 56, NULL, 'individual', 36, 'asdas', 'dsad', '2024-10-06 12:01:55'),
-(10, 56, NULL, 'todos', NULL, 'asda', 'sdd', '2024-10-06 12:19:25'),
-(12, 56, NULL, 'todos', NULL, 'asd', 'asd', '2024-10-06 12:39:46');
+INSERT INTO `mensajes` (`id_mensaje`, `id_remitente`, `tipo_remitente`, `tipo_destinatario`, `id_destinatario`, `asunto`, `contenido`, `fecha_envio`, `id_tipo_usuario`) VALUES
+(1, 56, NULL, 'todos', NULL, '0', 'asdasdasd', '2024-10-06 11:34:57', NULL),
+(4, 56, NULL, 'todos', NULL, 'asdas', 'dasd', '2024-10-06 11:41:14', NULL),
+(5, 56, NULL, 'todos', NULL, 'asdasd', 'ad', '2024-10-06 11:43:44', NULL),
+(6, 56, NULL, 'todos', NULL, 'dasd', 'asdasd', '2024-10-06 11:50:20', NULL),
+(7, 56, NULL, 'todos', NULL, 'asd', 'asdasd', '2024-10-06 11:59:23', NULL),
+(8, 56, NULL, 'individual', 36, 'asdas', 'dsad', '2024-10-06 12:01:55', NULL),
+(10, 56, NULL, 'todos', NULL, 'asda', 'sdd', '2024-10-06 12:19:25', NULL),
+(12, 56, NULL, 'todos', NULL, 'asd', 'asd', '2024-10-06 12:39:46', NULL),
+(19, 56, NULL, 'todos', NULL, 'asd', 'asd', '2024-10-06 13:59:41', NULL),
+(20, 56, NULL, 'todos', NULL, 'asda', 'sd', '2024-10-06 14:07:13', NULL),
+(22, 56, NULL, 'todos', NULL, 'sapo', 'asdasdasasdasdasaasdasdasasdasdasasasasasasasasasasasasasasasasasasasasasdasdasasdasdasasasasasasasasasasasasasasasasasasasasasdasdasasdasdasasasasasasasasasasasasasasasasasasasasasdasdasasdasdasasasasasasasasasasasasasasasasasasasasasdasdasasdasdasasasasasasasasasasasasasasasasasasasasasdasdasasdasdasasasasasasasasasasasasasasasasasasasasasdasdasasdasdasasasasasasasasasasasasasasasasasasasasasdasdasasdasdasasasasasasasasasasasasasasasasasasasasasdasdasasdasdasasasasasasasasasasasasasasasasasasasasasdasdasasdasdasasasasasasasasasasasasasasasasasasasassasasasasasasasasasasasasasasasasasasasasasd', '2024-10-06 17:24:17', NULL),
+(24, 56, NULL, 'todos', NULL, 'asdasd', 'asd', '2024-10-06 18:18:05', NULL),
+(26, 56, NULL, 'todos', NULL, 'asd', 'asd', '2024-10-06 18:19:47', NULL),
+(32, NULL, NULL, 'estudiantes', NULL, 'asdas', 'dasdasd', '2024-10-06 18:24:21', 3),
+(33, NULL, NULL, 'estudiantes', NULL, 'asdasd', 'asdsa', '2024-10-06 18:24:30', 3),
+(34, NULL, NULL, 'estudiantes', NULL, 'asd', 'asdasd', '2024-10-06 18:28:53', 3),
+(35, NULL, NULL, 'todos', NULL, 'asdad', 'asd', '2024-10-06 18:29:00', NULL),
+(36, NULL, NULL, 'todos', NULL, 'asdad', 'asd', '2024-10-06 18:29:07', NULL),
+(37, 56, NULL, 'todos', NULL, 'asda', 'asdasd', '2024-10-06 18:31:29', NULL),
+(38, 56, NULL, 'estudiantes', NULL, 'asdasd', 'asd', '2024-10-06 18:31:39', 3),
+(39, 53, NULL, 'todos', NULL, 'asdas', 'asdas', '2024-10-06 18:32:17', NULL),
+(40, 56, NULL, 'todos', NULL, 'asdasd', 'asdasd', '2024-10-06 18:32:40', NULL),
+(41, 53, NULL, 'todos', NULL, 'Perro marica quien lo lea ', 'JEJE de pana que malo si lo vio :v ya no se que hacer con mi vida\r\n', '2024-10-06 18:34:48', NULL),
+(42, 53, NULL, 'todos', NULL, 'asdas', 'dasda', '2024-10-06 18:37:39', NULL);
+
+-- --------------------------------------------------------
+
+--
+-- Estructura de tabla para la tabla `mensajes_eliminados`
+--
+
+CREATE TABLE `mensajes_eliminados` (
+  `id` int(11) NOT NULL,
+  `id_usuario` int(11) NOT NULL,
+  `id_mensaje` int(11) NOT NULL,
+  `fecha_eliminacion` timestamp NOT NULL DEFAULT current_timestamp()
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+--
+-- Volcado de datos para la tabla `mensajes_eliminados`
+--
+
+INSERT INTO `mensajes_eliminados` (`id`, `id_usuario`, `id_mensaje`, `fecha_eliminacion`) VALUES
+(1, 56, 40, '2024-10-06 23:37:22'),
+(2, 53, 42, '2024-10-06 23:37:42');
 
 -- --------------------------------------------------------
 
@@ -625,6 +690,14 @@ ALTER TABLE `mensajes`
   ADD KEY `id_destinatario` (`id_destinatario`);
 
 --
+-- Indices de la tabla `mensajes_eliminados`
+--
+ALTER TABLE `mensajes_eliminados`
+  ADD PRIMARY KEY (`id`),
+  ADD UNIQUE KEY `unique_usuario_mensaje` (`id_usuario`,`id_mensaje`),
+  ADD KEY `id_mensaje` (`id_mensaje`);
+
+--
 -- Indices de la tabla `modulos`
 --
 ALTER TABLE `modulos`
@@ -700,7 +773,7 @@ ALTER TABLE `asignacion_curso`
 -- AUTO_INCREMENT de la tabla `asig_modulo`
 --
 ALTER TABLE `asig_modulo`
-  MODIFY `id_asig_modulo` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=24;
+  MODIFY `id_asig_modulo` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=25;
 
 --
 -- AUTO_INCREMENT de la tabla `asistencia`
@@ -730,7 +803,7 @@ ALTER TABLE `cursos`
 -- AUTO_INCREMENT de la tabla `db_gescursoslecturas_mensajes`
 --
 ALTER TABLE `db_gescursoslecturas_mensajes`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=136;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=497;
 
 --
 -- AUTO_INCREMENT de la tabla `estudiante`
@@ -766,7 +839,13 @@ ALTER TABLE `login_attempts`
 -- AUTO_INCREMENT de la tabla `mensajes`
 --
 ALTER TABLE `mensajes`
-  MODIFY `id_mensaje` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=19;
+  MODIFY `id_mensaje` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=43;
+
+--
+-- AUTO_INCREMENT de la tabla `mensajes_eliminados`
+--
+ALTER TABLE `mensajes_eliminados`
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=3;
 
 --
 -- AUTO_INCREMENT de la tabla `modulos`
@@ -886,6 +965,13 @@ ALTER TABLE `inscripciones`
 ALTER TABLE `mensajes`
   ADD CONSTRAINT `mensajes_ibfk_1` FOREIGN KEY (`id_remitente`) REFERENCES `usuario` (`id_usuario`),
   ADD CONSTRAINT `mensajes_ibfk_2` FOREIGN KEY (`id_destinatario`) REFERENCES `usuario` (`id_usuario`);
+
+--
+-- Filtros para la tabla `mensajes_eliminados`
+--
+ALTER TABLE `mensajes_eliminados`
+  ADD CONSTRAINT `mensajes_eliminados_ibfk_1` FOREIGN KEY (`id_usuario`) REFERENCES `usuario` (`id_usuario`),
+  ADD CONSTRAINT `mensajes_eliminados_ibfk_2` FOREIGN KEY (`id_mensaje`) REFERENCES `mensajes` (`id_mensaje`);
 
 --
 -- Filtros para la tabla `pagos`
