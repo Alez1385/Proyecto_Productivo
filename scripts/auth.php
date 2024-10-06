@@ -18,6 +18,13 @@ require_once('functions.php');
  * @return bool true si el usuario ha iniciado sesión, false en caso contrario
  */
 function authenticateUser() {
+    error_log("Attempting to authenticate user");
+    error_log("Session data: " . print_r($_SESSION, true));
+
+    if (isset($_SESSION['id_usuario'])) {
+        error_log("User authenticated via session: {$_SESSION['id_usuario']}");
+        return true;
+    }
     global $conn; // Asegúrate de que $conn esté disponible
     error_log("Attempting to authenticate user");
     error_log("Session data: " . print_r($_SESSION, true));
@@ -32,6 +39,7 @@ function authenticateUser() {
             session_destroy();
             error_log("User not found in database. Session cleared.");
             return false;
+            
         }
     }
 
