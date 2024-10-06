@@ -1,10 +1,16 @@
 <?php
 // auth.php
 error_log("Starting auth.php");
-session_start();
+
+// Verificar si la sesión ya está activa antes de llamarla
+if (session_status() === PHP_SESSION_NONE) {
+    session_start();
+}
+
 require_once('conexion.php');
 require_once('config.php');
 require_once('functions.php');
+
 
 /**
  * Verificar si el usuario ha iniciado sesión
@@ -98,5 +104,7 @@ if (!isset($_SESSION['csrf_token'])) {
     $_SESSION['csrf_token'] = bin2hex(random_bytes(32));
     error_log("New CSRF token generated: " . $_SESSION['csrf_token']);
 }
+
+
 
 error_log("auth.php completed");

@@ -1,5 +1,7 @@
 <?php
 session_start();
+
+
 // Asegúrate de que esta línea esté al principio de tu archivo
 include('scripts/conexion.php'); // Ajusta la ruta según sea necesario
 
