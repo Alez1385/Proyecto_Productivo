@@ -2,8 +2,19 @@
  function toggleNewMessageForm() {
     var form = document.getElementById('newMessageForm');
     var isHidden = form.style.display === 'none';
-    form.style.display = isHidden ? 'block' : 'none';
-    document.body.classList.toggle('modal-active', isHidden);
+    
+    if (isHidden) {
+        form.style.display = 'block';
+        form.classList.remove('hiding');
+        document.body.classList.add('modal-active');
+    } else {
+        form.classList.add('hiding');
+        setTimeout(() => {
+            form.style.display = 'none';
+            form.classList.remove('hiding');
+            document.body.classList.remove('modal-active');
+        }, 300); // Este tiempo debe coincidir con la duración de la animación
+    }
 }
 
 // Mostrar campo ID de destinatario solo si el destinatario es individual
@@ -241,41 +252,50 @@ window.onload = function() {
 };
 
 // Función para hacer la lista de mensajes redimensionable
-function makeResizable(element) {
-const resizer = document.createElement('div');
-resizer.className = 'resizer';
-resizer.style.width = '5px';
-resizer.style.height = '100%';
-resizer.style.background = 'transparent';
-resizer.style.position = 'absolute';
-resizer.style.right = '0';
-resizer.style.top = '0';
-resizer.style.cursor = 'ew-resize';
-element.appendChild(resizer);
+function makeResizable() {
+    const messageListWrapper = document.querySelector('.message-list-wrapper');
+    const messageList = document.querySelector('.message-list');
+    const resizeHandle = document.querySelector('.resize-handle');
+    const container = document.querySelector('.messaging-container');
 
-resizer.addEventListener('mousedown', initResize, false);
+    let isResizing = false;
 
-function initResize(e) {
-    window.addEventListener('mousemove', Resize, false);
-    window.addEventListener('mouseup', stopResize, false);
+    resizeHandle.addEventListener('mousedown', (e) => {
+        isResizing = true;
+        document.addEventListener('mousemove', resize);
+        document.addEventListener('mouseup', stopResize);
+    });
+
+    function resize(e) {
+        if (!isResizing) return;
+        const containerRect = container.getBoundingClientRect();
+        const newWidth = e.clientX - containerRect.left;
+        const maxWidth = container.offsetWidth * 0.8; // 80% del ancho del contenedor
+        const minWidth = 200; // Ancho mínimo
+
+        if (newWidth > minWidth && newWidth < maxWidth) {
+            messageListWrapper.style.width = `${newWidth}px`;
+        }
+    }
+
+    function stopResize() {
+        isResizing = false;
+        document.removeEventListener('mousemove', resize);
+        document.removeEventListener('mouseup', stopResize);
+    }
+
+    // Manejar el scroll horizontal
+    messageList.addEventListener('scroll', () => {
+        const scrollPercentage = messageList.scrollLeft / (messageList.scrollWidth - messageList.clientWidth);
+        const handlePosition = scrollPercentage * (messageListWrapper.clientWidth - resizeHandle.clientWidth);
+        resizeHandle.style.right = `${handlePosition}px`;
+    });
 }
 
-function Resize(e) {
-    element.style.width = (e.clientX - element.offsetLeft) + 'px';
-}
-
-function stopResize(e) {
-    window.removeEventListener('mousemove', Resize, false);
-    window.removeEventListener('mouseup', stopResize, false);
-}
-}
-
-// Aplicar la funcionalidad de redimensionamiento
-window.onload = function() {
-const messageList = document.querySelector('.message-list');
-makeResizable(messageList);
+// Llamar a esta función cuando se carga la página
+window.addEventListener('load', makeResizable);
 loadMessages();
-};
+
 
 
 function buscarUsuarios() {
