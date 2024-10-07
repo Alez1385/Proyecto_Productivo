@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Servidor: 127.0.0.1
--- Tiempo de generación: 07-10-2024 a las 01:39:01
+-- Tiempo de generación: 07-10-2024 a las 03:08:45
 -- Versión del servidor: 10.4.32-MariaDB
 -- Versión de PHP: 8.0.30
 
@@ -67,7 +67,9 @@ INSERT INTO `asig_modulo` (`id_asig_modulo`, `id_modulo`, `id_tipo_usuario`, `fe
 (21, 3, 3, NULL),
 (22, 9, 1, NULL),
 (23, 10, 1, NULL),
-(24, 10, 3, NULL);
+(24, 10, 3, NULL),
+(25, 11, 1, NULL),
+(26, 11, 3, NULL);
 
 -- --------------------------------------------------------
 
@@ -176,14 +178,14 @@ CREATE TABLE `db_gescursoslecturas_mensajes` (
 --
 
 INSERT INTO `db_gescursoslecturas_mensajes` (`id`, `id_mensaje`, `id_usuario`, `fecha_lectura`) VALUES
-(1, 1, 56, '2024-10-06 22:49:36'),
-(2, 4, 56, '2024-10-06 22:49:36'),
-(3, 5, 56, '2024-10-06 22:49:33'),
-(4, 6, 56, '2024-10-06 22:49:35'),
-(5, 7, 56, '2024-10-06 23:12:36'),
+(1, 1, 56, '2024-10-06 23:44:10'),
+(2, 4, 56, '2024-10-06 23:44:10'),
+(3, 5, 56, '2024-10-06 23:52:03'),
+(4, 6, 56, '2024-10-07 00:07:02'),
+(5, 7, 56, '2024-10-07 00:06:58'),
 (6, 9, 56, '2024-10-06 18:46:24'),
-(14, 10, 56, '2024-10-06 23:09:52'),
-(15, 12, 56, '2024-10-06 23:37:17'),
+(14, 10, 56, '2024-10-07 00:06:58'),
+(15, 12, 56, '2024-10-07 00:07:01'),
 (23, 13, 56, '2024-10-06 18:34:53'),
 (28, 14, 56, '2024-10-06 18:22:01'),
 (30, 15, 56, '2024-10-06 18:36:18'),
@@ -191,10 +193,10 @@ INSERT INTO `db_gescursoslecturas_mensajes` (`id`, `id_mensaje`, `id_usuario`, `
 (32, 17, 56, '2024-10-06 18:22:03'),
 (45, 11, 56, '2024-10-06 18:37:59'),
 (101, 18, 56, '2024-10-06 18:34:24'),
-(162, 19, 56, '2024-10-06 23:12:35'),
-(165, 20, 56, '2024-10-06 23:12:35'),
-(227, 22, 56, '2024-10-06 23:18:02'),
-(418, 26, 56, '2024-10-06 23:31:34'),
+(162, 19, 56, '2024-10-07 00:07:00'),
+(165, 20, 56, '2024-10-06 23:51:51'),
+(227, 22, 56, '2024-10-07 00:07:00'),
+(418, 26, 56, '2024-10-07 00:05:24'),
 (419, 26, 53, '2024-10-06 23:28:43'),
 (420, 24, 53, '2024-10-06 23:28:43'),
 (421, 22, 53, '2024-10-06 23:28:25'),
@@ -207,16 +209,18 @@ INSERT INTO `db_gescursoslecturas_mensajes` (`id`, `id_mensaje`, `id_usuario`, `
 (436, 12, 53, '2024-10-06 23:27:44'),
 (437, 10, 53, '2024-10-06 23:28:26'),
 (441, 1, 53, '2024-10-06 23:27:48'),
-(463, 37, 56, '2024-10-06 23:31:35'),
-(466, 38, 56, '2024-10-06 23:32:23'),
+(463, 37, 56, '2024-10-07 00:06:57'),
+(466, 38, 56, '2024-10-07 00:53:09'),
 (467, 38, 53, '2024-10-06 23:37:33'),
 (469, 39, 53, '2024-10-06 23:37:34'),
 (471, 40, 56, '2024-10-06 23:37:19'),
-(474, 39, 56, '2024-10-06 23:34:19'),
+(474, 39, 56, '2024-10-07 00:53:08'),
 (481, 40, 53, '2024-10-06 23:37:31'),
-(484, 41, 56, '2024-10-06 23:34:53'),
+(484, 41, 56, '2024-10-07 00:57:50'),
 (495, 42, 53, '2024-10-06 23:37:41'),
-(496, 42, 56, '2024-10-06 23:37:49');
+(496, 42, 56, '2024-10-07 01:07:58'),
+(501, 24, 56, '2024-10-07 00:05:25'),
+(514, 8, 56, '2024-10-07 00:07:02');
 
 -- --------------------------------------------------------
 
@@ -393,7 +397,8 @@ INSERT INTO `modulos` (`id_modulo`, `nom_modulo`, `url`, `icono`) VALUES
 (7, 'Modulos', 'models/modulos/modulos.php', 'event'),
 (8, 'Inscripciones', 'models/inscripciones/inscripciones.php', 'card_travel'),
 (9, 'Index', 'models/admin_index/admin_index.php', 'home'),
-(10, 'mensajeria ', 'models/mensajeria/mensajeria.php', 'question_answer');
+(10, 'mensajeria ', 'models/mensajeria/mensajeria.php', 'question_answer'),
+(11, 'perfil', 'models/perfil/perfil.php', 'person');
 
 -- --------------------------------------------------------
 
@@ -582,7 +587,7 @@ INSERT INTO `usuario` (`id_usuario`, `nombre`, `apellido`, `tipo_doc`, `document
 (51, 'antonela', 'sepulveda', 'ID', '342352345', '0005-04-23', '66d23c1021bab_f7c0528d915ec3b38dd89bf7beb2a194.jpg', 'scflorez@corsaje.edu.co', '42352345', 'CL 18 A NORTE 2 72', 1, 'mientras', '$2y$10$KJU2liHj854T1T9M.6/EK.xDYy4sfLf2XEwCldj230rdreZmC.3KC', '2024-08-30 16:39:28', 'activo', NULL, 0, NULL),
 (53, 'Juanitoaa', 'Alimaña', 'ID', '43523634', '0634-06-02', '66d2441faa705_pngwing.com.png', 'juanit@gmail.com', '5233456345123', 'CL 18 A NORTE 2 72', 3, 'alez123123', '$2y$10$p.bJhCL9d2VM1IjUCnC63.Edj5Pg87KZgKGTFyedUHPusUd.QSDAK', '2024-08-30 17:13:51', 'activo', NULL, 0, NULL),
 (55, 'Santiago', 'Capon', 'Passport', '4234523456', '5234-04-23', 'pngwing.com.png', 'scflorez@corsaje.edu.co3', '53643563456', 'CL 18 A NORTE 2 72', 4, 'alez1234', '$2y$10$pcvzMHIh1F53bR25oEpRfu5MbZB5FO6Kn3ceIKwNBtp9KWahjApMe', '2024-09-03 12:35:04', 'activo', NULL, 0, NULL),
-(56, 'camilo', 'prato', 'ID', '1091357317', '2024-09-17', 'salir guapo en fotos-605380757.webp', 'albertocamiloprato@gmail.com', '3043282464', 'Sapo Marica', 1, 'camilo', '$2y$10$pkH8Zi8gEArSclW4KlpcjOm0Tbx5fSF2o8f7Ukw8qUNWj8Bl7i2I.', '2024-09-07 18:45:23', 'activo', '2024-09-08 11:32:39', 0, NULL),
+(56, 'camilo ', 'prato', 'ID', '1091357317', '2024-09-17', '67032f8d169dd_images.png', 'albertocamiloprato@gmail.com', '3043282464', 'Sapo Marica', 1, 'camilo', '$2y$10$pkH8Zi8gEArSclW4KlpcjOm0Tbx5fSF2o8f7Ukw8qUNWj8Bl7i2I.', '2024-09-07 18:45:23', 'activo', '2024-09-08 11:32:39', 0, NULL),
 (58, 'santiago', NULL, NULL, NULL, NULL, NULL, 'edison_alberto@hotmail.com', '52343456', '', 4, 'edison_alberto', '$2y$10$DLJSPUZnsBduhl5PFRtg6uP5aXma0xTP9FOSkKUN/g2l9MrcP7d3S', '2024-09-19 12:02:34', 'activo', NULL, 0, NULL),
 (59, 'Santiago', NULL, NULL, NULL, NULL, NULL, 'scapon@misena.edu.co', '3034235435', '', 4, 'scapon', '$2y$10$yrrLCg7Fr85s6u9jOmiVMO14UhXLMOrHN6krm2bL4fCNqnnCqc4Oy', '2024-09-20 20:09:22', 'activo', NULL, 0, NULL),
 (60, 'Santiago', NULL, NULL, NULL, NULL, NULL, 'albertocamiloprato@gmail.comw', '563456346', '', 4, 'albertocamiloprato', '$2y$10$3u2mhrj1Ce6x8WCnljewFOuy20NifY7kKhXbWo0Y7NqPSXH89a9qe', '2024-09-20 20:50:39', 'activo', NULL, 0, NULL),
@@ -773,7 +778,7 @@ ALTER TABLE `asignacion_curso`
 -- AUTO_INCREMENT de la tabla `asig_modulo`
 --
 ALTER TABLE `asig_modulo`
-  MODIFY `id_asig_modulo` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=25;
+  MODIFY `id_asig_modulo` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=27;
 
 --
 -- AUTO_INCREMENT de la tabla `asistencia`
@@ -803,7 +808,7 @@ ALTER TABLE `cursos`
 -- AUTO_INCREMENT de la tabla `db_gescursoslecturas_mensajes`
 --
 ALTER TABLE `db_gescursoslecturas_mensajes`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=497;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=679;
 
 --
 -- AUTO_INCREMENT de la tabla `estudiante`
@@ -851,7 +856,7 @@ ALTER TABLE `mensajes_eliminados`
 -- AUTO_INCREMENT de la tabla `modulos`
 --
 ALTER TABLE `modulos`
-  MODIFY `id_modulo` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=11;
+  MODIFY `id_modulo` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=12;
 
 --
 -- AUTO_INCREMENT de la tabla `pagos`
