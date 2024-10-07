@@ -38,7 +38,7 @@ if (isset($_COOKIE['remember_token'])) {
     $rememberToken = $_COOKIE['remember_token'];
     
     // Get the user ID associated with the token
-    $userId = getUserIdFromToken($rememberToken, $conn);
+    $userId = getUserIdFromToken($rememberToken);
     
     if ($userId) {
         // Validate the remember token

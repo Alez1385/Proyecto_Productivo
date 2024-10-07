@@ -5,6 +5,7 @@ require_once BASE_PATH . 'vendor/autoload.php';
 use PHPMailer\PHPMailer\PHPMailer;
 use PHPMailer\PHPMailer\Exception;
 
+
 function isValidRedirect($url) {
     if (empty($url) || !is_string($url)) {
         return false;

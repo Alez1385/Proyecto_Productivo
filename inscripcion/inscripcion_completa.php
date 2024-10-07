@@ -84,8 +84,39 @@ function validateFile($file, $fileType) {
 }
 
 function processInscripcion($conn, $curso_id, $id_usuario, $comprobante) {
-    $stmt = $conn->prepare("INSERT INTO inscripciones (id_curso, id_estudiante, fecha_inscripcion, estado, fecha_actualizacion, comprobante_pago) VALUES (?, ?, NOW(), 'pendiente', NOW(), ?)");
-    $stmt->bind_param("iis", $curso_id, $id_usuario, $comprobante);
+    // First, check if the estudiante exists
+    $stmt = $conn->prepare("SELECT id_estudiante FROM estudiante WHERE id_usuario = ?");
+    $stmt->bind_param("i", $id_usuario);
+    $stmt->execute();
+    $result = $stmt->get_result();
+    
+    if ($result->num_rows === 0) {
+        // If the estudiante doesn't exist, create one
+        $stmt = $conn->prepare("INSERT INTO estudiante (id_usuario) VALUES (?)");
+        $stmt->bind_param("i", $id_usuario);
+        if (!$stmt->execute()) {
+            return false;
+        }
+        $id_estudiante = $stmt->insert_id;
+    } else {
+        $row = $result->fetch_assoc();
+        $id_estudiante = $row['id_estudiante'];
+    }
+    
+    // Check if there's a preinscripcion for this student and course
+    $stmt = $conn->prepare("SELECT id_preinscripcion FROM preinscripciones WHERE id_usuario = ? AND id_curso = ?");
+    $stmt->bind_param("ii", $id_usuario, $curso_id);
+    $stmt->execute();
+    $result = $stmt->get_result();
+    $id_preinscripcion = null;
+    if ($result->num_rows > 0) {
+        $row = $result->fetch_assoc();
+        $id_preinscripcion = $row['id_preinscripcion'];
+    }
+
+    // Now proceed with the inscription
+    $stmt = $conn->prepare("INSERT INTO inscripciones (id_curso, id_estudiante, id_preinscripcion, fecha_inscripcion, estado, fecha_actualizacion, comprobante_pago) VALUES (?, ?, ?, NOW(), 'pendiente', NOW(), ?)");
+    $stmt->bind_param("iiis", $curso_id, $id_estudiante, $id_preinscripcion, $comprobante);
     return $stmt->execute();
 }
 

@@ -1,0 +1,40 @@
+{
+	"version": "2.0.0",
+	"tasks": [
+		{
+			"type": "npm",
+			"script": "build",
+			"group": "build",
+			"problemMatcher": [],
+			"label": "npm: build",
+			"detail": "tailwindcss -i ./css/tail.css -o ./dist/output.css"
+		},
+		{
+			"type": "shell",
+			"label": "Importar cambios de BD",
+			"command": "C:\\Users\\santi\\OneDrive\\PC\\Escritorio\\bd_importar.bat",
+			"problemMatcher": [],
+			"group": "none",
+			"presentation": {
+				"echo": true,
+				"reveal": "always",
+				"focus": false,
+				"panel": "new"
+			}
+		},
+		{
+			"type": "shell",
+			"label": "Exportar cambios de BD",
+			"command": "C:\\Users\\santi\\OneDrive\\PC\\Escritorio\\bd_exportar.bat",
+			"problemMatcher": [],
+			"group": "none",
+			"presentation": {
+				"echo": true,
+				"reveal": "always",
+				"focus": false,
+				"panel": "new"
+			}
+		}
+	]
+}
+

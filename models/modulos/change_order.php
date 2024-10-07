@@ -1,24 +1,23 @@
 <!DOCTYPE html>
-<html lang="en">
-
+<html lang="es">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Cambiar Orden de Módulos</title>
     <link rel="stylesheet" href="modulo.css">
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons+Sharp" rel="stylesheet">
 </head>
-
 <body>
-
     <div class="dashboard-container">
-
         <?php
         include "../../scripts/sidebar.php";
         include "../../scripts/conexion.php";
 
         // Consulta para obtener los módulos
-        $sql = "SELECT id_modulo, nom_modulo, icono FROM modulos ORDER BY id_modulo ASC";
-        $result = $conn->query($sql);
+        $sql = "SELECT id_modulo, nom_modulo, icono, orden FROM modulos ORDER BY orden ASC";
+        $stmt = $conn->prepare($sql);
+        $stmt->execute();
+        $result = $stmt->get_result();
         ?>
 
         <!-- Main Content -->
@@ -33,36 +32,33 @@
             </header>
 
             <section class="content">
-                <!-- Instrucción para el usuario -->
                 <p>Arrastra los módulos para cambiar su orden y guarda los cambios.</p>
 
-                <!-- Lista de módulos -->
                 <div class="module-list" id="sortableModules">
                     <?php
                     if ($result->num_rows > 0) {
                         while ($row = $result->fetch_assoc()) {
-                            echo '<div class="module-item" data-module-id="' . $row["id_modulo"] . '" draggable="true">';
+                            echo '<div class="module-item" data-module-id="' . htmlspecialchars($row["id_modulo"]) . '" data-order="' . htmlspecialchars($row["orden"]) . '" draggable="true">';
                             echo '<div class="module-details">';
-                            echo '<span class="material-icons-sharp">' . $row["icono"] . '</span>';
-                            echo '<h2>' . $row["nom_modulo"] . '</h2>';
+                            echo '<span class="material-icons-sharp">' . htmlspecialchars($row["icono"]) . '</span>';
+                            echo '<h2>' . htmlspecialchars($row["nom_modulo"]) . '</h2>';
                             echo '</div>';
                             echo '</div>';
                         }
                     } else {
                         echo "No hay módulos.";
                     }
+                    $stmt->close();
                     $conn->close();
                     ?>
                 </div>
 
-                <!-- Botón para guardar cambios -->
                 <button onclick="saveModuleOrder()" class="assign-btn">Guardar Cambios</button>
             </section>
         </div>
     </div>
 
     <script>
-        // Variables para arrastrar y soltar
         let draggedItem = null;
 
         document.addEventListener('DOMContentLoaded', () => {
@@ -100,7 +96,6 @@
             }
         });
 
-        // Función para guardar el nuevo orden de los módulos
         function saveModuleOrder() {
             const moduleList = document.getElementById('sortableModules');
             const modules = moduleList.getElementsByClassName('module-item');
@@ -108,7 +103,12 @@
 
             for (let i = 0; i < modules.length; i++) {
                 let moduleId = modules[i].getAttribute('data-module-id');
-                orderData.push({ id_modulo: moduleId, orden: i + 1 });
+                let oldOrder = modules[i].getAttribute('data-order');
+                orderData.push({ 
+                    id_modulo: moduleId, 
+                    old_orden: oldOrder,
+                    new_orden: i + 1 
+                });
             }
 
             fetch('update_order.php', {
@@ -122,9 +122,9 @@
             .then(data => {
                 if (data.success) {
                     alert('Orden actualizado correctamente');
-                    window.location.href = 'modulos.php'; // Redirige a la lista de módulos
+                    window.location.href = 'modulos.php';
                 } else {
-                    alert('Error al actualizar el orden');
+                    alert('Error al actualizar el orden: ' + data.message);
                 }
             })
             .catch(error => {
@@ -133,7 +133,5 @@
             });
         }
     </script>
-
 </body>
-
 </html>
