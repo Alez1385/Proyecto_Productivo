@@ -19,7 +19,16 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     foreach ($dias as $dia) {
         $sql .= ", $dia = ?";
         if (!empty($_POST["hora_inicio"][$dia]) && !empty($_POST["hora_fin"][$dia])) {
-            $params[] = $_POST["hora_inicio"][$dia] . " - " . $_POST["hora_fin"][$dia];
+            $hora_inicio = $_POST["hora_inicio"][$dia];
+            $hora_fin = $_POST["hora_fin"][$dia];
+            
+            // Validar que las horas estén dentro del rango permitido
+            if (strtotime($hora_inicio) < strtotime('06:00') || strtotime($hora_fin) > strtotime('20:00')) {
+                $error = "Las horas deben estar entre las 6:00 AM y las 8:00 PM para el día " . ucfirst($dia) . ".";
+                break;
+            }
+            
+            $params[] = $hora_inicio . " - " . $hora_fin;
             $types .= "s";
         } else {
             $params[] = null;
@@ -27,22 +36,24 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
         }
     }
     
-    $sql .= " WHERE id_horario = ?";
-    $params[] = $id_horario;
-    $types .= "i";
-    
-    $stmt = $conn->prepare($sql);
-    $stmt->bind_param($types, ...$params);
-    
-    if ($stmt->execute()) {
-        $_SESSION['mensaje'] = "Horario actualizado exitosamente.";
-        header("Location: horarios_asignados.php");
-        exit();
-    } else {
-        $error = "Error al actualizar el horario: " . $conn->error;
+    if (!isset($error)) {
+        $sql .= " WHERE id_horario = ?";
+        $params[] = $id_horario;
+        $types .= "i";
+        
+        $stmt = $conn->prepare($sql);
+        $stmt->bind_param($types, ...$params);
+        
+        if ($stmt->execute()) {
+            $_SESSION['mensaje'] = "Horario actualizado exitosamente.";
+            header("Location: horarios_asignados.php");
+            exit();
+        } else {
+            $error = "Error al actualizar el horario: " . $conn->error;
+        }
+        
+        $stmt->close();
     }
-    
-    $stmt->close();
 }
 
 // Cargar el horario existente
@@ -90,6 +101,7 @@ if (!$horario) {
 
             <section class="content">
                 <?php if (isset($error)) echo "<p class='error'>$error</p>"; ?>
+                <p><strong>Nota:</strong> Los horarios deben estar entre las 6:00 AM y las 8:00 PM.</p>
                 <form id="editarHorarioForm" method="POST">
                     <div class="form-group">
                         <label for="curso">Curso:</label>
@@ -125,8 +137,8 @@ if (!$horario) {
                             $horario_dia = isset($horario[$dia]) ? explode(' - ', $horario[$dia]) : ['', ''];
                             echo "<div class='dia-horario'>";
                             echo "<label>" . ucfirst($dia) . ":</label>";
-                            echo "<input type='time' name='hora_inicio[$dia]' value='" . htmlspecialchars($horario_dia[0]) . "'>";
-                            echo "<input type='time' name='hora_fin[$dia]' value='" . htmlspecialchars($horario_dia[1]) . "'>";
+                            echo "<input type='time' name='hora_inicio[$dia]' value='" . htmlspecialchars($horario_dia[0]) . "' min='06:00' max='20:00'>";
+                            echo "<input type='time' name='hora_fin[$dia]' value='" . htmlspecialchars($horario_dia[1]) . "' min='06:00' max='20:00'>";
                             echo "<div class='error-message' id='error_$dia'></div>";
                             echo "</div>";
                         }
@@ -146,16 +158,20 @@ if (!$horario) {
             const submitButton = document.getElementById('submitButton');
             let formValido = true;
 
-            function verificarDisponibilidad() {
-                const idProfesor = profesorSelect.value;
-                if (!idProfesor) return;
-
-                formValido = true;
+          
 
                 const promesas = dias.map(dia => {
                     const horaInicio = document.querySelector(`input[name="hora_inicio[${dia}]"]`).value;
                     const horaFin = document.querySelector(`input[name="hora_fin[${dia}]"]`).value;
                     if (horaInicio && horaFin) {
+                        // Validar rango de horas
+                        if (horaInicio < "06:00" || horaFin > "20:00") {
+                            document.getElementById(`error_${dia}`).textContent = 'Las horas deben estar entre las 6:00 AM y las 8:00 PM.';
+                            document.getElementById(`error_${dia}`).style.display = 'block';
+                            formValido = false;
+                            return Promise.resolve();
+                        }
+
                         return fetch('verificar_disponibilidad.php', {
                             method: 'POST',
                             headers: {

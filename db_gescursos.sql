@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Servidor: 127.0.0.1
--- Tiempo de generación: 08-10-2024 a las 06:34:15
+-- Tiempo de generación: 08-10-2024 a las 08:16:31
 -- Versión del servidor: 10.4.32-MariaDB
 -- Versión de PHP: 8.0.30
 
@@ -213,17 +213,17 @@ INSERT INTO `db_gescursoslecturas_mensajes` (`id`, `id_mensaje`, `id_usuario`, `
 (441, 1, 53, '2024-10-06 23:27:48'),
 (463, 37, 56, '2024-10-07 00:06:57'),
 (466, 38, 56, '2024-10-07 00:53:09'),
-(467, 38, 53, '2024-10-08 04:10:29'),
-(469, 39, 53, '2024-10-07 19:57:00'),
+(467, 38, 53, '2024-10-08 04:36:41'),
+(469, 39, 53, '2024-10-08 04:36:42'),
 (471, 40, 56, '2024-10-06 23:37:19'),
 (474, 39, 56, '2024-10-07 00:53:08'),
-(481, 40, 53, '2024-10-08 04:10:31'),
+(481, 40, 53, '2024-10-08 04:36:53'),
 (484, 41, 56, '2024-10-07 00:57:50'),
 (495, 42, 53, '2024-10-06 23:37:41'),
 (496, 42, 56, '2024-10-07 01:07:58'),
 (501, 24, 56, '2024-10-07 00:05:25'),
 (514, 8, 56, '2024-10-07 00:07:02'),
-(679, 41, 53, '2024-10-08 04:10:30'),
+(679, 41, 53, '2024-10-08 04:36:54'),
 (685, 37, 53, '2024-10-07 19:57:02'),
 (687, 41, 36, '2024-10-07 19:57:48'),
 (688, 42, 36, '2024-10-07 19:57:49');
@@ -301,9 +301,7 @@ CREATE TABLE `horarios` (
 --
 
 INSERT INTO `horarios` (`id_horario`, `id_curso`, `id_profesor`, `fecha_creacion`, `dia_semana`, `lunes`, `martes`, `miercoles`, `jueves`, `viernes`, `sabado`, `hora_inicio`, `hora_fin`) VALUES
-(14, 1, 5, '2024-10-08 02:29:22', 'lunes', '12:30 - 12:50', NULL, NULL, NULL, NULL, NULL, NULL, NULL),
-(19, 1, 5, '2024-10-08 02:37:35', 'lunes', '11:40 - 12:30', NULL, NULL, NULL, NULL, NULL, NULL, NULL),
-(20, 2, 5, '2024-10-08 03:43:29', 'lunes', NULL, '01:02 - 02:03', NULL, NULL, NULL, NULL, NULL, NULL);
+(26, 1, 5, '2024-10-08 06:07:46', 'lunes', '08:08 - 09:09', '12:02 - 17:05', '09:10 - 10:10', NULL, NULL, NULL, NULL, NULL);
 
 -- --------------------------------------------------------
 
@@ -877,7 +875,7 @@ ALTER TABLE `cursos`
 -- AUTO_INCREMENT de la tabla `db_gescursoslecturas_mensajes`
 --
 ALTER TABLE `db_gescursoslecturas_mensajes`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=695;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=716;
 
 --
 -- AUTO_INCREMENT de la tabla `estudiante`
@@ -895,7 +893,7 @@ ALTER TABLE `historial_inscripciones`
 -- AUTO_INCREMENT de la tabla `horarios`
 --
 ALTER TABLE `horarios`
-  MODIFY `id_horario` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=21;
+  MODIFY `id_horario` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=27;
 
 --
 -- AUTO_INCREMENT de la tabla `inscripciones`

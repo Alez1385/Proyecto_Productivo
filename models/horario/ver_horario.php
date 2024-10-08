@@ -4,82 +4,30 @@ require_once '../../scripts/conexion.php';
 require_once '../../scripts/config.php';
 requireLogin();
 
-// Debugging: Imprimir información de la sesión
-error_log(print_r($_SESSION, true));
+$id_curso = isset($_GET['id_curso']) ? intval($_GET['id_curso']) : 0;
 
-// Obtener el ID del usuario actual
-$id_usuario = $_SESSION['id_usuario'] ?? null; // Cambiado de 'user_id' a 'id_usuario'
-
-if (!$id_usuario) {
-    error_log("ID de usuario no encontrado en la sesión");
-    // Redirigir al usuario a la página de inicio de sesión o mostrar un error
-    header('Location: ' . BASE_URL . 'login/login.php');
-    exit;
+if (!$id_curso) {
+    die("ID de curso no válido.");
 }
 
-// Determinar el rol del usuario
-$es_admin = checkPermission('admin', false);
-$es_profesor = checkPermission('profesor', false);
-$es_estudiante = !$es_admin && !$es_profesor;
+// Consulta SQL para obtener los horarios
+$sql = "SELECT c.nombre_curso, h.lunes, h.martes, h.miercoles, h.jueves, h.viernes, h.sabado, 
+               CONCAT(u.nombre, ' ', u.apellido) as nombre_profesor
+        FROM cursos c
+        LEFT JOIN horarios h ON c.id_curso = h.id_curso
+        LEFT JOIN profesor p ON h.id_profesor = p.id_profesor
+        LEFT JOIN usuario u ON p.id_usuario = u.id_usuario
+        WHERE c.id_curso = ?";
 
-// Debugging: Imprimir roles
-error_log("Es admin: " . ($es_admin ? 'Sí' : 'No'));
-error_log("Es profesor: " . ($es_profesor ? 'Sí' : 'No'));
-error_log("Es estudiante: " . ($es_estudiante ? 'Sí' : 'No'));
-
-// Obtener el ID específico según el rol
-$id_especifico = null;
-if ($es_estudiante) {
-    $stmt = $conn->prepare("SELECT id_estudiante FROM estudiante WHERE id_usuario = ?");
-    $stmt->bind_param("i", $id_usuario);
-    $stmt->execute();
-    $result = $stmt->get_result();
-    if ($row = $result->fetch_assoc()) {
-        $id_especifico = $row['id_estudiante'];
-    }
-    $stmt->close();
-} elseif ($es_profesor) {
-    $stmt = $conn->prepare("SELECT id_profesor FROM profesor WHERE id_usuario = ?");
-    $stmt->bind_param("i", $id_usuario);
-    $stmt->execute();
-    $result = $stmt->get_result();
-    if ($row = $result->fetch_assoc()) {
-        $id_especifico = $row['id_profesor'];
-    }
-    $stmt->close();
-}
-
-// Debugging: Imprimir ID específico
-error_log("ID específico: " . $id_especifico);
-
-// Construir la consulta SQL base
-$sql = "SELECT h.*, c.nombre_curso, CONCAT(u.nombre, ' ', u.apellido) as nombre_profesor 
-        FROM horarios h 
-        JOIN cursos c ON h.id_curso = c.id_curso 
-        JOIN profesor p ON h.id_profesor = p.id_profesor 
-        JOIN usuario u ON p.id_usuario = u.id_usuario";
-
-// Modificar la consulta según el rol
-if ($es_estudiante) {
-    $sql .= " JOIN inscripciones i ON h.id_curso = i.id_curso WHERE i.id_estudiante = ?";
-    $stmt = $conn->prepare($sql);
-    $stmt->bind_param("i", $id_especifico);
-} elseif ($es_profesor) {
-    $sql .= " WHERE h.id_profesor = ?";
-    $stmt = $conn->prepare($sql);
-    $stmt->bind_param("i", $id_especifico);
-} else {
-    // Para administradores, mostrar todos los horarios
-    $stmt = $conn->prepare($sql);
-}
-
+$stmt = $conn->prepare($sql);
+$stmt->bind_param("i", $id_curso);
 $stmt->execute();
 $result = $stmt->get_result();
-$horarios = $result->fetch_all(MYSQLI_ASSOC);
-$stmt->close();
+$curso = $result->fetch_assoc();
 
-// Debugging: Imprimir número de horarios obtenidos
-error_log("Número de horarios obtenidos: " . count($horarios));
+if (!$curso) {
+    die("Curso no encontrado.");
+}
 
 ?>
 
@@ -88,108 +36,92 @@ error_log("Número de horarios obtenidos: " . count($horarios));
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Horario</title>
-    <link rel="stylesheet" href="css/horario.css">
+    <title>Horario del Curso</title>
+    <link rel="stylesheet" href="css/horarios_asignados.css">
     <link rel="stylesheet" href="https://fonts.googleapis.com/icon?family=Material+Icons+Sharp">
-    <script type="module">
-        import SidebarManager from '../../js/form_side.js';
-
-        window.toggleSidebar = SidebarManager.toggle;
-        window.openSidebar = SidebarManager.open;
-
-        document.addEventListener('DOMContentLoaded', SidebarManager.init);
-    </script>
     <style>
-        .horario-grid {
-            display: grid;
-            grid-template-columns: auto repeat(6, 1fr);
-            gap: 10px;
+        .horario-table {
+            width: 100%;
+            border-collapse: collapse;
             margin-top: 20px;
         }
-        .horario-grid > div {
-            padding: 10px;
-            background-color: #f0f0f0;
+        .horario-table th, .horario-table td {
             border: 1px solid #ddd;
+            padding: 8px;
             text-align: center;
         }
-        .horario-grid .header {
-            font-weight: bold;
-            background-color: #e0e0e0;
+        .horario-table th {
+            background-color: #f2f2f2;
         }
         .curso-info {
-            background-color: #fff;
-            border: 1px solid #ccc;
+            background-color: #e6f7ff;
             padding: 5px;
-            margin: 2px 0;
+            border-radius: 4px;
+        }
+        .profesor-info {
             font-size: 0.9em;
+            margin-top: 5px;
         }
     </style>
 </head>
 <body>
-    <div id="overlay"></div>
-    <div id="sidebar">
-        <button class="sidebar-close" onclick="toggleSidebar()">&times;</button>
-        <div id="sidebar-content">
-            <!-- El contenido del formulario se cargará dinámicamente aquí -->
-        </div>
-        <div id="sidebar-resizer"></div>
-    </div>
-
     <div class="dashboard-container">
         <?php include "../../scripts/sidebar.php"; ?>
         <div class="main-content">
             <header class="header">
                 <div class="header-left">
-                    <h1>Horario</h1>
+                    <h1>Horario: <?php echo htmlspecialchars($curso['nombre_curso']); ?></h1>
                 </div>
-                <?php if ($es_admin): ?>
                 <div class="header-right">
-                    <button onclick="window.location.href='horarios_asignados.php'" class="btn-back">Volver a Horarios Asignados</button>
+                    <button onclick="window.location.href='cursos_listado.php'" class="btn-back">Volver a Mis Cursos</button>
                 </div>
-                <?php endif; ?>
             </header>
 
             <section class="content">
-                <div class="horario-grid">
-                    <div class="header">Hora</div>
-                    <div class="header">Lunes</div>
-                    <div class="header">Martes</div>
-                    <div class="header">Miércoles</div>
-                    <div class="header">Jueves</div>
-                    <div class="header">Viernes</div>
-                    <div class="header">Sábado</div>
-                    
+                <table class="horario-table">
+                    <tr>
+                        <th>Hora</th>
+                        <th>Lunes</th>
+                        <th>Martes</th>
+                        <th>Miércoles</th>
+                        <th>Jueves</th>
+                        <th>Viernes</th>
+                        <th>Sábado</th>
+                    </tr>
                     <?php
-                    $horas = ['07:00', '08:00', '09:00', '10:00', '11:00', '12:00', '13:00', '14:00', '15:00', '16:00', '17:00', '18:00', '19:00', '20:00'];
+                    $horas = [];
+                    for ($i = 6; $i <= 20; $i++) {
+                        $horas[] = sprintf("%02d:00", $i);
+                        $horas[] = sprintf("%02d:30", $i);
+                    }
                     $dias = ['lunes', 'martes', 'miercoles', 'jueves', 'viernes', 'sabado'];
-                    
+
                     foreach ($horas as $hora) {
-                        echo "<div>{$hora}</div>";
+                        echo "<tr>";
+                        echo "<td>" . date("h:i A", strtotime($hora)) . "</td>";
                         foreach ($dias as $dia) {
-                            echo "<div>";
-                            foreach ($horarios as $horario) {
-                                if (!empty($horario[$dia])) {
-                                    list($inicio, $fin) = explode(' - ', $horario[$dia]);
-                                    if ($inicio <= $hora && $hora < $fin) {
-                                        echo "<div class='curso-info'>";
-                                        echo "{$horario['nombre_curso']}<br>";
-                                        echo "{$horario['nombre_profesor']}<br>";
-                                        echo "{$horario[$dia]}";
-                                        echo "</div>";
-                                    }
+                            echo "<td>";
+                            if (!empty($curso[$dia])) {
+                                list($inicio, $fin) = explode(' - ', $curso[$dia]);
+                                $hora_actual = strtotime($hora);
+                                $hora_inicio = strtotime($inicio);
+                                $hora_fin = strtotime($fin);
+                                
+                                if ($hora_actual >= $hora_inicio && $hora_actual < $hora_fin) {
+                                    echo "<div class='curso-info'>";
+                                    echo htmlspecialchars($curso['nombre_curso']) . "<br>";
+                                    echo "<p class='profesor-info'>Profesor: " . htmlspecialchars($curso['nombre_profesor']) . "</p>";
+                                    echo "</div>";
                                 }
                             }
-                            echo "</div>";
+                            echo "</td>";
                         }
+                        echo "</tr>";
                     }
                     ?>
-                </div>
+                </table>
             </section>
         </div>
     </div>
-
-    <script>
-        document.getElementById('overlay').addEventListener('click', toggleSidebar);
-    </script>
 </body>
 </html>

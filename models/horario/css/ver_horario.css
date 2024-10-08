@@ -1,0 +1,44 @@
+.horario-grid {
+    display: grid;
+    grid-template-columns: auto repeat(6, 1fr);
+    gap: 10px;
+    margin-top: 20px;
+}
+
+.horario-grid > div {
+    padding: 10px;
+    background-color: #f0f0f0;
+    border: 1px solid #ddd;
+    text-align: center;
+}
+
+.horario-grid .header {
+    font-weight: bold;
+    background-color: #e0e0e0;
+}
+
+.curso-info {
+    background-color: #fff;
+    border: 1px solid #ccc;
+    padding: 5px;
+    margin: 2px 0;
+    font-size: 0.9em;
+}
+
+.horario-info {
+    margin-bottom: 20px;
+}
+
+.btn-back {
+    padding: 10px 20px;
+    background-color: #00bcff;
+    color: #fff;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+}
+
+.btn-back:hover {
+    background-color: #0095cc;
+}

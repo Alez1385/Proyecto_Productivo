@@ -3,7 +3,17 @@ require_once '../../scripts/auth.php';
 require_once '../../scripts/conexion.php';
 require_once '../../scripts/config.php';
 requireLogin();
-checkPermission('admin');
+
+$sql = "SELECT h.id_horario, c.nombre_curso, c.descripcion, c.duracion, 
+               CONCAT(u.nombre, ' ', u.apellido) as nombre_profesor,
+               h.lunes, h.martes, h.miercoles, h.jueves, h.viernes, h.sabado
+        FROM horarios h
+        JOIN cursos c ON h.id_curso = c.id_curso
+        JOIN profesor p ON h.id_profesor = p.id_profesor
+        JOIN usuario u ON p.id_usuario = u.id_usuario
+        ORDER BY h.fecha_creacion DESC";
+
+$result = $conn->query($sql);
 ?>
 
 <!DOCTYPE html>
@@ -24,21 +34,14 @@ checkPermission('admin');
                     <h1>Horarios Asignados</h1>
                 </div>
                 <div class="header-right">
-                    <button onclick="window.location.href='horario.php'">Asignar Nuevo Horario</button>
+                    <button onclick="window.location.href='horario.php'" class="btn-add">Agregar Horario</button>
                 </div>
             </header>
 
             <section class="content">
-                <?php
-                if (isset($_SESSION['mensaje'])) {
-                    echo "<div class='mensaje exito'>" . $_SESSION['mensaje'] . "</div>";
-                    unset($_SESSION['mensaje']);
-                }
-                ?>
-                <div class="search-bar">
-                    <span class="material-icons-sharp search-icon">search</span>
-                    <input type="text" id="searchInput" placeholder="Buscar horarios..." onkeyup="filterHorarios()">
-                </div>
+                <?php if (isset($_SESSION['mensaje'])): ?>
+                    <div class="mensaje"><?php echo $_SESSION['mensaje']; unset($_SESSION['mensaje']); ?></div>
+                <?php endif; ?>
 
                 <div class="horario-list">
                     <?php

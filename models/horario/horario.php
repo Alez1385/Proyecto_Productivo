@@ -2,106 +2,96 @@
 require_once '../../scripts/auth.php';
 require_once '../../scripts/conexion.php';
 require_once '../../scripts/config.php';
-
+requireLogin();
+checkPermission('admin');
 
 if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     $id_curso = $_POST['curso'];
     $id_profesor = $_POST['profesor'];
     $dias = ['lunes', 'martes', 'miercoles', 'jueves', 'viernes', 'sabado'];
     
-    $horarios = array_fill(0, 6, null);
-    $conflicto = false;
+    // Verificar si el curso ya tiene un horario asignado
+    $sql_check = "SELECT id_horario FROM horarios WHERE id_curso = ?";
+    $stmt_check = $conn->prepare($sql_check);
+    $stmt_check->bind_param("i", $id_curso);
+    $stmt_check->execute();
+    $result_check = $stmt_check->get_result();
     
-    foreach ($dias as $index => $dia) {
-        if (!empty($_POST["hora_inicio"][$dia]) && !empty($_POST["hora_fin"][$dia])) {
-            $hora_inicio = $_POST["hora_inicio"][$dia];
-            $hora_fin = $_POST["hora_fin"][$dia];
-            
-            // Verificar que la hora de inicio no sea igual a la hora de fin
-            if ($hora_inicio === $hora_fin) {
-                $conflicto = true;
-                $error = "La hora de inicio y fin no pueden ser iguales para el día " . ucfirst($dia) . ".";
-                break;
-            }
-            
-            $horarios[$index] = $hora_inicio . " - " . $hora_fin;
-            
-            // Verificar disponibilidad antes de insertar
-            $sql_check = "SELECT * FROM horarios 
-                          WHERE id_profesor = ? 
-                          AND $dia IS NOT NULL 
-                          AND (
-                              (SUBSTRING_INDEX($dia, ' - ', 1) < ? AND SUBSTRING_INDEX($dia, ' - ', -1) > ?)
-                              OR (SUBSTRING_INDEX($dia, ' - ', 1) >= ? AND SUBSTRING_INDEX($dia, ' - ', 1) < ?)
-                              OR (? >= SUBSTRING_INDEX($dia, ' - ', 1) AND ? < SUBSTRING_INDEX($dia, ' - ', -1))
-                          )";
-            $stmt_check = $conn->prepare($sql_check);
-            $stmt_check->bind_param("issssss", $id_profesor, $hora_fin, $hora_inicio, $hora_inicio, $hora_fin, $hora_inicio, $hora_fin);
-            $stmt_check->execute();
-            $result_check = $stmt_check->get_result();
-            
-            if ($result_check->num_rows > 0) {
-                $conflicto = true;
-                $error = "El profesor ya tiene un horario asignado que se superpone en este período para el día " . ucfirst($dia) . ".";
-                break;
+    if ($result_check->num_rows > 0) {
+        $error = "Este curso ya tiene un horario asignado.";
+    } else {
+        $horarios = array_fill(0, 6, null);
+        $conflicto = false;
+        $error = "";
+        
+        foreach ($dias as $index => $dia) {
+            if (!empty($_POST["hora_inicio"][$dia]) && !empty($_POST["hora_fin"][$dia])) {
+                $hora_inicio = $_POST["hora_inicio"][$dia];
+                $hora_fin = $_POST["hora_fin"][$dia];
+                
+                // Validar que las horas estén dentro del rango permitido
+                if (strtotime($hora_inicio) < strtotime('06:00') || strtotime($hora_fin) > strtotime('20:00')) {
+                    $conflicto = true;
+                    $error = "Las horas deben estar entre las 6:00 AM y las 8:00 PM para el día " . ucfirst($dia) . ".";
+                    break;
+                }
+                
+                // Verificar que la hora de inicio sea menor que la hora de fin
+                if (strtotime($hora_inicio) >= strtotime($hora_fin)) {
+                    $conflicto = true;
+                    $error = "La hora de inicio debe ser menor que la hora de fin para el día " . ucfirst($dia) . ".";
+                    break;
+                }
+                
+                $horarios[$index] = $hora_inicio . " - " . $hora_fin;
+                
+                // Verificar conflicto de horarios
+                $sql = "SELECT * FROM horarios WHERE id_profesor = ? AND $dia IS NOT NULL";
+                $stmt = $conn->prepare($sql);
+                $stmt->bind_param("i", $id_profesor);
+                $stmt->execute();
+                $result = $stmt->get_result();
+                
+                while ($row = $result->fetch_assoc()) {
+                    list($h_inicio, $h_fin) = explode(" - ", $row[$dia]);
+                    if ((strtotime($hora_inicio) >= strtotime($h_inicio) && strtotime($hora_inicio) < strtotime($h_fin)) ||
+                        (strtotime($hora_fin) > strtotime($h_inicio) && strtotime($hora_fin) <= strtotime($h_fin)) ||
+                        (strtotime($hora_inicio) <= strtotime($h_inicio) && strtotime($hora_fin) >= strtotime($h_fin))) {
+                        $conflicto = true;
+                        $error = "Conflicto de horario para el profesor en el día " . ucfirst($dia) . ".";
+                        break 2;
+                    }
+                }
             }
         }
-    }
-    
-    if (!$conflicto) {
-        $stmt = $conn->prepare("INSERT INTO horarios (id_curso, id_profesor, lunes, martes, miercoles, jueves, viernes, sabado) VALUES (?, ?, ?, ?, ?, ?, ?, ?)");
-        $stmt->bind_param("iissssss", $id_curso, $id_profesor, $horarios[0], $horarios[1], $horarios[2], $horarios[3], $horarios[4], $horarios[5]);
         
-        if ($stmt->execute()) {
-            $_SESSION['mensaje'] = "Horario guardado exitosamente.";
-            header("Location: horarios_asignados.php");
-            exit();
-        } else {
-            $error = "Error al guardar el horario: " . $conn->error;
+        if (!$conflicto) {
+            $sql = "INSERT INTO horarios (id_curso, id_profesor, lunes, martes, miercoles, jueves, viernes, sabado) VALUES (?, ?, ?, ?, ?, ?, ?, ?)";
+            $stmt = $conn->prepare($sql);
+            $stmt->bind_param("iissssss", $id_curso, $id_profesor, $horarios[0], $horarios[1], $horarios[2], $horarios[3], $horarios[4], $horarios[5]);
+            
+            if ($stmt->execute()) {
+                $_SESSION['mensaje'] = "Horario creado exitosamente.";
+                header("Location: horarios_asignados.php");
+                exit();
+            } else {
+                $error = "Error al crear el horario: " . $conn->error;
+            }
         }
-        
-        $stmt->close();
     }
 }
 ?>
 
 <!DOCTYPE html>
 <html lang="es">
-
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Asignación de Horarios</title>
     <link rel="stylesheet" href="css/horario.css">
     <link rel="stylesheet" href="https://fonts.googleapis.com/icon?family=Material+Icons+Sharp">
-    <script type="module">
-        import SidebarManager from '../../js/form_side.js';
-
-        window.toggleSidebar = SidebarManager.toggle;
-        window.openSidebar = SidebarManager.open;
-
-        document.addEventListener('DOMContentLoaded', SidebarManager.init);
-    </script>
-    <style>
-        .error-message {
-            color: red;
-            font-size: 0.9em;
-            margin-top: 5px;
-            display: none;
-        }
-    </style>
 </head>
-
 <body>
-    <div id="overlay"></div>
-    <div id="sidebar">
-        <button class="sidebar-close" onclick="toggleSidebar()">&times;</button>
-        <div id="sidebar-content">
-            <!-- El contenido del formulario se cargará dinámicamente aquí -->
-        </div>
-        <div id="sidebar-resizer"></div>
-    </div>
-
     <div class="dashboard-container">
         <?php include "../../scripts/sidebar.php"; ?>
         <div class="main-content">
@@ -115,18 +105,23 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
             </header>
 
             <section class="content">
-                <?php
-                if (isset($error)) {
-                    echo "<div class='mensaje error'>$error</div>";
-                }
-                ?>
+                <h2>Asignación de Horarios</h2>
+                <p><strong>Nota:</strong> Los horarios deben estar entre las 6:00 AM y las 8:00 PM.</p>
+                
+                <?php if (isset($error)): ?>
+                    <div class="error-message"><?php echo $error; ?></div>
+                <?php endif; ?>
+
                 <form id="horarioForm" method="POST">
                     <div class="form-group">
                         <label for="curso">Curso:</label>
                         <select id="curso" name="curso" required>
                             <option value="">Seleccione un curso</option>
                             <?php
-                            $sql_cursos = "SELECT id_curso, nombre_curso FROM cursos WHERE estado = 'activo'";
+                            $sql_cursos = "SELECT c.id_curso, c.nombre_curso 
+                                           FROM cursos c
+                                           LEFT JOIN horarios h ON c.id_curso = h.id_curso
+                                           WHERE c.estado = 'activo' AND h.id_horario IS NULL";
                             $result_cursos = $conn->query($sql_cursos);
                             while ($curso = $result_cursos->fetch_assoc()) {
                                 echo "<option value='" . $curso['id_curso'] . "'>" . htmlspecialchars($curso['nombre_curso']) . "</option>";
@@ -134,7 +129,6 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
                             ?>
                         </select>
                     </div>
-
                     <div class="form-group">
                         <label for="profesor">Profesor:</label>
                         <select id="profesor" name="profesor" required>
@@ -148,7 +142,6 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
                             ?>
                         </select>
                     </div>
-
                     <div class="form-group">
                         <label>Horario:</label>
                         <?php
@@ -156,51 +149,45 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
                         foreach ($dias as $dia) {
                             echo "<div class='dia-horario'>";
                             echo "<label>" . ucfirst($dia) . ":</label>";
-                            echo "<input type='time' name='hora_inicio[$dia]' id='hora_inicio_$dia' placeholder='Hora inicio'>";
-                            echo "<input type='time' name='hora_fin[$dia]' id='hora_fin_$dia' placeholder='Hora fin'>";
-                            echo "<div class='error-message' id='error_$dia'></div>";
+                            echo "<input type='time' name='hora_inicio[$dia]' min='06:00' max='20:00'>";
+                            echo "<input type='time' name='hora_fin[$dia]' min='06:00' max='20:00'>";
                             echo "</div>";
                         }
                         ?>
                     </div>
-
-                    <button type="submit" class="btn-submit" id="submitButton">Guardar Horario</button>
+                    <button type="submit" class="btn-submit">Crear Horario</button>
                 </form>
             </section>
         </div>
     </div>
 
     <script>
-        document.getElementById('overlay').addEventListener('click', toggleSidebar);
-        
-        document.addEventListener('DOMContentLoaded', function() {
-            const profesorSelect = document.getElementById('profesor');
-            const dias = ['lunes', 'martes', 'miercoles', 'jueves', 'viernes', 'sabado'];
-            const submitButton = document.getElementById('submitButton');
-            let formValido = true;
+    document.addEventListener('DOMContentLoaded', function() {
+        const form = document.getElementById('horarioForm');
+        form.addEventListener('submit', function(event) {
+            const inputs = form.querySelectorAll('input[type="time"]');
+            let isValid = true;
 
-            function verificarHorarios() {
-                formValido = true;
-
-                dias.forEach(dia => {
-                    const horaInicio = document.getElementById(`hora_inicio_${dia}`).value;
-                    const horaFin = document.getElementById(`hora_fin_${dia}`).value;
-                    const errorElement = document.getElementById(`error_${dia}`);
-
-                    if (horaInicio && horaFin) {
-                        if (horaInicio === horaFin) {
-                            errorElement.textContent = 'La hora de inicio y fin no pueden ser iguales.';
-                            errorElement.style.display = 'block';
-                            formValido = false;
-                        } else {
-                            errorElement.textContent = '';
-                            errorElement.style.display = 'none';
-                        }
+            inputs.forEach(function(input) {
+                if (input.value) {
+                    const time = input.value;
+                    if (time < "06:00" || time > "20:00") {
+                        isValid = false;
+                        input.setCustomValidity('Las horas deben estar entre las 6:00 AM y las 8:00 PM.');
+                    } else {
+                        input.setCustomValidity('');
                     }
-                });
+                }
+            });
 
-                return formValido;
+            if (!isValid) {
+                event.preventDefault();
             }
+            const dias = ['lunes', 'martes', 'miercoles', 'jueves', 'viernes', 'sabado'];
+        dias.forEach(function(dia) {
+            const inicioInput = document.querySelector(`input[name="hora_inicio[${dia}]"]`);
+            const finInput = document.querySelector(`input[name="hora_fin[${dia}]"]`);
+        });
 
             function verificarDisponibilidad() {
                 const idProfesor = profesorSelect.value;
@@ -260,7 +247,43 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
                 }
             });
         });
+
+        // Agregar validación de rango de horas
+        document.getElementById('horarioForm').addEventListener('submit', function(event) {
+            var inputs = this.getElementsByTagName('input');
+            for (var i = 0; i < inputs.length; i++) {
+                if (inputs[i].type === 'time') {
+                    var time = inputs[i].value;
+                    if (time < "06:00" || time > "20:00") {
+                        alert('Las horas deben estar entre las 6:00 AM y las 8:00 PM.');
+                        event.preventDefault();
+                        return;
+                    }
+                }
+            }
+        });
+
+        // Agregar validación adicional para verificar si el curso ya tiene horario
+        document.getElementById('horarioForm').addEventListener('submit', function(event) {
+            const cursoSelect = document.getElementById('curso');
+            if (cursoSelect.options.length === 0) {
+                alert('No hay cursos disponibles para asignar horario.');
+                event.preventDefault();
+                return;
+            }
+        });
+
+        finInput.addEventListener('change', function() {
+                if (inicioInput.value && finInput.value) {
+                    if (inicioInput.value >= finInput.value) {
+                        finInput.setCustomValidity('La hora de fin debe ser mayor que la hora de inicio.');
+                    } else {
+                        finInput.setCustomValidity('');
+                    }
+                }
+            });
+        });
+    });
     </script>
 </body>
-
 </html>
