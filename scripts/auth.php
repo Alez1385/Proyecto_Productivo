@@ -95,15 +95,26 @@ function requireLogin() {
     error_log("User authenticated successfully");
 }
 
-function checkPermission($requiredRole) {
+function checkPermission($requiredRole, $redirect = true) {
     error_log("Checking permission for role: $requiredRole");
     error_log("Current user role: " . ($_SESSION['user_role'] ?? 'Not set'));
+    
+    if ($requiredRole === 'any') {
+        error_log("Any role is allowed. Permission granted.");
+        return true;
+    }
+    
     if (!isset($_SESSION['user_role']) || $_SESSION['user_role'] !== $requiredRole) {
-        error_log("Permission denied. Redirecting to access denied page");
-        header('Location: ' . BASE_URL . 'scripts/access-denied.php?role=' . $requiredRole);
-        exit;
+        error_log("Permission denied for role: $requiredRole");
+        if ($redirect) {
+            error_log("Redirecting to access denied page");
+            header('Location: ' . BASE_URL . 'scripts/access-denied.php?role=' . $requiredRole);
+            exit;
+        }
+        return false;
     }
     error_log("Permission granted");
+    return true;
 }
 
 
