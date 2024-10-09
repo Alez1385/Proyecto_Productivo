@@ -91,7 +91,7 @@ if ($result->num_rows > 0) {
         }
         $_SESSION['username'] = $user['username'];
         $_SESSION['user_role'] = $user['tipo_nombre'];  // Using tipo_nombre as user_role
-        
+        updateLastAccess($user['id_usuario']);
         error_log("Session data set: " . print_r($_SESSION, true));
         
         // Regenerate session ID for security

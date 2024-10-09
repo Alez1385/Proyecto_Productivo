@@ -7,14 +7,7 @@ requireLogin();
 // Obtener el tipo de usuario
 $user = getUserInfo($conn, $_SESSION['id_usuario']);
 
-function getDatabaseData($conn, $query)
-{
-    $result = $conn->query($query);
-    if (!$result) {
-        die("Error al ejecutar la consulta: " . $conn->error);
-    }
-    return $result->fetch_all(MYSQLI_ASSOC);
-}
+
 
 // Contenido HTML común
 ?>

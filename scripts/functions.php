@@ -536,3 +536,33 @@ function deleteUser($userId) {
     $stmt->close();
     return $success;
 }
+
+function getDatabaseData($conn, $query, $params = [])
+{
+    $stmt = $conn->prepare($query);
+    
+    if (!$stmt) {
+        die("Error al preparar la consulta: " . $conn->error);
+    }
+    
+    if (!empty($params)) {
+        $types = str_repeat('s', count($params)); // Asume que todos los parámetros son strings
+        $stmt->bind_param($types, ...$params);
+    }
+    
+    if (!$stmt->execute()) {
+        die("Error al ejecutar la consulta: " . $stmt->error);
+    }
+    
+    $result = $stmt->get_result();
+    
+    if (!$result) {
+        die("Error al obtener el resultado: " . $stmt->error);
+    }
+    
+    $data = $result->fetch_all(MYSQLI_ASSOC);
+    
+    $stmt->close();
+    
+    return $data;
+}

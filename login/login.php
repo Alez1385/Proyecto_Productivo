@@ -27,6 +27,7 @@ if (!in_array($_SERVER['SERVER_NAME'], ['localhost', '127.0.0.1'])) {
 // Si ya hay una sesión activa, redirigir al dashboard
 if (isset($_SESSION['username'])) {
     header("Location: /dashboard/dashboard.php");
+    updateLastAccess($_SESSION['id_usuario']);
     exit();
 }
 

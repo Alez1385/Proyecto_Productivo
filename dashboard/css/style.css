@@ -168,7 +168,7 @@ aside {
     width: var(--sidebar-width);
     transition: all 0.3s ease;
     padding: var(--sidebar-padding);
-    overflow-y: hidden;
+    overflow-y: auto;
 }
 
 #sortable-sidebar {

@@ -1,7 +1,7 @@
 <?php
 
 // Cargar la configuración de logs
-$log_config = require __DIR__ . 'config/log_config.php';
+$log_config = require 'log_config.php';
 
 /**
  * Registra un mensaje de error en el archivo de log

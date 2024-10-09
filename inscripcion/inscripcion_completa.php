@@ -34,31 +34,23 @@ $error_message = '';
 $success_message = '';
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-    $nombre = filter_input(INPUT_POST, 'nombre', FILTER_SANITIZE_STRING);
-    $email = filter_input(INPUT_POST, 'email', FILTER_VALIDATE_EMAIL);
-    $telefono = filter_input(INPUT_POST, 'telefono', FILTER_SANITIZE_STRING);
+    $target_dir = "../uploads/comprobantes/";
+    $file_name = basename($_FILES["comprobante"]["name"]);
+    $target_file = $target_dir . time() . '_' . $file_name;
+    $imageFileType = strtolower(pathinfo($target_file, PATHINFO_EXTENSION));
 
-    if (!$nombre || !$email || !$telefono) {
-        $error_message = 'Error: Todos los campos son obligatorios y deben ser válidos.';
-    } else {
-        $target_dir = "../uploads/comprobantes/";
-        $file_name = basename($_FILES["comprobante"]["name"]);
-        $target_file = $target_dir . time() . '_' . $file_name;
-        $imageFileType = strtolower(pathinfo($target_file, PATHINFO_EXTENSION));
+    // Validate file
+    $uploadOk = validateFile($_FILES["comprobante"], $imageFileType);
 
-        // Validate file
-        $uploadOk = validateFile($_FILES["comprobante"], $imageFileType);
-
-        if ($uploadOk) {
-            if (move_uploaded_file($_FILES["comprobante"]["tmp_name"], $target_file)) {
-                if (processInscripcion($conn, $curso_id, $id_usuario, $target_file)) {
-                    $success_message = "Inscripción completada con éxito.";
-                } else {
-                    $error_message = "Error al procesar la inscripción.";
-                }
+    if ($uploadOk) {
+        if (move_uploaded_file($_FILES["comprobante"]["tmp_name"], $target_file)) {
+            if (processInscripcion($conn, $curso_id, $id_usuario, $target_file)) {
+                $success_message = "Inscripción completada con éxito.";
             } else {
-                $error_message = "Lo siento, hubo un error al subir tu archivo.";
+                $error_message = "Error al procesar la inscripción.";
             }
+        } else {
+            $error_message = "Lo siento, hubo un error al subir tu archivo.";
         }
     }
 }
@@ -111,17 +103,18 @@ function processInscripcion($conn, $curso_id, $id_usuario, $comprobante) {
     $id_preinscripcion = null;
     if ($result->num_rows > 0) {
         $row = $result->fetch_assoc();
-        $id_preinscripcion = $row['id_preinscripcion'];
+        $stmt = $conn->prepare("delete from preinscripciones where id_preinscripcion = ?");
+        $stmt->bind_param("i", $row['id_preinscripcion']);
+        $stmt->execute();
     }
 
     // Now proceed with the inscription
-    $stmt = $conn->prepare("INSERT INTO inscripciones (id_curso, id_estudiante, id_preinscripcion, fecha_inscripcion, estado, fecha_actualizacion, comprobante_pago) VALUES (?, ?, ?, NOW(), 'pendiente', NOW(), ?)");
-    $stmt->bind_param("iiis", $curso_id, $id_estudiante, $id_preinscripcion, $comprobante);
+    $stmt = $conn->prepare("INSERT INTO inscripciones (id_curso, id_estudiante, fecha_inscripcion, estado, fecha_actualizacion, comprobante_pago) VALUES (?, ?, NOW(), 'pendiente', NOW(), ?)");
+    $stmt->bind_param("iis", $curso_id, $id_estudiante, $comprobante);
     return $stmt->execute();
 }
 
 ?>
-
 <!DOCTYPE html>
 <html lang="es">
 <head>
@@ -137,11 +130,9 @@ function processInscripcion($conn, $curso_id, $id_usuario, $comprobante) {
         <?php if ($error_message): ?>
             <div class="message error"><?php echo htmlspecialchars($error_message); ?></div>
         <?php endif; ?>
-
         <?php if ($success_message): ?>
             <div class="message success"><?php echo htmlspecialchars($success_message); ?></div>
         <?php endif; ?>
-
         <h1>Inscripción al Curso</h1>
 
         <div class="course-details">
@@ -159,21 +150,6 @@ function processInscripcion($conn, $curso_id, $id_usuario, $comprobante) {
         </div>
 
         <form action="<?php echo htmlspecialchars($_SERVER['PHP_SELF']) . '?curso_id=' . $curso_id; ?>" method="post" enctype="multipart/form-data">
-            <div class="form-group">
-                <label for="nombre">Nombre completo:</label>
-                <input type="text" id="nombre" name="nombre" value="<?php echo htmlspecialchars($user['nombre'] . ' ' . $user['apellido']); ?>" required>
-            </div>
-
-            <div class="form-group">
-                <label for="email">Correo electrónico:</label>
-                <input type="email" id="email" name="email" value="<?php echo htmlspecialchars($user['mail']); ?>" required>
-            </div>
-
-            <div class="form-group">
-                <label for="telefono">Teléfono:</label>
-                <input type="tel" id="telefono" name="telefono" value="<?php echo htmlspecialchars($user['telefono']); ?>" required>
-            </div>
-
             <div class="form-group">
                 <label for="comprobante">Comprobante de pago:</label>
                 <div class="file-upload">
