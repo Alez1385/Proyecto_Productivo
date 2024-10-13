@@ -19,24 +19,16 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     $conn->begin_transaction();
 
     try {
-        // Si no hay id_usuario, primero insertamos en la tabla usuario
-        if ($id_usuario == 0) {
-            $nombre = sanitizeInput($_POST['nombre']);
-            $apellido = sanitizeInput($_POST['apellido']);
-            $mail = sanitizeInput($_POST['mail']);
-            $username = sanitizeInput($_POST['username']);
-            $clave = password_hash($_POST['clave'], PASSWORD_DEFAULT);
-
-            $stmt = $conn->prepare("INSERT INTO usuario (nombre, apellido, mail, username, clave, id_tipo_usuario) VALUES (?, ?, ?, ?, ?, 2)");
-            $stmt->bind_param("sssss", $nombre, $apellido, $mail, $username, $clave);
-            $stmt->execute();
-            $id_usuario = $conn->insert_id;
-            $stmt->close();
+        // Actualizar el tipo de usuario a profesor (id_tipo_usuario = 2)
+        $stmt_update_user = $conn->prepare("UPDATE usuario SET id_tipo_usuario = 2 WHERE id_usuario = ?");
+        $stmt_update_user->bind_param("i", $id_usuario);
+        if (!$stmt_update_user->execute()) {
+            throw new Exception("Error al actualizar el tipo de usuario: " . $stmt_update_user->error);
         }
+        $stmt_update_user->close();
 
-        // Ahora manejamos la tabla profesor
+        // Si no hay id_profesor, insertamos en la tabla profesor
         if ($id_profesor == 0) {
-            // Insertar nuevo profesor
             $stmt = $conn->prepare("INSERT INTO profesor (id_usuario, especialidad, experiencia, descripcion) VALUES (?, ?, ?, ?)");
             $stmt->bind_param("isss", $id_usuario, $especialidad, $experiencia, $descripcion);
         } else {

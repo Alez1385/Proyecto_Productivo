@@ -76,6 +76,25 @@ $stmt->close();
                     ?>
                 </select>
             </div>
+            <div class="form-group">
+               
+                <select name="profesor" id="profesor">
+                    <option value="">Seleccione un profesor</option>
+                    <?php
+                    $sql_teachers = "SELECT p.id_profesor, u.nombre, u.apellido 
+                                     FROM profesor p 
+                                     JOIN usuario u ON p.id_usuario = u.id_usuario";
+                    $result_teachers = $conn->query($sql_teachers);
+                    if ($result_teachers->num_rows > 0) {
+                        while ($teacher = $result_teachers->fetch_assoc()) {
+                            $selected = ($curso['id_profesor'] == $teacher['id_profesor']) ? 'selected' : '';
+                            echo "<option value='" . $teacher['id_profesor'] . "' $selected>" 
+                                 . htmlspecialchars($teacher['nombre'] . " " . $teacher['apellido']) . "</option>";
+                        }
+                    }
+                    ?>
+                </select>
+            </div>
 
             <div class="form-group">
                 <div class="icon-upload">
@@ -87,6 +106,9 @@ $stmt->close();
                     <img src="../../uploads/icons/<?php echo htmlspecialchars($curso['icono']); ?>" alt="Icono del curso" style="width: 50px; height: 50px;">
                 <?php endif; ?>
             </div>
+
+            <!-- Agrega esto dentro del formulario de edición -->
+           
 
             <div class="form-group">
                 <a href="cursos.php" style="color: #00bcff;">Volver</a>

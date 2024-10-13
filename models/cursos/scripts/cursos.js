@@ -91,3 +91,65 @@ function resetFilters() {
 }
 
 document.getElementById('overlay').addEventListener('click', toggleSidebar);
+
+function openAssignTeacherModal(courseId, currentTeacherId) {
+    const modal = document.getElementById('assignTeacherModal');
+    const courseIdInput = document.getElementById('courseId');
+    const teacherSelect = document.getElementById('teacherSelect');
+
+    courseIdInput.value = courseId;
+    if (currentTeacherId && currentTeacherId !== 'null') {
+        teacherSelect.value = currentTeacherId;
+    } else {
+        teacherSelect.selectedIndex = 0;
+    }
+
+    modal.style.display = 'block';
+}
+
+document.querySelector('.modal .close').addEventListener('click', function() {
+    document.getElementById('assignTeacherModal').style.display = 'none';
+});
+
+document.getElementById('assignTeacherForm').addEventListener('submit', function(e) {
+    e.preventDefault();
+    const courseId = document.getElementById('courseId').value;
+    const teacherId = document.getElementById('teacherSelect').value;
+
+    console.log('Enviando solicitud - CourseId:', courseId, 'TeacherId:', teacherId);
+
+    if (!courseId || !teacherId) {
+        alert('Por favor, asegúrate de que se ha seleccionado un curso y un profesor.');
+        return;
+    }
+
+    fetch('assign_teacher.php', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/x-www-form-urlencoded',
+        },
+        body: `courseId=${encodeURIComponent(courseId)}&teacherId=${encodeURIComponent(teacherId)}`
+    })
+    .then(response => {
+        console.log('Respuesta recibida:', response);
+        return response.json();
+    })
+    .then(data => {
+        console.log('Datos recibidos:', data);
+        if (data.success) {
+            alert('Profesor asignado con éxito');
+            document.getElementById('assignTeacherModal').style.display = 'none';
+            // Actualizar la información del curso en la página
+            const courseItem = document.querySelector(`[data-course-id="${courseId}"]`);
+            const professorInfo = courseItem.querySelector('p:nth-child(5)');
+            professorInfo.innerHTML = `<strong>Profesor: </strong>${data.teacherName}`;
+            console.log('Información del profesor actualizada en la página');
+        } else {
+            alert('Error al asignar el profesor: ' + data.message);
+        }
+    })
+    .catch(error => {
+        console.error('Error:', error);
+        alert('Ocurrió un error al asignar el profesor.');
+    });
+});

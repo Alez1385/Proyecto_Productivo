@@ -33,9 +33,10 @@ try {
     $estado = sanitize_input($_POST['estado']);
     $categoria = filter_var($_POST['categoria'], FILTER_VALIDATE_INT);
     $upload_icon = $_FILES['upload_icon'];
+    $id_profesor = filter_var($_POST['profesor'], FILTER_VALIDATE_INT);
 
-    if (!$id_curso || !$nombre_curso || !$descripcion || !$nivel_educativo || !$duracion || !$estado || !$categoria) {
-        throw new Exception('Por favor, complete todos los campos correctamente.');
+    if (!$id_curso || !$nombre_curso || !$descripcion || !$nivel_educativo || !$duracion || !$estado || !$categoria || !$id_profesor) {
+        throw new Exception('Por favor, complete todos los campos correctamente, incluyendo el profesor.');
     }
 
     // Manejo de la imagen del icono
@@ -85,6 +86,23 @@ try {
         ':icono' => $icono_name,
         ':id_curso' => $id_curso
     ]);
+
+    // Actualizar o insertar la asignación del profesor
+    $sql_check_assignment = "SELECT id_asignacion FROM asignacion_curso WHERE id_curso = ? AND estado = 'activo'";
+    $stmt_check = $pdo->prepare($sql_check_assignment);
+    $stmt_check->execute([$id_curso]);
+
+    if ($stmt_check->rowCount() > 0) {
+        // Actualizar la asignación existente
+        $sql_update_teacher = "UPDATE asignacion_curso SET id_profesor = ?, fecha_asignacion = CURDATE() WHERE id_curso = ? AND estado = 'activo'";
+        $stmt_update_teacher = $pdo->prepare($sql_update_teacher);
+        $stmt_update_teacher->execute([$id_profesor, $id_curso]);
+    } else {
+        // Insertar una nueva asignación
+        $sql_insert_teacher = "INSERT INTO asignacion_curso (id_curso, id_profesor, fecha_asignacion, estado) VALUES (?, ?, CURDATE(), 'activo')";
+        $stmt_insert_teacher = $pdo->prepare($sql_insert_teacher);
+        $stmt_insert_teacher->execute([$id_curso, $id_profesor]);
+    }
 
     // Redirigir a una página de éxito o mostrar mensaje de éxito
     header("Location: ../cursos.php");

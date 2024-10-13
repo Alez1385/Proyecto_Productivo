@@ -99,17 +99,34 @@ checkPermission('admin');
                 <!-- Lista de cursos -->
                 <div class="course-list">
                     <?php
-                    $sql = "SELECT c.id_curso, c.nombre_curso, c.descripcion, c.nivel_educativo, c.duracion, c.estado, c.id_categoria, c.icono,
-                                   u.nombre AS nombre_profesor, u.apellido AS apellido_profesor,
-                                   GROUP_CONCAT(DISTINCT CONCAT(h.dia_semana, ' ', h.hora_inicio, '-', h.hora_fin) SEPARATOR ', ') AS horarios,
-                                   COUNT(DISTINCT i.id_estudiante) AS num_estudiantes
-                            FROM cursos c
-                            LEFT JOIN asignacion_curso ac ON c.id_curso = ac.id_curso
-                            LEFT JOIN profesor p ON ac.id_profesor = p.id_profesor
-                            LEFT JOIN usuario u ON p.id_usuario = u.id_usuario
-                            LEFT JOIN horarios h ON c.id_curso = h.id_curso
-                            LEFT JOIN inscripciones i ON c.id_curso = i.id_curso
-                            GROUP BY c.id_curso";
+                    $sql = "SELECT 
+                                c.id_curso, 
+                                c.nombre_curso, 
+                                c.descripcion, 
+                                c.nivel_educativo, 
+                                c.duracion, 
+                                c.estado, 
+                                c.id_categoria, 
+                                c.icono,
+                                u.nombre AS nombre_profesor, 
+                                u.apellido AS apellido_profesor, 
+                                ac.id_profesor,
+                                GROUP_CONCAT(DISTINCT CONCAT(h.dia_semana, ' ', h.hora_inicio, '-', h.hora_fin) SEPARATOR ', ') AS horarios,
+                                COUNT(DISTINCT i.id_estudiante) AS num_estudiantes
+                            FROM 
+                                cursos c
+                            LEFT JOIN 
+                                asignacion_curso ac ON c.id_curso = ac.id_curso AND ac.estado = 'activo'
+                            LEFT JOIN 
+                                profesor p ON ac.id_profesor = p.id_profesor
+                            LEFT JOIN 
+                                usuario u ON p.id_usuario = u.id_usuario
+                            LEFT JOIN 
+                                horarios h ON c.id_curso = h.id_curso
+                            LEFT JOIN 
+                                inscripciones i ON c.id_curso = i.id_curso
+                            GROUP BY 
+                                c.id_curso";
                     $result = $conn->query($sql);
 
                     if ($result->num_rows > 0) {
@@ -122,13 +139,16 @@ checkPermission('admin');
                             echo '<p>' . $row["descripcion"] . '</p>';
                             echo '<p><strong>Nivel: </strong>' . $row["nivel_educativo"] . '</p>';
                             echo '<p><strong>Duración: </strong>' . $row["duracion"] . ' semanas</p>';
-                            echo '<p><strong>Profesor: </strong>' . $row["nombre_profesor"] . ' ' . $row["apellido_profesor"] . '</p>';
+                            echo '<p><strong>Profesor: </strong>' . ($row["nombre_profesor"] ? htmlspecialchars($row["nombre_profesor"] . ' ' . $row["apellido_profesor"]) : 'No asignado') . '</p>';
                             echo '<p><strong>Horarios: </strong>' . $row["horarios"] . '</p>';
                             echo '<p><strong>Estudiantes inscritos: </strong>' . $row["num_estudiantes"] . '</p>';
                             echo '</div>';
                             echo '<div class="course-actions">';
                             echo '<button onclick="openSidebar(\'editar_curso.php?id_curso=' . $row["id_curso"] . '\')" class="edit-btn">Editar</button>';
                             echo '<button onclick="deleteCourse(' . $row["id_curso"] . ')" class="delete-btn">Eliminar</button>';
+                            if (!$row["nombre_profesor"]) {
+                                echo '<button onclick="window.open(\'assign_teacher_form.php?courseId=' . $row["id_curso"] . '\', \'AssignTeacher\', \'width=600,height=400\')" class="assign-teacher-btn">Asignar Profesor</button>';
+                            }
                             echo '</div>';
                             echo '</div>';
                             echo '</div>';
@@ -142,6 +162,41 @@ checkPermission('admin');
             </section>
         </div>
     </div>
+
+    <!-- Modal para asignar profesor -->
+    <div id="assignTeacherModal" class="modal">
+        <div class="modal-content">
+            <span class="close">&times;</span>
+            <h2>Asignar Profesor</h2>
+            <form id="assignTeacherForm">
+                <input type="hidden" id="courseId" name="courseId" value="">
+                <select id="teacherSelect" name="teacherId" required>
+                    <option value="">Seleccione un profesor</option>
+                    <?php
+                    $conn = new mysqli($servername, $username, $password, $dbname);
+                    if ($conn->connect_error) {
+                        die("Conexión fallida: " . $conn->connect_error);
+                    }
+                    $sql_teachers = "SELECT p.id_profesor, u.nombre, u.apellido 
+                                     FROM profesor p 
+                                     JOIN usuario u ON p.id_usuario = u.id_usuario";
+                    $result_teachers = $conn->query($sql_teachers);
+                    if ($result_teachers->num_rows > 0) {
+                        while ($teacher = $result_teachers->fetch_assoc()) {
+                            echo "<option value='" . htmlspecialchars($teacher['id_profesor']) . "'>" 
+                                 . htmlspecialchars($teacher['nombre'] . " " . $teacher['apellido']) . "</option>";
+                        }
+                    } else {
+                        echo "<option value=''>No hay profesores disponibles</option>";
+                    }
+                    $conn->close();
+                    ?>
+                </select>
+                <button type="submit">Guardar</button>
+            </form>
+        </div>
+    </div>
+
     <script src="scripts/cursos.js"></script>
 </body>
 
