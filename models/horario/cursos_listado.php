@@ -49,11 +49,12 @@ $id_usuario = $_SESSION['id_usuario'];
                                 WHERE i.id_estudiante = (SELECT id_estudiante FROM estudiante WHERE id_usuario = ?)
                                 ORDER BY c.nombre_curso ASC";
                     } elseif ($es_profesor) {
-                        $sql = "SELECT c.id_curso, c.nombre_curso, c.descripcion, c.nivel_educativo, c.duracion, cc.nombre_categoria 
+                        $sql = "SELECT DISTINCT c.id_curso, c.nombre_curso, c.descripcion, c.nivel_educativo, c.duracion, cc.nombre_categoria 
                                 FROM cursos c 
                                 LEFT JOIN categoria_curso cc ON c.id_categoria = cc.id_categoria
-                                JOIN horarios h ON c.id_curso = h.id_curso
-                                WHERE h.id_profesor = (SELECT id_profesor FROM profesor WHERE id_usuario = ?)
+                                LEFT JOIN horarios h ON c.id_curso = h.id_curso
+                                LEFT JOIN profesor p ON h.id_profesor = p.id_profesor OR c.id_profesor = p.id_profesor
+                                WHERE p.id_usuario = ?
                                 ORDER BY c.nombre_curso ASC";
                     }
 
@@ -81,7 +82,7 @@ $id_usuario = $_SESSION['id_usuario'];
                         echo "<div class='no-cursos-message'>";
                         echo "<div class='icon-text'>";
                         echo "<span class='material-icons-sharp'>info</span>";
-                        echo "<p>No hay cursos disponibles</p>";
+                        echo "<p>No tienes cursos asignados actualmente.</p>";
                         echo "</div>";
                         echo "</div>";
                     }

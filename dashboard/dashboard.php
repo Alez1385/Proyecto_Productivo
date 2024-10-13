@@ -7,8 +7,6 @@ requireLogin();
 // Obtener el tipo de usuario
 $user = getUserInfo($conn, $_SESSION['id_usuario']);
 
-
-
 // Contenido HTML común
 ?>
 <!DOCTYPE html>
@@ -20,6 +18,7 @@ $user = getUserInfo($conn, $_SESSION['id_usuario']);
     <title>Dashboard - <?php echo ucfirst($user['tipo_nombre']); ?></title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.1.1/css/all.min.css">
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <link rel="stylesheet" href="../css/dashboard_profesor.css">
 </head>
 
 <body>
@@ -31,8 +30,15 @@ $user = getUserInfo($conn, $_SESSION['id_usuario']);
                 <section class="user-info">
                     <h2>Información del Usuario</h2>
                     <div class="user-details">
-                        <img src="../../uploads/<?php echo htmlspecialchars($user['foto']); ?>" alt="Foto de perfil">
-                        <div>
+                        <?php
+                        $foto_path = '../uploads/' . $user['foto'];
+                        if (!empty($user['foto']) && file_exists($foto_path)) {
+                            echo '<img src="' . htmlspecialchars($foto_path) . '" alt="Foto de perfil" class="user-photo">';
+                        } else {
+                            echo '<i class="fas fa-user-circle user-icon"></i>';
+                        }
+                        ?>
+                        <div class="user-text">
                             <p><strong>Nombre:</strong> <?php echo htmlspecialchars($user['nombre'] . ' ' . $user['apellido']); ?></p>
                             <p><strong>Email:</strong> <?php echo htmlspecialchars($user['mail']); ?></p>
                             <p><strong>Tipo de Usuario:</strong> <?php echo htmlspecialchars($user['tipo_nombre']); ?></p>
@@ -41,7 +47,6 @@ $user = getUserInfo($conn, $_SESSION['id_usuario']);
                     </div>
                 </section>
             </header>
-
 
             <?php
             // Contenido específico según el tipo de usuario
@@ -59,7 +64,7 @@ $user = getUserInfo($conn, $_SESSION['id_usuario']);
                 case 'profesor':
                     include 'dashboard_profesor.php';
                     echo "<script src='../js/loadCss.js'></script>";
-                    echo "<script>loadCSS('css/profesor.css');</script>"; // Assuming there's a profesor.css file
+                    echo "<script>loadCSS('css/dash.css');</script>";
                     break;
                 default:
                     echo "<p>Tipo de usuario no reconocido.</p>";

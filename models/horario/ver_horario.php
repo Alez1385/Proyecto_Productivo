@@ -92,7 +92,6 @@ if (!$curso) {
                     $horas = [];
                     for ($i = 6; $i <= 20; $i++) {
                         $horas[] = sprintf("%02d:00", $i);
-                        $horas[] = sprintf("%02d:30", $i);
                     }
                     $dias = ['lunes', 'martes', 'miercoles', 'jueves', 'viernes', 'sabado'];
 
@@ -104,13 +103,17 @@ if (!$curso) {
                             if (!empty($curso[$dia])) {
                                 list($inicio, $fin) = explode(' - ', $curso[$dia]);
                                 $hora_actual = strtotime($hora);
+                                $hora_siguiente = strtotime("+1 hour", $hora_actual);
                                 $hora_inicio = strtotime($inicio);
                                 $hora_fin = strtotime($fin);
                                 
-                                if ($hora_actual >= $hora_inicio && $hora_actual < $hora_fin) {
+                                if (($hora_actual >= $hora_inicio && $hora_actual < $hora_fin) ||
+                                    ($hora_siguiente > $hora_inicio && $hora_siguiente <= $hora_fin) ||
+                                    ($hora_actual <= $hora_inicio && $hora_siguiente >= $hora_fin)) {
                                     echo "<div class='curso-info'>";
                                     echo htmlspecialchars($curso['nombre_curso']) . "<br>";
                                     echo "<p class='profesor-info'>Profesor: " . htmlspecialchars($curso['nombre_profesor']) . "</p>";
+                                    echo "<p class='horario-info'>" . date("h:i A", $hora_inicio) . " - " . date("h:i A", $hora_fin) . "</p>";
                                     echo "</div>";
                                 }
                             }

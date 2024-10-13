@@ -9,7 +9,11 @@
     --border-radius: 8px;
     --transition: all 0.3s ease;
 }
-
+.user-details i.fa-user-circle {
+    font-size: 100px;
+    color: #ccc;
+    margin-right: 20px;
+}
 body {
     line-height: 1.6;
     color: var(--color-text);
@@ -77,11 +81,10 @@ body {
 }
 
 .summary-card p {
-    font-size: 1.8rem;
+    font-size: 2rem;
     font-weight: bold;
     color: var(--color-primary);
 }
-
 
 .dashboard-charts {
     background-color: var(--color-card);
@@ -94,19 +97,17 @@ body {
     gap: 1.5rem;
 }
 
-
 .chart-container {
-    height: 400px;
-    width: 100%;
+    background-color: var(--color-card);
+    border-radius: var(--border-radius);
+    padding: 1.5rem;
+    box-shadow: 0 4px 6px var(--color-shadow);
 }
 
 .chart-container h3 {
-    font-size: 1.2rem;
     margin-bottom: 1rem;
-    color: var(--color-primary);
-    text-align: center;
+    color: var(--color-text);
 }
-
 
 /* Estilos para gráficas específicas */
 #popularCoursesChart,
@@ -197,7 +198,6 @@ body {
     }
 }
 
-
 /* Estilo para el gráfico circular de ancho completo */
 .chart-full-width {
     grid-column: 1 / -1;
@@ -258,4 +258,82 @@ body {
 #educationLevelsChart {
     max-height: 300px;
     margin: 0 auto;
+}
+
+/* Estilos específicos para el dashboard del profesor */
+.professor-dashboard {
+    padding: 2rem;
+}
+
+.cursos-asignados {
+    background-color: var(--color-card);
+    border-radius: var(--border-radius);
+    padding: 1.5rem;
+    box-shadow: 0 4px 6px var(--color-shadow);
+    margin-top: 2rem;
+}
+
+.cursos-asignados h2 {
+    color: var(--color-primary);
+    font-size: 1.5rem;
+    margin-bottom: 1rem;
+    border-bottom: 2px solid var(--color-primary);
+    padding-bottom: 0.5rem;
+}
+
+.cursos-asignados-list {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    gap: 1.5rem;
+}
+
+.curso-item {
+    background-color: var(--color-background);
+    border-radius: var(--border-radius);
+    padding: 1.5rem;
+    box-shadow: 0 2px 4px var(--color-shadow);
+    transition: var(--transition);
+}
+
+.curso-item:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 4px 8px var(--color-shadow);
+}
+
+.curso-item h3 {
+    color: var(--color-primary);
+    font-size: 1.2rem;
+    margin-bottom: 1rem;
+}
+
+.curso-item p {
+    margin-bottom: 0.5rem;
+    color: var(--color-text);
+}
+
+.curso-item strong {
+    color: var(--color-text-dark);
+}
+
+.btn-registrar {
+    display: inline-block;
+    background-color: var(--color-primary);
+    color: var(--color-white);
+    padding: 0.5rem 1rem;
+    border-radius: var(--border-radius);
+    text-decoration: none;
+    margin-top: 1rem;
+    transition: var(--transition);
+    font-weight: bold;
+}
+
+.btn-registrar:hover {
+    background-color: var(--color-secondary);
+    color: var(--color-white);
+}
+
+@media (max-width: 768px) {
+    .cursos-asignados-list {
+        grid-template-columns: 1fr;
+    }
 }

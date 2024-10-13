@@ -14,6 +14,11 @@ html {
   display: flex;
   background-color: #f8f9fa;
 }
+.user-details i.fa-user-circle {
+    font-size: 100px;
+    color: #ccc;
+    margin-right: 20px;
+}
 
 /* Contenido principal */
 .main-content {

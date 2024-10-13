@@ -5,7 +5,16 @@ require_once '../../scripts/config.php';
 requireLogin();
 checkPermission('estudiante');
 
-$id_estudiante = $_SESSION['id_usuario'];
+// Obtener el id_estudiante correcto
+$id_usuario = $_SESSION['id_usuario'];
+$sql_estudiante = "SELECT id_estudiante FROM estudiante WHERE id_usuario = ?";
+$stmt_estudiante = $conn->prepare($sql_estudiante);
+$stmt_estudiante->bind_param("i", $id_usuario);
+$stmt_estudiante->execute();
+$result_estudiante = $stmt_estudiante->get_result();
+$estudiante = $result_estudiante->fetch_assoc();
+$id_estudiante = $estudiante['id_estudiante'];
+
 $id_curso = isset($_GET['id_curso']) ? intval($_GET['id_curso']) : 0;
 
 if ($id_curso == 0) {
@@ -21,12 +30,14 @@ $result_curso = $stmt_curso->get_result();
 $curso = $result_curso->fetch_assoc();
 
 // Obtener detalles de asistencia
-$sql_asistencias = "SELECT a.fecha, a.presente, c.nombre_curso
+$sql_asistencias = "SELECT a.fecha, a.estado
                     FROM asistencia a
-                    INNER JOIN cursos c ON a.id_curso = c.id_curso
                     WHERE a.id_estudiante = ? AND a.id_curso = ?
                     ORDER BY a.fecha DESC";
 $stmt_asistencias = $conn->prepare($sql_asistencias);
+if (!$stmt_asistencias) {
+    die("Error en la preparación de la consulta: " . $conn->error);
+}
 $stmt_asistencias->bind_param("ii", $id_estudiante, $id_curso);
 $stmt_asistencias->execute();
 $result_asistencias = $stmt_asistencias->get_result();
@@ -35,16 +46,27 @@ $result_asistencias = $stmt_asistencias->get_result();
 $total_clases = $result_asistencias->num_rows;
 $asistencias = 0;
 $inasistencias = 0;
+$retardos = 0;
+
 
 while ($row = $result_asistencias->fetch_assoc()) {
-    if ($row['presente'] == 1) {
-        $asistencias++;
-    } else {
-        $inasistencias++;
+    switch ($row['estado']) {
+        case 'presente':
+            $asistencias++;
+            break;
+        case 'ausente':
+            $inasistencias++;
+            break;
+        case 'retardo':
+            $retardos++;
+            break;
     }
 }
 
-$porcentaje_asistencia = $total_clases > 0 ? ($asistencias / $total_clases) * 100 : 0;
+$porcentaje_asistencia = $total_clases > 0 ? (($asistencias + $retardos) / $total_clases) * 100 : 0;
+
+
+
 ?>
 
 <!DOCTYPE html>
@@ -56,6 +78,11 @@ $porcentaje_asistencia = $total_clases > 0 ? ($asistencias / $total_clases) * 10
     <link rel="stylesheet" href="../cursos/cursos.css">
     <link rel="stylesheet" href="css/asistencia.css">
     <link rel="stylesheet" href="https://fonts.googleapis.com/icon?family=Material+Icons+Sharp">
+    <style>
+        .asistencia-presente { color: green; }
+        .asistencia-ausente { color: red; }
+        .asistencia-retardo { color: orange; }
+    </style>
 </head>
 <body>
     <div class="dashboard-container">
@@ -79,6 +106,7 @@ $porcentaje_asistencia = $total_clases > 0 ? ($asistencias / $total_clases) * 10
                     <p><strong>Total de clases:</strong> <?php echo $total_clases; ?></p>
                     <p><strong>Asistencias:</strong> <?php echo $asistencias; ?></p>
                     <p><strong>Inasistencias:</strong> <?php echo $inasistencias; ?></p>
+                    <p><strong>Retardos:</strong> <?php echo $retardos; ?></p>
                     <p><strong>Porcentaje de asistencia:</strong> <?php echo number_format($porcentaje_asistencia, 2); ?>%</p>
                 </div>
 
@@ -99,11 +127,21 @@ $porcentaje_asistencia = $total_clases > 0 ? ($asistencias / $total_clases) * 10
                             <tr>
                                 <td><?php echo date('d/m/Y', strtotime($asistencia['fecha'])); ?></td>
                                 <td>
-                                    <?php if ($asistencia['presente'] == 1): ?>
-                                        <span class="asistencia-presente">Presente</span>
-                                    <?php else: ?>
-                                        <span class="asistencia-ausente">Ausente</span>
-                                    <?php endif; ?>
+                                    <?php
+                                    switch ($asistencia['estado']) {
+                                        case 'presente':
+                                            echo '<span class="asistencia-presente">Presente</span>';
+                                            break;
+                                        case 'ausente':
+                                            echo '<span class="asistencia-ausente">Ausente</span>';
+                                            break;
+                                        case 'retardo':
+                                            echo '<span class="asistencia-retardo">Retardo</span>';
+                                            break;
+                                        default:
+                                            echo 'Desconocido';
+                                    }
+                                    ?>
                                 </td>
                             </tr>
                             <?php endwhile; ?>

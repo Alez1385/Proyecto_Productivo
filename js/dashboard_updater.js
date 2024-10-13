@@ -560,4 +560,3 @@ const dashboardUpdater = {
       `;
     document.head.appendChild(style);
   });
-

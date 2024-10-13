@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Servidor: 127.0.0.1
--- Tiempo de generación: 13-10-2024 a las 19:10:59
+-- Tiempo de generación: 13-10-2024 a las 23:30:34
 -- Versión del servidor: 10.4.32-MariaDB
 -- Versión de PHP: 8.0.30
 
@@ -64,15 +64,12 @@ CREATE TABLE `asig_modulo` (
 
 INSERT INTO `asig_modulo` (`id_asig_modulo`, `id_modulo`, `id_tipo_usuario`, `fecha_asig`) VALUES
 (11, 2, 37, NULL),
-(12, 2, 2, NULL),
 (13, 2, 1, NULL),
 (14, 3, 1, NULL),
-(15, 3, 2, NULL),
 (17, 5, 1, NULL),
 (18, 6, 1, NULL),
 (19, 7, 1, NULL),
 (20, 8, 1, NULL),
-(21, 3, 3, NULL),
 (22, 9, 1, NULL),
 (23, 10, 1, NULL),
 (24, 10, 3, NULL),
@@ -82,7 +79,9 @@ INSERT INTO `asig_modulo` (`id_asig_modulo`, `id_modulo`, `id_tipo_usuario`, `fe
 (28, 13, 3, NULL),
 (29, 13, 2, NULL),
 (30, 14, 2, NULL),
-(31, 15, 3, NULL);
+(31, 15, 3, NULL),
+(32, 10, 2, NULL),
+(33, 11, 2, NULL);
 
 -- --------------------------------------------------------
 
@@ -96,15 +95,19 @@ CREATE TABLE `asistencia` (
   `id_curso` int(11) DEFAULT NULL,
   `fecha` date DEFAULT NULL,
   `presente` enum('si','no','','') DEFAULT NULL,
-  `justificacion` text DEFAULT NULL
+  `justificacion` text DEFAULT NULL,
+  `estado` enum('presente','ausente','retardo') NOT NULL DEFAULT 'ausente'
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 --
 -- Volcado de datos para la tabla `asistencia`
 --
 
-INSERT INTO `asistencia` (`id_asistencia`, `id_estudiante`, `id_curso`, `fecha`, `presente`, `justificacion`) VALUES
-(4, 1, 1, '2024-10-13', 'si', NULL);
+INSERT INTO `asistencia` (`id_asistencia`, `id_estudiante`, `id_curso`, `fecha`, `presente`, `justificacion`, `estado`) VALUES
+(4, 1, 1, '2024-10-13', 'si', NULL, 'ausente'),
+(5, 1, 1, '2024-10-13', 'no', NULL, 'ausente'),
+(6, 1, 1, '2024-10-13', NULL, NULL, 'presente'),
+(7, 1, 1, '2024-12-04', NULL, NULL, 'ausente');
 
 -- --------------------------------------------------------
 
@@ -325,7 +328,8 @@ CREATE TABLE `horarios` (
 --
 
 INSERT INTO `horarios` (`id_horario`, `id_curso`, `id_profesor`, `fecha_creacion`, `dia_semana`, `lunes`, `martes`, `miercoles`, `jueves`, `viernes`, `sabado`, `hora_inicio`, `hora_fin`) VALUES
-(26, 1, 5, '2024-10-08 06:07:46', 'lunes', '08:08 - 09:09', '12:02 - 17:05', '09:10 - 10:10', NULL, NULL, NULL, NULL, NULL);
+(26, 1, 5, '2024-10-08 06:07:46', 'lunes', '08:08 - 09:09', '12:02 - 17:05', '09:10 - 10:10', NULL, NULL, NULL, NULL, NULL),
+(27, 2, 7, '2024-10-13 20:49:41', 'lunes', '08:08 - 09:10', '10:00 - 16:50', NULL, NULL, NULL, NULL, NULL, NULL);
 
 -- --------------------------------------------------------
 
@@ -529,6 +533,13 @@ CREATE TABLE `preinscripciones` (
   `id_usuario` int(11) DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
+--
+-- Volcado de datos para la tabla `preinscripciones`
+--
+
+INSERT INTO `preinscripciones` (`id_preinscripcion`, `id_curso`, `nombre`, `email`, `telefono`, `fecha_preinscripcion`, `estado`, `token`, `id_usuario`) VALUES
+(46, 2, 'camilo  prato', 'albertocamiloprato@gmail.com', '3043282464', '2024-10-13 21:28:44', 'pendiente', '1a8014822dcc49abfb76578342002b11', 56);
+
 -- --------------------------------------------------------
 
 --
@@ -628,7 +639,8 @@ CREATE TABLE `user_module_order` (
 INSERT INTO `user_module_order` (`id_usuario`, `module_order`) VALUES
 (36, '[\"8\",\"12\",\"7\",\"2\",\"3\",\"5\",\"6\",\"10\",\"11\",\"9\"]'),
 (53, '[\"13\",\"3\",\"10\",\"15\",\"11\"]'),
-(56, '[\"12\",\"5\",\"11\",\"10\",\"7\",\"6\",\"8\",\"2\",\"3\",\"9\"]');
+(56, '[\"12\",\"5\",\"11\",\"10\",\"7\",\"6\",\"8\",\"2\",\"3\",\"9\"]'),
+(64, '[\"13\",\"14\",\"10\",\"2\",\"11\",\"3\"]');
 
 -- --------------------------------------------------------
 
@@ -665,14 +677,14 @@ INSERT INTO `usuario` (`id_usuario`, `nombre`, `apellido`, `tipo_doc`, `document
 (36, 'Santiago', 'Capon', 'ID', '12341235234', '2345-03-12', 'WhatsApp Image 2024-07-23 at 4.49.07 PM.jpeg', 'santiagocaponf@gmail.com', '32452345', 'CL 18 A NORTE 2 72', 1, 'alez', '$2y$10$64T2Qk8yptB8y8Rk6Kq26uhnbT3Ias.JH.EXcin2d1BPQCzAvHiM6', '2024-08-25 17:43:54', 'activo', '2024-10-08 16:12:59', 0, NULL),
 (42, 'chad', 'sexteto', 'ID', '523456346', '3654-04-23', '66d273c33d474_Recurso 9europe.jpg', 'luisillo@gmail.com', '4563475674', 'CL 18 A NORTE 2 72', 1, 'alez23', '$2y$10$FrpZXvgI3WrL22y9MxNtfuQsyQSgCJ7Jm4VPUv3Aa4qEn2HCKdxsK', '2024-08-29 16:26:44', 'activo', NULL, 0, NULL),
 (51, 'antonela', 'sepulveda', 'ID', '342352345', '0005-04-23', '66d23c1021bab_f7c0528d915ec3b38dd89bf7beb2a194.jpg', 'scflorez@corsaje.edu.co', '42352345', 'CL 18 A NORTE 2 72', 1, 'mientras', '$2y$10$KJU2liHj854T1T9M.6/EK.xDYy4sfLf2XEwCldj230rdreZmC.3KC', '2024-08-30 16:39:28', 'activo', NULL, 0, NULL),
-(53, 'Juanito', 'Alimaña', 'ID', '43523634', '0634-06-02', '66d2441faa705_pngwing.com.png', 'juanit@gmail.com', '5233456345123', 'CL 18 A NORTE 2 72', 3, 'alez123123', '$2y$10$p.bJhCL9d2VM1IjUCnC63.Edj5Pg87KZgKGTFyedUHPusUd.QSDAK', '2024-08-30 17:13:51', 'activo', '2024-10-13 11:51:48', 0, NULL),
+(53, 'Juanito', 'Alimaña', 'ID', '43523634', '0634-06-02', '66d2441faa705_pngwing.com.png', 'juanit@gmail.com', '5233456345123', 'CL 18 A NORTE 2 72', 3, 'alez123123', '$2y$10$p.bJhCL9d2VM1IjUCnC63.Edj5Pg87KZgKGTFyedUHPusUd.QSDAK', '2024-08-30 17:13:51', 'activo', '2024-10-13 14:38:47', 0, NULL),
 (55, 'Santiago', 'Capon', 'Passport', '4234523456', '5234-04-23', 'pngwing.com.png', 'scflorez@corsaje.edu.co3', '53643563456', 'CL 18 A NORTE 2 72', 4, 'alez1234', '$2y$10$pcvzMHIh1F53bR25oEpRfu5MbZB5FO6Kn3ceIKwNBtp9KWahjApMe', '2024-09-03 12:35:04', 'activo', NULL, 0, NULL),
-(56, 'camilo ', 'prato', 'ID', '1091357317', '2024-09-17', '67032f8d169dd_images.png', 'albertocamiloprato@gmail.com', '3043282464', 'Sapo Marica', 1, 'camilo', '$2y$10$pkH8Zi8gEArSclW4KlpcjOm0Tbx5fSF2o8f7Ukw8qUNWj8Bl7i2I.', '2024-09-07 18:45:23', 'activo', '2024-10-13 09:28:45', 0, NULL),
+(56, 'camilo ', 'prato', 'ID', '1091357317', '2024-09-17', '67032f8d169dd_images.png', 'albertocamiloprato@gmail.com', '3043282464', 'Sapo Marica', 1, 'camilo', '$2y$10$pkH8Zi8gEArSclW4KlpcjOm0Tbx5fSF2o8f7Ukw8qUNWj8Bl7i2I.', '2024-09-07 18:45:23', 'activo', '2024-10-13 16:28:47', 0, NULL),
 (58, 'santiago', NULL, NULL, NULL, NULL, NULL, 'edison_alberto@hotmail.com', '52343456', '', 4, 'edison_alberto', '$2y$10$DLJSPUZnsBduhl5PFRtg6uP5aXma0xTP9FOSkKUN/g2l9MrcP7d3S', '2024-09-19 12:02:34', 'activo', NULL, 0, NULL),
 (59, 'Santiago', NULL, NULL, NULL, NULL, NULL, 'scapon@misena.edu.co', '3034235435', '', 4, 'scapon', '$2y$10$yrrLCg7Fr85s6u9jOmiVMO14UhXLMOrHN6krm2bL4fCNqnnCqc4Oy', '2024-09-20 20:09:22', 'activo', NULL, 0, NULL),
 (60, 'Santiago', NULL, NULL, NULL, NULL, NULL, 'albertocamiloprato@gmail.comw', '563456346', '', 4, 'albertocamiloprato', '$2y$10$3u2mhrj1Ce6x8WCnljewFOuy20NifY7kKhXbWo0Y7NqPSXH89a9qe', '2024-09-20 20:50:39', 'activo', NULL, 0, NULL),
 (63, NULL, NULL, NULL, NULL, NULL, NULL, 'santigao@gmail.com', NULL, '', 1, 'alez1233', '$2y$10$DSX8990wWKG04J/82ENXo.xZAJyQn/flaX2ULl1gFLB3TuZKQpMZ6', '2024-09-28 20:04:00', 'activo', NULL, 0, NULL),
-(64, 'camilo', 'prato profe', 'ID', '13450735', '2000-08-14', NULL, 'camiloprato234@gmail.com', '3043282464', 'Brr Atalaya', 2, 'camilop', '$2y$10$1Djh88ty26viA.IG41s4oOFrO5NU.mrAiw.6b3VnEVTPDj0qKeg2q', '2024-10-13 09:06:40', 'activo', '2024-10-13 11:34:49', 0, NULL);
+(64, 'camilo', 'prato profe', 'ID', '13450735', '2000-08-14', '670c345acc2a8_fondos-de-pantalla-3d-paisaje.jpg', 'camiloprato234@gmail.com', '3043282464', 'Brr Atalaya', 2, 'camilop', '$2y$10$1Djh88ty26viA.IG41s4oOFrO5NU.mrAiw.6b3VnEVTPDj0qKeg2q', '2024-10-13 09:06:40', 'activo', '2024-10-13 15:18:07', 0, NULL);
 
 --
 -- Índices para tablas volcadas
@@ -866,13 +878,13 @@ ALTER TABLE `asignacion_curso`
 -- AUTO_INCREMENT de la tabla `asig_modulo`
 --
 ALTER TABLE `asig_modulo`
-  MODIFY `id_asig_modulo` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=32;
+  MODIFY `id_asig_modulo` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=35;
 
 --
 -- AUTO_INCREMENT de la tabla `asistencia`
 --
 ALTER TABLE `asistencia`
-  MODIFY `id_asistencia` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=5;
+  MODIFY `id_asistencia` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=8;
 
 --
 -- AUTO_INCREMENT de la tabla `carousel`
@@ -914,7 +926,7 @@ ALTER TABLE `historial_inscripciones`
 -- AUTO_INCREMENT de la tabla `horarios`
 --
 ALTER TABLE `horarios`
-  MODIFY `id_horario` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=27;
+  MODIFY `id_horario` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=28;
 
 --
 -- AUTO_INCREMENT de la tabla `inscripciones`
@@ -962,7 +974,7 @@ ALTER TABLE `password_resets`
 -- AUTO_INCREMENT de la tabla `preinscripciones`
 --
 ALTER TABLE `preinscripciones`
-  MODIFY `id_preinscripcion` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=46;
+  MODIFY `id_preinscripcion` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=47;
 
 --
 -- AUTO_INCREMENT de la tabla `profesor`

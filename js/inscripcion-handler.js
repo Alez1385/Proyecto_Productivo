@@ -1262,6 +1262,7 @@ const dashboardUpdater = {
           });
       });
   };
+  
 
   // Run initialization
   if (document.readyState === "loading") {
@@ -1281,5 +1282,6 @@ const dashboardUpdater = {
     
     // Add any other functions you want to expose
 };
+
 })();
 })();

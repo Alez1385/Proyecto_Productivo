@@ -7,10 +7,32 @@
     <title>Formulario de Asignación de Modulos</title>
     <link rel="stylesheet" href="../styles/asignacion.css">
     <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700&display=swap" rel="stylesheet">
+    <style>
+        .button-container {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 20px;
+        }
+        .notification {
+            padding: 10px;
+            margin-bottom: 10px;
+            border-radius: 5px;
+            color: white;
+            display: none;
+        }
+        .success {
+            background-color: #4CAF50;
+        }
+        .error {
+            background-color: #f44336;
+        }
+    </style>
 </head>
 
 <body>
     <div class="container">
+        <div id="notification" class="notification"></div>
+        
         <form id="assignmentForm" method="post" action="../scripts/asig_modulo.php">
             <h2>Asignación de Módulos</h2>
 
@@ -56,7 +78,10 @@
                 </div>
             </div>
 
-            <button type="submit">Enviar</button>
+            <div class="button-container">
+        <button type="submit" name="action" value="assign">Asignar Módulos</button>
+        <button type="submit" name="action" value="remove">Quitar Módulos</button>
+    </div>
         </form>
     </div>
 
@@ -73,6 +98,58 @@
     </div>
 
     <script src="../scripts/modulos.js"></script>
+    <script>
+        // Función para mostrar notificaciones
+        function showNotification(message, isSuccess = true) {
+            const notification = document.getElementById('notification');
+            notification.textContent = message;
+            notification.className = 'notification ' + (isSuccess ? 'success' : 'error');
+            notification.style.display = 'block';
+            setTimeout(() => {
+                notification.style.display = 'none';
+            }, 5000); // La notificación desaparecerá después de 5 segundos
+        }
+
+        // Verificar si hay un mensaje en la URL
+        const urlParams = new URLSearchParams(window.location.search);
+        const message = urlParams.get('message');
+        if (message) {
+            showNotification(message);
+        }
+
+        document.getElementById('assignmentForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            const formData = new FormData(this);
+            
+            // Añade el valor de 'action' basado en el botón presionado
+            const submitButton = e.submitter;
+            formData.append('action', submitButton.value);
+
+            fetch('../scripts/asig_modulo.php', {
+                method: 'POST',
+                body: formData
+            })
+            .then(response => response.text())
+            .then(text => {
+                try {
+                    return JSON.parse(text);
+                } catch (e) {
+                    console.error('Respuesta no válida:', text);
+                    throw new Error('La respuesta del servidor no es JSON válido');
+                }
+            })
+            .then(data => {
+                showNotification(data.message, data.success);
+                if (data.success) {
+                    fetchAssignedModules(document.getElementById('userType').value);
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                showNotification('Error al procesar la solicitud: ' + error.message, false);
+            });
+        });
+    </script>
 </body>
 
 </html>

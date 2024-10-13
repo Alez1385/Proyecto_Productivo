@@ -213,3 +213,17 @@
 .btn-back .material-icons-sharp {
     margin-right: 5px;
 }
+
+.btn-detalles {
+    display: inline-block;
+    padding: 10px 15px;
+    background-color: #007bff;
+    color: white;
+    text-decoration: none;
+    border-radius: 5px;
+    transition: background-color 0.3s;
+}
+
+.btn-detalles:hover {
+    background-color: #0056b3;
+}

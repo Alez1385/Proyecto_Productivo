@@ -1,37 +1,44 @@
 function fetchAssignedModules(userTypeId) {
-    if (userTypeId) {
-        const xhr = new XMLHttpRequest();
-        xhr.open('GET', '../scripts/fetch_assigned_modules.php?user_type_id=' + userTypeId, true);
-        xhr.onload = function () {
-            if (this.status === 200) {
-                console.log(this.responseText); // Agregar esto para ver la respuesta en la consola
-                try {
-                    const response = JSON.parse(this.responseText);
-                    
-                    const userTypeSelect = document.getElementById('userType');
-                    const selectedOption = userTypeSelect.options[userTypeSelect.selectedIndex].text;
-                    document.getElementById('userTypeName').textContent = selectedOption;
+    const userTypeName = document.getElementById('userType').options[document.getElementById('userType').selectedIndex].text;
+    document.getElementById('userTypeName').textContent = 'Módulos asignados a: ' + userTypeName;
 
-                    const assignedModulesList = document.getElementById('assignedModulesList');
-                    assignedModulesList.innerHTML = '';
-
-                    if (response.length > 0) {
-                        response.forEach(module => {
-                            const li = document.createElement('li');
-                            li.textContent = module.nom_modulo;
-                            assignedModulesList.appendChild(li);
-                        });
-                    } else {
-                        assignedModulesList.innerHTML = '<li>No hay módulos asignados</li>';
-                    }
-                } catch (e) {
-                    console.error('Error al analizar JSON:', e);
-                }
+    fetch('../scripts/get_assigned_modules.php?userTypeId=' + userTypeId)
+        .then(response => response.json())
+        .then(data => {
+            const assignedModulesList = document.getElementById('assignedModulesList');
+            assignedModulesList.innerHTML = '';
+            if (Array.isArray(data)) {
+                data.forEach(module => {
+                    const li = document.createElement('li');
+                    li.textContent = module.nom_modulo;
+                    assignedModulesList.appendChild(li);
+                });
+            } else {
+                console.error('La respuesta no es un array:', data);
+                showNotification('Error al cargar los módulos asignados.', false);
             }
-        };
-        xhr.send();
-    } else {
-        document.getElementById('userTypeName').textContent = 'No se cargó';
-        document.getElementById('assignedModulesList').innerHTML = '<li>No hay módulos asignados</li>';
-    }
+        })
+        .catch(error => {
+            console.error('Error:', error);
+            showNotification('Error al cargar los módulos asignados: ' + error.message, false);
+        });
 }
+
+document.getElementById('assignmentForm').addEventListener('submit', function(e) {
+    e.preventDefault();
+    const formData = new FormData(this);
+
+    fetch('../scripts/asig_modulo.php', {
+        method: 'POST',
+        body: formData
+    })
+    .then(response => response.text())
+    .then(data => {
+        showNotification(data);
+        fetchAssignedModules(document.getElementById('userType').value);
+    })
+    .catch(error => {
+        console.error('Error:', error);
+        showNotification('Error al procesar la solicitud.', false);
+    });
+});
