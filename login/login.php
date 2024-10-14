@@ -174,7 +174,7 @@ if (isset($_GET['error'])) {
                 <!-- Password con ojito para mostrar/ocultar -->
                 <div class="input-group">
                     <input type="password" placeholder="Password" name="password" id="password" required>
-                    <img src="img/eye-open.svg" alt="Toggle Lock" class="lock-icon" id="login-lock-icon" onclick="togglePassword('password', 'login-lock-icon')">
+                    <img src="./img/eye-open.svg" alt="Toggle Lock" class="lock-icon" id="login-lock-icon" onclick="togglePassword('password', 'login-lock-icon')">
                     <span id="login-password-strength" class="password-strength"></span>
                 </div>
 
