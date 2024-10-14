@@ -510,7 +510,7 @@ const dashboardUpdater = {
     margin-bottom: 1.5rem;
 }
 
-img {
+.course-image {
     max-width: 100%;
     height: auto;
     display: block;
@@ -519,13 +519,13 @@ img {
     box-shadow: 0 4px 10px rgba(0,0,0,0.1);
 }
 
-p {
+.course-info p {
     margin-bottom: 1rem;
     line-height: 1.6;
     color: #555;
 }
 
-h2 {
+.course-info h2 {
     margin-bottom: 1rem;
     color: #333;
 }

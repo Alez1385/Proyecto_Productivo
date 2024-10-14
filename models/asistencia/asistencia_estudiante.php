@@ -33,11 +33,7 @@ $stmt_cursos->bind_param("i", $id_estudiante);
 $stmt_cursos->execute();
 $result_cursos = $stmt_cursos->get_result();
 
-// Debugging
-if ($result_cursos->num_rows == 0) {
-    echo "No se encontraron cursos para el estudiante con ID: " . $id_estudiante;
-    // Puedes agregar más información de depuración aquí si es necesario
-}
+
 ?>
 
 <!DOCTYPE html>

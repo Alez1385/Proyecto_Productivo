@@ -18,7 +18,6 @@ $user = getUserInfo($conn, $_SESSION['id_usuario']);
     <title>Dashboard - <?php echo ucfirst($user['tipo_nombre']); ?></title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.1.1/css/all.min.css">
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-    <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="../css/dashboard_profesor.css">
 </head>
 
@@ -60,7 +59,9 @@ $user = getUserInfo($conn, $_SESSION['id_usuario']);
                 case 'estudiante':
                     include 'dashboard_estudiante.php';
                     echo "<script src='../js/loadCss.js'></script>";
-                    echo "<script>loadCSS('css/estudiante.css');</script>";
+                    echo "<script>
+                    loadCSS('/dist/css/styles.css');loadCSS('css/estudiante.css');
+                    </script>";
                     break;
                 case 'profesor':
                     include 'dashboard_profesor.php';

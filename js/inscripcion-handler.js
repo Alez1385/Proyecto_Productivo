@@ -1,66 +1,64 @@
 (function () {
-    const DEBUG = false;
-    const log = (...args) => DEBUG && console.log(...args);
-    const logError = (...args) => console.error(...args);
+  const DEBUG = false;
+  const log = (...args) => DEBUG && console.log(...args);
+  const logError = (...args) => console.error(...args);
 
-    const showLoading = () => {
-        if (!document.getElementById("loading-spinner")) {
-            const spinner = document.createElement("div");
-            spinner.id = "loading-spinner";
-            spinner.className = "fixed inset-0 bg-white bg-opacity-80 flex justify-center items-center z-[1000]";
-            spinner.innerHTML = `
-                                    <div class="grid min-h-[140px] w-full place-items-center overflow-x-scroll rounded-lg p-6 lg:overflow-visible">
-                      <svg class="text-gray-300 animate-spin" viewBox="0 0 64 64" fill="none" xmlns="http://www.w3.org/2000/svg"
-                        width="24" height="24">
-                        <path
-                          d="M32 3C35.8083 3 39.5794 3.75011 43.0978 5.20749C46.6163 6.66488 49.8132 8.80101 52.5061 11.4939C55.199 14.1868 57.3351 17.3837 58.7925 20.9022C60.2499 24.4206 61 28.1917 61 32C61 35.8083 60.2499 39.5794 58.7925 43.0978C57.3351 46.6163 55.199 49.8132 52.5061 52.5061C49.8132 55.199 46.6163 57.3351 43.0978 58.7925C39.5794 60.2499 35.8083 61 32 61C28.1917 61 24.4206 60.2499 20.9022 58.7925C17.3837 57.3351 14.1868 55.199 11.4939 52.5061C8.801 49.8132 6.66487 46.6163 5.20749 43.0978C3.7501 39.5794 3 35.8083 3 32C3 28.1917 3.75011 24.4206 5.2075 20.9022C6.66489 17.3837 8.80101 14.1868 11.4939 11.4939C14.1868 8.80099 17.3838 6.66487 20.9022 5.20749C24.4206 3.7501 28.1917 3 32 3L32 3Z"
-                          stroke="currentColor" stroke-width="5" stroke-linecap="round" stroke-linejoin="round"></path>
-                        <path
-                          d="M32 3C36.5778 3 41.0906 4.08374 45.1692 6.16256C49.2477 8.24138 52.7762 11.2562 55.466 14.9605C58.1558 18.6647 59.9304 22.9531 60.6448 27.4748C61.3591 31.9965 60.9928 36.6232 59.5759 40.9762"
-                          stroke="currentColor" stroke-width="5" stroke-linecap="round" stroke-linejoin="round" class="text-gray-900">
-                        </path>
-                      </svg>
-                    </div>
-            `;
-            document.body.appendChild(spinner);
-        }
-    };
+  const showLoading = () => {
+      if (!document.getElementById("loading-spinner")) {
+          const spinner = document.createElement("div");
+          spinner.id = "loading-spinner";
+          spinner.className = "tw-fixed tw-inset-0 tw-bg-white tw-bg-opacity-80 tw-flex tw-justify-center tw-items-center tw-z-[1000]";
+          spinner.innerHTML = `
+              <div class="tw-grid tw-min-h-[140px] tw-w-full tw-place-items-center tw-overflow-x-scroll tw-rounded-lg tw-p-6 lg:tw-overflow-visible">
+                  <svg class="tw-text-gray-300 tw-animate-spin" viewBox="0 0 64 64" fill="none" xmlns="http://www.w3.org/2000/svg"
+                  width="24" height="24">
+                  <path
+                      d="M32 3C35.8083 3 39.5794 3.75011 43.0978 5.20749C46.6163 6.66488 49.8132 8.80101 52.5061 11.4939C55.199 14.1868 57.3351 17.3837 58.7925 20.9022C60.2499 24.4206 61 28.1917 61 32C61 35.8083 60.2499 39.5794 58.7925 43.0978C57.3351 46.6163 55.199 49.8132 52.5061 52.5061C49.8132 55.199 46.6163 57.3351 43.0978 58.7925C39.5794 60.2499 35.8083 61 32 61C28.1917 61 24.4206 60.2499 20.9022 58.7925C17.3837 57.3351 14.1868 55.199 11.4939 52.5061C8.801 49.8132 6.66487 46.6163 5.20749 43.0978C3.7501 39.5794 3 35.8083 3 32C3 28.1917 3.75011 24.4206 5.2075 20.9022C6.66489 17.3837 8.80101 14.1868 11.4939 11.4939C14.1868 8.80099 17.3838 6.66487 20.9022 5.20749C24.4206 3.7501 28.1917 3 32 3L32 3Z"
+                      stroke="currentColor" stroke-width="5" stroke-linecap="round" stroke-linejoin="round"></path>
+                  <path
+                      d="M32 3C36.5778 3 41.0906 4.08374 45.1692 6.16256C49.2477 8.24138 52.7762 11.2562 55.466 14.9605C58.1558 18.6647 59.9304 22.9531 60.6448 27.4748C61.3591 31.9965 60.9928 36.6232 59.5759 40.9762"
+                      stroke="currentColor" stroke-width="5" stroke-linecap="round" stroke-linejoin="round" class="tw-text-gray-900">
+                  </path>
+                  </svg>
+              </div>
+          `;
+          document.body.appendChild(spinner);
+      }
+  };
 
-    const hideLoading = () => {
-        const spinner = document.getElementById("loading-spinner");
-        if (spinner) spinner.remove();
-    };
+  const hideLoading = () => {
+      const spinner = document.getElementById("loading-spinner");
+      if (spinner) spinner.remove();
+  };
 
-    const showMessage = (message, type) => {
-        const messageDiv = document.createElement("div");
-        messageDiv.className = `fixed top-5 left-1/2 transform -translate-x-1/2 px-4 py-2 rounded-md shadow-lg z-50 text-white text-sm ${
-            type === 'error' ? 'bg-red-500' : 'bg-green-500'
-        }`;
-        messageDiv.textContent = message;
-        document.body.appendChild(messageDiv);
-        setTimeout(() => messageDiv.remove(), 5000);
-    };
+  const showMessage = (message, type) => {
+      const messageDiv = document.createElement("div");
+      messageDiv.className = `tw-fixed tw-top-5 tw-left-1/2 tw-transform -tw-translate-x-1/2 tw-px-4 tw-py-2 tw-rounded-md tw-shadow-lg tw-z-50 tw-text-white tw-text-sm ${
+          type === 'error' ? 'tw-bg-red-500' : 'tw-bg-green-500'
+      }`;
+      messageDiv.textContent = message;
+      document.body.appendChild(messageDiv);
+      setTimeout(() => messageDiv.remove(), 5000);
+  };
 
-    const showError = (message) => showMessage(message, "error");
-    const showSuccess = (message) => showMessage(message, "success");
+  const showError = (message) => showMessage(message, "error");
+  const showSuccess = (message) => showMessage(message, "success");
 
-    // Update the closeModal function
-// Update the closeModal function
-const closeModal = (modalId) => {
-    const modal = document.getElementById(modalId);
-    if (modal) {
-        modal.remove();
-    }
-};
+  const closeModal = (modalId) => {
+      const modal = document.getElementById(modalId);
+      if (modal) {
+          modal.remove();
+      }
+  };
 
-    const fetchWithTimeout = (url, options = {}, timeout = 5000) => {
-        return Promise.race([
-            fetch(url, options),
-            new Promise((_, reject) =>
-                setTimeout(() => reject(new Error('Request timed out')), timeout)
-            )
-        ]);
-    };
+  const fetchWithTimeout = (url, options = {}, timeout = 5000) => {
+      return Promise.race([
+          fetch(url, options),
+          new Promise((_, reject) =>
+              setTimeout(() => reject(new Error('Request timed out')), timeout)
+          )
+      ]);
+  };
 
     // Main functions
 
@@ -92,26 +90,26 @@ const closeModal = (modalId) => {
 
    // Update the showEnrollmentModal function
 const showEnrollmentModal = (courseId) => { 
-    const modalHTML = `
-        <div class="fixed inset-0 bg-gray-600 bg-opacity-50 overflow-y-auto h-full w-full" id="inscripcionModal">
-            <div style="top: 50%; transform: translateY(-50%);" class="relative mx-auto p-5 border w-96 shadow-lg rounded-md bg-white">
-                <div class="mt-3 text-center">
-                    <h3 class="text-lg leading-6 font-medium text-gray-900">Opciones de Inscripción</h3>
-                    <div class="mt-2 px-7 py-3">
-                        <p class="text-sm text-gray-500">Elija una opción para inscribirse al curso:</p>
-                    </div>
-                    <div class="items-center px-4 py-3">
-                        <button id="preinscripcionBtn" class="px-4 py-2 bg-blue-500 text-white text-base font-medium rounded-md w-full shadow-sm hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-300">
-                            Preinscripción Rápida
-                        </button>
-                        <button id="inscripcionCompletaBtn" class="mt-3 px-4 py-2 bg-gray-500 text-white text-base font-medium rounded-md w-full shadow-sm hover:bg-gray-700 focus:outline-none focus:ring-2 focus:ring-gray-300">
-                            Inscripción Completa
-                        </button>
-                    </div>
-                </div>
-            </div>
-        </div>
-    `;
+  const modalHTML = `
+  <div class="tw-fixed tw-inset-0 tw-bg-gray-600 tw-bg-opacity-50 tw-overflow-y-auto tw-h-full tw-w-full" id="inscripcionModal">
+      <div style="top: 50%; transform: translateY(-50%);" class="tw-relative tw-mx-auto tw-p-5 tw-border tw-w-96 tw-shadow-lg tw-rounded-md tw-bg-white">
+          <div class="tw-mt-3 tw-text-center">
+              <h3 class="tw-text-lg tw-leading-6 tw-font-medium tw-text-gray-900">Opciones de Inscripción</h3>
+              <div class="tw-mt-2 tw-px-7 tw-py-3">
+                  <p class="tw-text-sm tw-text-gray-500">Elija una opción para inscribirse al curso:</p>
+              </div>
+              <div class="tw-items-center tw-px-4 tw-py-3">
+                  <button id="preinscripcionBtn" class="tw-px-4 tw-py-2 tw-bg-blue-500 tw-text-white tw-text-base tw-font-medium tw-rounded-md tw-w-full tw-shadow-sm hover:tw-bg-blue-700 focus:tw-outline-none focus:tw-ring-2 focus:tw-ring-blue-300">
+                      Preinscripción Rápida
+                  </button>
+                  <button id="inscripcionCompletaBtn" class="tw-mt-3 tw-px-4 tw-py-2 tw-bg-gray-500 tw-text-white tw-text-base tw-font-medium tw-rounded-md tw-w-full tw-shadow-sm hover:tw-bg-gray-700 focus:tw-outline-none focus:tw-ring-2 focus:tw-ring-gray-300">
+                      Inscripción Completa
+                  </button>
+              </div>
+          </div>
+      </div>
+  </div>
+`;
 
 
 
@@ -236,42 +234,43 @@ const showEnrollmentModal = (courseId) => {
 
   const showEnrollmentForm = (courseId, userData = {}) => {
     const formHTML = `
-        <div class="fixed inset-0 bg-gray-600 bg-opacity-50 overflow-y-auto h-full w-full" id="preinscripcionModal">
-            <div class="relative top-20 mx-auto p-5 border w-96 shadow-lg rounded-md bg-white">
-                <div class="absolute top-0 right-0 pt-4 pr-4">
-                    <button type="button" class="text-gray-400 hover:text-gray-500 focus:outline-none focus:text-gray-500 transition ease-in-out duration-150" aria-label="Close" onclick="enrollmentApp.closeModal('preinscripcionModal')">
-                        <svg class="h-6 w-6" stroke="currentColor" fill="none" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
-                        </svg>
-                    </button>
-                </div>
-                <div class="mt-3">
-                    <h3 class="text-lg leading-6 font-medium text-gray-900 text-center">Preinscripción Rápida</h3>
-                    <form id="preinscripcionForm" class="mt-4">
-                        <input type="hidden" name="curso_id" value="${courseId}">
-                        <div class="mb-4">
-                            <label for="nombre" class="block text-sm font-medium text-gray-700">Nombre completo</label>
-                            <input type="text" id="nombre" name="nombre" value="${userData.nombre || ""}" required
-                                class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm">
-                        </div>
-                        <div class="mb-4">
-                            <label for="email" class="block text-sm font-medium text-gray-700">Correo electrónico</label>
-                            <input type="email" id="email" name="email" value="${userData.email || ""}" required
-                                class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm">
-                        </div>
-                        <div class="mb-4">
-                            <label for="telefono" class="block text-sm font-medium text-gray-700">Teléfono</label>
-                            <input type="tel" id="telefono" name="telefono" value="${userData.telefono || ""}" required
-                                class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm">
-                        </div>
-                        <button type="submit" class="w-full flex justify-center py-2 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500">
-                            Enviar Preinscripción
+            <div class="tw-fixed tw-inset-0 tw-bg-gray-600 tw-bg-opacity-50 tw-overflow-y-auto tw-h-full tw-w-full" id="preinscripcionModal">
+                <div class="tw-relative tw-top-20 tw-mx-auto tw-p-5 tw-border tw-w-96 tw-shadow-lg tw-rounded-md tw-bg-white">
+                    <div class="tw-absolute tw-top-0 tw-right-0 tw-pt-4 tw-pr-4">
+                        <button type="button" class="tw-text-gray-400 hover:tw-text-gray-500 focus:tw-outline-none focus:tw-text-gray-500 tw-transition tw-ease-in-out tw-duration-150" aria-label="Close" onclick="enrollmentApp.closeModal('preinscripcionModal')">
+                            <svg class="tw-h-6 tw-w-6" stroke="currentColor" fill="none" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+                            </svg>
                         </button>
-                    </form>
+                    </div>
+                    <div class="tw-mt-3">
+                        <h3 class="tw-text-lg tw-leading-6 tw-font-medium tw-text-gray-900 tw-text-center">Preinscripción Rápida</h3>
+                        <form id="preinscripcionForm" class="tw-mt-4">
+                            <input type="hidden" name="curso_id" value="${courseId}">
+                            <div class="tw-mb-4">
+                                <label for="nombre" class="tw-block tw-text-sm tw-font-medium tw-text-gray-700">Nombre completo</label>
+                                <input type="text" id="nombre" name="nombre" value="${userData.nombre || ""}" required
+                                    class="tw-mt-1 tw-block tw-w-full tw-border tw-border-gray-300 tw-rounded-md tw-shadow-sm tw-py-2 tw-px-3 focus:tw-outline-none focus:tw-ring-indigo-500 focus:tw-border-indigo-500 sm:tw-text-sm">
+                            </div>
+                            <div class="tw-mb-4">
+                                <label for="email" class="tw-block tw-text-sm tw-font-medium tw-text-gray-700">Correo electrónico</label>
+                                <input type="email" id="email" name="email" value="${userData.email || ""}" required
+                                    class="tw-mt-1 tw-block tw-w-full tw-border tw-border-gray-300 tw-rounded-md tw-shadow-sm tw-py-2 tw-px-3 focus:tw-outline-none focus:tw-ring-indigo-500 focus:tw-border-indigo-500 sm:tw-text-sm">
+                            </div>
+                            <div class="tw-mb-4">
+                                <label for="telefono" class="tw-block tw-text-sm tw-font-medium tw-text-gray-700">Teléfono</label>
+                                <input type="tel" id="telefono" name="telefono" value="${userData.telefono || ""}" required
+                                    class="tw-mt-1 tw-block tw-w-full tw-border tw-border-gray-300 tw-rounded-md tw-shadow-sm tw-py-2 tw-px-3 focus:tw-outline-none focus:tw-ring-indigo-500 focus:tw-border-indigo-500 sm:tw-text-sm">
+                            </div>
+                            <button type="submit" class="tw-w-full tw-flex tw-justify-center tw-py-2 tw-px-4 tw-border tw-border-transparent tw-rounded-md tw-shadow-sm tw-text-sm tw-font-medium tw-text-white tw-bg-indigo-600 hover:tw-bg-indigo-700 focus:tw-outline-none focus:tw-ring-2 focus:tw-ring-offset-2 focus:tw-ring-indigo-500">
+                                Enviar Preinscripción
+                            </button>
+                        </form>
+                    </div>
                 </div>
             </div>
-        </div>
-    `;
+        `;
+
 
       // Remove existing modal if present
       const existingModal = document.getElementById("preinscripcionModal");
