@@ -399,7 +399,7 @@ CREATE TABLE `mensajes` (
   `id_mensaje` int(11) NOT NULL AUTO_INCREMENT,
   `id_remitente` int(11) DEFAULT NULL,
   `tipo_remitente` int(11) DEFAULT NULL,
-  `tipo_destinatario` enum('todos','estudiantes','profesores','users','individual') DEFAULT NULL,
+  `tipo_destinatario` varchar(20) NOT NULL,
   `id_destinatario` int(11) DEFAULT NULL,
   `asunto` varchar(255) DEFAULT NULL,
   `contenido` text DEFAULT NULL,

@@ -16,9 +16,20 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
 
     // Determinar el id_tipo_usuario basado en el tipo_destinatario
     $id_tipo_usuario = null;
+    $id_destinatario = null;
+
     switch ($tipo_destinatario) {
         case 'individual':
-            $id_tipo_usuario = null; // Se usará id_destinatario en su lugar
+            // Verifica que el campo 'destinatario_email' esté presente
+            if (empty($_POST['destinatario_email'])) {
+                echo json_encode(['success' => false, 'message' => 'El correo del destinatario es obligatorio para mensajes individuales.']);
+                exit;
+            }
+            $id_destinatario = obtenerIdUsuarioPorEmail($_POST['destinatario_email']);
+            if ($id_destinatario === null) {
+                echo json_encode(['success' => false, 'message' => 'Usuario destinatario no encontrado']);
+                exit;
+            }
             break;
         case 'estudiantes':
             $id_tipo_usuario = obtenerIdTipoUsuario('estudiante');
@@ -29,6 +40,9 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
         case 'todos':
             $id_tipo_usuario = null;
             break;
+        default:
+            echo json_encode(['success' => false, 'message' => 'Tipo de destinatario no válido.']);
+            exit;
     }
 
     // Preparar la consulta
@@ -40,10 +54,19 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
         exit;
     }
 
-    // Determinar el id_destinatario
-    $id_destinatario = ($tipo_destinatario === 'individual') ? $_POST['destinatario'] : null;
+    // Asegúrate de que id_destinatario sea NULL cuando no es un mensaje individual
+    if ($tipo_destinatario !== 'individual') {
+        $id_destinatario = null;
+    } else {
+        // Verifica que esta función exista y funcione correctamente
+        $destinatario_email = $_POST['destinatario'];
+        $id_destinatario = obtenerIdUsuarioPorEmail($destinatario_email);
+        if ($id_destinatario === null) {
+            echo json_encode(['success' => false, 'message' => 'Usuario destinatario no encontrado']);
+            exit;
+        }
+    }
 
-    // Bind de parámetros
     $stmt->bind_param("isiiss", $id_remitente, $tipo_destinatario, $id_tipo_usuario, $id_destinatario, $asunto, $contenido);
 
     if ($stmt->execute()) {
@@ -69,3 +92,16 @@ function obtenerIdTipoUsuario($tipo) {
     $stmt->close();
     return $row ? $row['id_tipo_usuario'] : null;
 }
+
+function obtenerIdUsuarioPorEmail($email) {
+    global $conn;
+    $query = "SELECT id_usuario FROM usuario WHERE mail = ?";
+    $stmt = $conn->prepare($query);
+    $stmt->bind_param("s", $email);
+    $stmt->execute();
+    $result = $stmt->get_result();
+    $row = $result->fetch_assoc();
+    $stmt->close();
+    return $row ? $row['id_usuario'] : null;
+}
+
