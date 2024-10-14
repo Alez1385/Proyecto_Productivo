@@ -9,14 +9,14 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     $comprobante_pago = $_FILES['comprobante_pago'] ?? null;  
 
     if (!$comprobante_pago) {
-        logError("No se ha cargado ningún comprobante de pago.", "insertar_inscripcion.php");
+        logError("No se ha cargado ningún comprobante de pago.", "");
         sendJsonResponse(false, "No se ha cargado ningún comprobante de pago.");
         exit;
     }
 
     // Validar entrada
     if (!$id_curso || !$id_estudiante) {
-        logError("Datos de entrada inválidos: id_curso = $id_curso, id_estudiante = $id_estudiante", "insertar_inscripcion.php");
+        logError("Datos de entrada inválidos: id_curso = $id_curso, id_estudiante = $id_estudiante", "");
         sendJsonResponse(false, "Datos de entrada inválidos. Por favor, verifica los campos del formulario.");
         exit;
     }
@@ -36,7 +36,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 
         // Permitir crear un nuevo registro si el estado es 'cancelado' o 'rechazado'
         if ($estado === 'aprobada' || $estado === 'pendiente') {
-            logError("El estudiante ya está inscrito en este curso.", "insertar_inscripcion.php");
+            logError("El estudiante ya está inscrito en este curso.", "", "INFO");
             throw new Exception("El estudiante ya está inscrito en este curso.");
         }
 
@@ -65,7 +65,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     } catch (Exception $e) {
         // En caso de error, hacer rollback
         $conn->rollback();
-        logError($e->getMessage(), "insertar_inscripcion.php");
+        logError($e->getMessage(), "");
         sendJsonResponse(false, "Error: " . $e->getMessage());
     } finally {
         // Cerrar la declaración
@@ -91,12 +91,12 @@ function handleFileUpload($file) {
     $target_file = $target_dir . $file_name;
 
     if ($file['error'] != 0) {
-        logError("Error en el archivo: " . $file['error'], "handleFileUpload");
+        logError("Error en el archivo: " . $file['error'], "");
         return null;
     }
 
     if (!move_uploaded_file($file["tmp_name"], $target_file)) {
-        logError("Error al mover el archivo: " . $file["name"], "handleFileUpload");
+        logError("Error al mover el archivo: " . $file["name"], "");
         return null;
     }
 
