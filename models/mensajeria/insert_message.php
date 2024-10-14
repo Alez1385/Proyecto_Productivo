@@ -62,6 +62,15 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
         $conn->close();
 
         echo json_encode(['success' => true, 'message' => 'Mensaje enviado correctamente.']);
+
+        error_log("Inserting message: " . json_encode([
+            'id_remitente' => $id_remitente,
+            'tipo_destinatario' => $tipo_destinatario,
+            'id_tipo_usuario' => $id_tipo_usuario,
+            'id_destinatario' => $id_destinatario,
+            'asunto' => $asunto,
+            'contenido' => $contenido
+        ]));
     } catch (Exception $e) {
         echo json_encode(['success' => false, 'message' => 'Error: ' . $e->getMessage()]);
     }

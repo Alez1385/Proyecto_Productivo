@@ -1,5 +1,5 @@
- // Mostrar/ocultar formulario de nuevo mensaje
- function toggleNewMessageForm() {
+// Mostrar/ocultar formulario de nuevo mensaje
+function toggleNewMessageForm() {
     var form = document.getElementById('newMessageForm');
     var isHidden = form.style.display === 'none';
     
@@ -20,7 +20,12 @@
 // Mostrar campo ID de destinatario solo si el destinatario es individual
 document.getElementById('tipo_destinatario').addEventListener('change', function() {
     var individualRecipient = document.getElementById('individualRecipient');
-    individualRecipient.style.display = this.value === 'individual' ? 'block' : 'none';
+    if (this.value === 'individual') {
+        individualRecipient.style.display = 'block';
+    } else {
+        individualRecipient.style.display = 'none';
+        document.getElementById('destinatario').value = ''; // Limpiar el campo de destinatario individual
+    }
 });
 
 // Filtrar mensajes
@@ -85,42 +90,7 @@ fetch('get_messages.php')
 }
 
 // Enviar nuevo mensaje
-function sendMessage() {
-    var form = document.getElementById('messageForm');
-    var formData = new FormData(form);
 
-    fetch('insert_message.php', {
-        method: 'POST',
-        body: formData
-    })
-    .then(response => {
-        if (!response.ok) {
-            throw new Error('Network response was not ok');
-        }
-        return response.text(); 
-    })
-    .then(text => {
-        console.log('Respuesta del servidor:', text); // Depuración
-        try {
-            const data = JSON.parse(text);
-            if (data.success) {
-                showNotification(data.message, 'success');
-                toggleNewMessageForm();
-                form.reset();
-                loadMessages();
-            } else {
-                showNotification(data.message, 'error');
-            }
-        } catch (error) {
-            console.error('Error al parsear JSON:', error);
-            showNotification('Error en la respuesta del servidor', 'error');
-        }
-    })
-    .catch(error => {
-        console.error('Error:', error);
-        showNotification('Error en la conexión: ' + error.message, 'error');
-    });
-}
 
 // Mostrar notificación
 function showNotification(message, type) {
@@ -151,6 +121,12 @@ if (confirm('¿Estás seguro de que quieres eliminar este mensaje?')) {
             showNotification(data.message, 'success');
             loadMessages(); // Recargar la lista de mensajes
             resetMessageContent(); // Volver al estado inicial
+            
+            // Remover la clase 'active' del mensaje eliminado
+            const activeMessage = document.querySelector('.message-item.active');
+            if (activeMessage) {
+                activeMessage.classList.remove('active');
+            }
         } else {
             showNotification(data.message, 'error');
         }
@@ -252,10 +228,6 @@ window.onload = function() {
 };
 
 
-window.addEventListener('load', () => {
-    makeResizable();
-    updateResizeHandlePosition(); // Asegúrate de que se llame aquí
-});
 
 // Función para buscar usuarios
 function buscarUsuarios() {
@@ -284,6 +256,16 @@ function buscarUsuarios() {
             });
         })
         .catch(error => console.error('Error:', error));
+
+    const parentElement = document.getElementById('resultadosBusqueda');
+    if (parentElement) {
+        // Crear y agregar elementos hijos
+        const newElement = document.createElement('div');
+        newElement.textContent = 'Nuevo usuario encontrado';
+        parentElement.appendChild(newElement);
+    } else {
+        console.error('El elemento contenedor de resultados no se encontró');
+    }
 }
 
 function cerrarTodasListas(elmnt) {
@@ -300,3 +282,80 @@ document.addEventListener("click", function (e) {
 });
 
 document.getElementById('destinatario').addEventListener('input', buscarUsuarios);
+
+function createMessageElement(message) {
+    const messageItem = document.createElement('div');
+    messageItem.className = 'message-item';
+    messageItem.setAttribute('data-id', message.id);
+
+    const avatar = document.createElement('div');
+    avatar.className = 'message-avatar';
+    avatar.textContent = message.sender.charAt(0).toUpperCase();
+
+    const messageInfo = document.createElement('div');
+    messageInfo.className = 'message-info';
+
+    const sender = document.createElement('div');
+    sender.className = 'message-sender';
+    sender.textContent = message.sender;
+
+    const preview = document.createElement('div');
+    preview.className = 'message-preview';
+    preview.textContent = message.subject;
+
+    messageInfo.appendChild(sender);
+    messageInfo.appendChild(preview);
+
+    const deleteBtn = document.createElement('button');
+    deleteBtn.className = 'delete-btn';
+    deleteBtn.innerHTML = '<i class="material-icons-sharp">delete</i>';
+    deleteBtn.onclick = function() { showDeleteModal(message.id); };
+
+    messageItem.appendChild(avatar);
+    messageItem.appendChild(messageInfo);
+    messageItem.appendChild(deleteBtn);
+
+    messageItem.onclick = function() { loadMessageContent(message.id); };
+
+    return messageItem;
+}
+
+// Función para actualizar la posición del manejador de redimensionamiento
+
+
+// Función para hacer elementos redimensionables
+
+// Asegurarse de que el DOM esté cargado antes de manipular elementos
+
+
+// Modifica la función sendMessage para manejar mejor los errores
+function sendMessage() {
+    var form = document.getElementById('messageForm');
+    var formData = new FormData(form);
+    var tipo_destinatario = document.getElementById('tipo_destinatario').value;
+
+    if (tipo_destinatario === 'individual') {
+        var destinatario = document.getElementById('destinatario').value;
+        formData.append('destinatario_email', destinatario);
+    }
+
+    fetch('insert_message.php', {
+        method: 'POST',
+        body: formData
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.success) {
+            showNotification(data.message, 'success');
+            toggleNewMessageForm();
+            form.reset();
+            loadMessages();
+        } else {
+            showNotification(data.message || 'Error al enviar el mensaje', 'error');
+        }
+    })
+    .catch(error => {
+        console.error('Error:', error);
+        showNotification('Error en la conexión: ' + error.message, 'error');
+    });
+}

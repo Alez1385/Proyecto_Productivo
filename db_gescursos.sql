@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Servidor: 127.0.0.1
--- Tiempo de generación: 13-10-2024 a las 23:30:34
+-- Tiempo de generación: 14-10-2024 a las 23:56:31
 -- Versión del servidor: 10.4.32-MariaDB
 -- Versión de PHP: 8.0.30
 
@@ -240,17 +240,43 @@ INSERT INTO `db_gescursoslecturas_mensajes` (`id`, `id_mensaje`, `id_usuario`, `
 (467, 38, 53, '2024-10-08 04:36:41'),
 (469, 39, 53, '2024-10-08 19:56:46'),
 (471, 40, 56, '2024-10-06 23:37:19'),
-(474, 39, 56, '2024-10-09 19:16:04'),
+(474, 39, 56, '2024-10-14 20:04:53'),
 (481, 40, 53, '2024-10-08 19:56:47'),
-(484, 41, 56, '2024-10-09 19:16:03'),
+(484, 41, 56, '2024-10-14 20:04:54'),
 (495, 42, 53, '2024-10-06 23:37:41'),
-(496, 42, 56, '2024-10-09 19:16:09'),
+(496, 42, 56, '2024-10-14 20:04:51'),
 (501, 24, 56, '2024-10-07 00:05:25'),
 (514, 8, 56, '2024-10-09 19:16:07'),
 (679, 41, 53, '2024-10-08 19:56:47'),
 (685, 37, 53, '2024-10-07 19:57:02'),
 (687, 41, 36, '2024-10-07 19:57:48'),
-(688, 42, 36, '2024-10-07 19:57:49');
+(688, 42, 36, '2024-10-07 19:57:49'),
+(732, 42, 64, '2024-10-14 19:51:13'),
+(734, 41, 64, '2024-10-14 19:51:14'),
+(735, 40, 64, '2024-10-14 19:51:16'),
+(736, 22, 64, '2024-10-14 19:48:08'),
+(737, 20, 64, '2024-10-14 19:48:08'),
+(738, 12, 64, '2024-10-14 19:51:18'),
+(740, 24, 64, '2024-10-14 19:48:19'),
+(741, 10, 64, '2024-10-14 19:48:20'),
+(747, 60, 64, '2024-10-14 20:05:05'),
+(748, 61, 64, '2024-10-14 20:05:05'),
+(749, 59, 56, '2024-10-14 20:06:00'),
+(760, 124, 64, '2024-10-14 20:30:55'),
+(761, 128, 64, '2024-10-14 20:33:03'),
+(766, 197, 64, '2024-10-14 21:31:43'),
+(767, 198, 64, '2024-10-14 21:32:05'),
+(771, 142, 56, '2024-10-14 21:42:28'),
+(772, 201, 64, '2024-10-14 21:43:24'),
+(774, 203, 64, '2024-10-14 21:43:25'),
+(777, 204, 64, '2024-10-14 21:43:34'),
+(778, 205, 64, '2024-10-14 21:43:46'),
+(779, 206, 64, '2024-10-14 21:43:56'),
+(780, 207, 64, '2024-10-14 21:44:11'),
+(781, 207, 56, '2024-10-14 21:44:16'),
+(782, 208, 64, '2024-10-14 21:44:53'),
+(784, 209, 56, '2024-10-14 21:44:37'),
+(786, 209, 64, '2024-10-14 21:44:53');
 
 -- --------------------------------------------------------
 
@@ -380,7 +406,7 @@ CREATE TABLE `mensajes` (
   `id_mensaje` int(11) NOT NULL,
   `id_remitente` int(11) DEFAULT NULL,
   `tipo_remitente` int(11) DEFAULT NULL,
-  `tipo_destinatario` enum('todos','estudiantes','profesores','users','individual') DEFAULT NULL,
+  `tipo_destinatario` varchar(20) NOT NULL,
   `id_destinatario` int(11) DEFAULT NULL,
   `asunto` varchar(255) DEFAULT NULL,
   `contenido` text DEFAULT NULL,
@@ -416,7 +442,25 @@ INSERT INTO `mensajes` (`id_mensaje`, `id_remitente`, `tipo_remitente`, `tipo_de
 (39, 53, NULL, 'todos', NULL, 'asdas', 'asdas', '2024-10-06 18:32:17', NULL),
 (40, 56, NULL, 'todos', NULL, 'asdasd', 'asdasd', '2024-10-06 18:32:40', NULL),
 (41, 53, NULL, 'todos', NULL, 'Perro marica quien lo lea ', 'JEJE de pana que malo si lo vio :v ya no se que hacer con mi vida\r\n', '2024-10-06 18:34:48', NULL),
-(42, 53, NULL, 'todos', NULL, 'asdas', 'dasda', '2024-10-06 18:37:39', NULL);
+(42, 53, NULL, 'todos', NULL, 'asdas', 'dasda', '2024-10-06 18:37:39', NULL),
+(59, 64, NULL, 'todos', NULL, 'asdasdasd', 'asdasdas', '2024-10-14 15:00:34', NULL),
+(60, 64, NULL, 'estudiantes', NULL, 'adada', 'dasd', '2024-10-14 15:00:43', 3),
+(61, 64, NULL, 'profesores', NULL, 'asdasda', 'sdasd', '2024-10-14 15:00:52', 2),
+(124, 56, NULL, 'todos', NULL, 'asdasd', 'asdasdasdasdasdas', '2024-10-14 15:17:55', NULL),
+(128, 56, NULL, 'todos', NULL, 'asdasd', 'asdasdasdasd', '2024-10-14 15:24:22', NULL),
+(141, 64, NULL, 'todos', NULL, 'asdasdas', 'dsad', '2024-10-14 15:33:06', NULL),
+(142, 64, NULL, 'todos', NULL, 'asdasd', 'asdas', '2024-10-14 15:33:27', NULL),
+(143, 64, NULL, 'estudiantes', NULL, 'dasd', 'asdas', '2024-10-14 15:33:39', 3),
+(199, 64, NULL, '0', NULL, 'asdasd', 'asd', '2024-10-14 16:41:58', NULL),
+(201, 64, NULL, '0', NULL, 'asdasdasd', 'asdasdasd', '2024-10-14 16:42:34', NULL),
+(202, 56, NULL, '0', NULL, 'asdasdas', 'dasd', '2024-10-14 16:42:57', NULL),
+(203, 64, NULL, '0', NULL, 'asdasd', 'asdsad', '2024-10-14 16:43:22', NULL),
+(204, 64, NULL, '0', NULL, 'asdasdas', 'dadas', '2024-10-14 16:43:33', NULL),
+(205, 64, NULL, '0', NULL, 'asdasd', 'asdsad', '2024-10-14 16:43:45', NULL),
+(206, 64, NULL, 'todos', NULL, 'asdasd', 'asda', '2024-10-14 16:43:55', NULL),
+(207, 64, NULL, 'todos', NULL, 'adas', 'dasd', '2024-10-14 16:44:10', NULL),
+(208, 64, NULL, 'profesores', NULL, 'asdasd', 'asda', '2024-10-14 16:44:21', 2),
+(209, 64, NULL, 'todos', NULL, 'asdasd', 'asda', '2024-10-14 16:44:34', NULL);
 
 -- --------------------------------------------------------
 
@@ -437,7 +481,8 @@ CREATE TABLE `mensajes_eliminados` (
 
 INSERT INTO `mensajes_eliminados` (`id`, `id_usuario`, `id_mensaje`, `fecha_eliminacion`) VALUES
 (1, 56, 40, '2024-10-06 23:37:22'),
-(2, 53, 42, '2024-10-06 23:37:42');
+(2, 53, 42, '2024-10-06 23:37:42'),
+(3, 56, 128, '2024-10-14 20:24:30');
 
 -- --------------------------------------------------------
 
@@ -679,12 +724,12 @@ INSERT INTO `usuario` (`id_usuario`, `nombre`, `apellido`, `tipo_doc`, `document
 (51, 'antonela', 'sepulveda', 'ID', '342352345', '0005-04-23', '66d23c1021bab_f7c0528d915ec3b38dd89bf7beb2a194.jpg', 'scflorez@corsaje.edu.co', '42352345', 'CL 18 A NORTE 2 72', 1, 'mientras', '$2y$10$KJU2liHj854T1T9M.6/EK.xDYy4sfLf2XEwCldj230rdreZmC.3KC', '2024-08-30 16:39:28', 'activo', NULL, 0, NULL),
 (53, 'Juanito', 'Alimaña', 'ID', '43523634', '0634-06-02', '66d2441faa705_pngwing.com.png', 'juanit@gmail.com', '5233456345123', 'CL 18 A NORTE 2 72', 3, 'alez123123', '$2y$10$p.bJhCL9d2VM1IjUCnC63.Edj5Pg87KZgKGTFyedUHPusUd.QSDAK', '2024-08-30 17:13:51', 'activo', '2024-10-13 14:38:47', 0, NULL),
 (55, 'Santiago', 'Capon', 'Passport', '4234523456', '5234-04-23', 'pngwing.com.png', 'scflorez@corsaje.edu.co3', '53643563456', 'CL 18 A NORTE 2 72', 4, 'alez1234', '$2y$10$pcvzMHIh1F53bR25oEpRfu5MbZB5FO6Kn3ceIKwNBtp9KWahjApMe', '2024-09-03 12:35:04', 'activo', NULL, 0, NULL),
-(56, 'camilo ', 'prato', 'ID', '1091357317', '2024-09-17', '67032f8d169dd_images.png', 'albertocamiloprato@gmail.com', '3043282464', 'Sapo Marica', 1, 'camilo', '$2y$10$pkH8Zi8gEArSclW4KlpcjOm0Tbx5fSF2o8f7Ukw8qUNWj8Bl7i2I.', '2024-09-07 18:45:23', 'activo', '2024-10-13 16:28:47', 0, NULL),
+(56, 'camilo ', 'prato', 'ID', '1091357317', '2024-09-17', '67032f8d169dd_images.png', 'albertocamiloprato@gmail.com', '3043282464', 'Sapo Marica', 1, 'camilo', '$2y$10$pkH8Zi8gEArSclW4KlpcjOm0Tbx5fSF2o8f7Ukw8qUNWj8Bl7i2I.', '2024-09-07 18:45:23', 'activo', '2024-10-14 14:51:42', 0, NULL),
 (58, 'santiago', NULL, NULL, NULL, NULL, NULL, 'edison_alberto@hotmail.com', '52343456', '', 4, 'edison_alberto', '$2y$10$DLJSPUZnsBduhl5PFRtg6uP5aXma0xTP9FOSkKUN/g2l9MrcP7d3S', '2024-09-19 12:02:34', 'activo', NULL, 0, NULL),
 (59, 'Santiago', NULL, NULL, NULL, NULL, NULL, 'scapon@misena.edu.co', '3034235435', '', 4, 'scapon', '$2y$10$yrrLCg7Fr85s6u9jOmiVMO14UhXLMOrHN6krm2bL4fCNqnnCqc4Oy', '2024-09-20 20:09:22', 'activo', NULL, 0, NULL),
 (60, 'Santiago', NULL, NULL, NULL, NULL, NULL, 'albertocamiloprato@gmail.comw', '563456346', '', 4, 'albertocamiloprato', '$2y$10$3u2mhrj1Ce6x8WCnljewFOuy20NifY7kKhXbWo0Y7NqPSXH89a9qe', '2024-09-20 20:50:39', 'activo', NULL, 0, NULL),
 (63, NULL, NULL, NULL, NULL, NULL, NULL, 'santigao@gmail.com', NULL, '', 1, 'alez1233', '$2y$10$DSX8990wWKG04J/82ENXo.xZAJyQn/flaX2ULl1gFLB3TuZKQpMZ6', '2024-09-28 20:04:00', 'activo', NULL, 0, NULL),
-(64, 'camilo', 'prato profe', 'ID', '13450735', '2000-08-14', '670c345acc2a8_fondos-de-pantalla-3d-paisaje.jpg', 'camiloprato234@gmail.com', '3043282464', 'Brr Atalaya', 2, 'camilop', '$2y$10$1Djh88ty26viA.IG41s4oOFrO5NU.mrAiw.6b3VnEVTPDj0qKeg2q', '2024-10-13 09:06:40', 'activo', '2024-10-13 15:18:07', 0, NULL);
+(64, 'camilo', 'prato profe', 'ID', '13450735', '2000-08-14', '670c345acc2a8_fondos-de-pantalla-3d-paisaje.jpg', 'camiloprato234@gmail.com', '3043282464', 'Brr Atalaya', 2, 'camilop', '$2y$10$1Djh88ty26viA.IG41s4oOFrO5NU.mrAiw.6b3VnEVTPDj0qKeg2q', '2024-10-13 09:06:40', 'activo', '2024-10-14 14:43:22', 0, NULL);
 
 --
 -- Índices para tablas volcadas
@@ -908,7 +953,7 @@ ALTER TABLE `cursos`
 -- AUTO_INCREMENT de la tabla `db_gescursoslecturas_mensajes`
 --
 ALTER TABLE `db_gescursoslecturas_mensajes`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=732;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=787;
 
 --
 -- AUTO_INCREMENT de la tabla `estudiante`
@@ -944,13 +989,13 @@ ALTER TABLE `login_attempts`
 -- AUTO_INCREMENT de la tabla `mensajes`
 --
 ALTER TABLE `mensajes`
-  MODIFY `id_mensaje` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=43;
+  MODIFY `id_mensaje` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=219;
 
 --
 -- AUTO_INCREMENT de la tabla `mensajes_eliminados`
 --
 ALTER TABLE `mensajes_eliminados`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=3;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=4;
 
 --
 -- AUTO_INCREMENT de la tabla `modulos`
@@ -1069,8 +1114,8 @@ ALTER TABLE `inscripciones`
 -- Filtros para la tabla `mensajes`
 --
 ALTER TABLE `mensajes`
-  ADD CONSTRAINT `mensajes_ibfk_1` FOREIGN KEY (`id_remitente`) REFERENCES `usuario` (`id_usuario`),
-  ADD CONSTRAINT `mensajes_ibfk_2` FOREIGN KEY (`id_destinatario`) REFERENCES `usuario` (`id_usuario`);
+  ADD CONSTRAINT `fk_mensajes_destinatario` FOREIGN KEY (`id_destinatario`) REFERENCES `usuario` (`id_usuario`) ON DELETE SET NULL ON UPDATE CASCADE,
+  ADD CONSTRAINT `mensajes_ibfk_1` FOREIGN KEY (`id_remitente`) REFERENCES `usuario` (`id_usuario`);
 
 --
 -- Filtros para la tabla `mensajes_eliminados`
