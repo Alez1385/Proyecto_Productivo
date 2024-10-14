@@ -112,6 +112,7 @@ function processInscripcion($conn, $curso_id, $id_usuario, $comprobante) {
     $stmt = $conn->prepare("INSERT INTO inscripciones (id_curso, id_estudiante, fecha_inscripcion, estado, fecha_actualizacion, comprobante_pago) VALUES (?, ?, NOW(), 'pendiente', NOW(), ?)");
     $stmt->bind_param("iis", $curso_id, $id_estudiante, $comprobante);
     return $stmt->execute();
+    
 }
 
 ?>
@@ -132,6 +133,11 @@ function processInscripcion($conn, $curso_id, $id_usuario, $comprobante) {
         <?php endif; ?>
         <?php if ($success_message): ?>
             <div class="message success"><?php echo htmlspecialchars($success_message); ?></div>
+            <script>
+                setTimeout(function() {
+                    window.location.href = '/dashboard/dashboard.php';
+                }, 3000);
+            </script>
         <?php endif; ?>
         <h1>Inscripción al Curso</h1>
 

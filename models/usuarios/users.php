@@ -7,7 +7,7 @@
     <title>Gestión de Usuarios</title>
     <link rel="stylesheet" href="user.css">
     <link rel="stylesheet" href="https://fonts.googleapis.com/icon?family=Material+Icons+Sharp">
-    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="/dist/css/styles.css">
     <script type="module">
         import SidebarManager from '../../js/form_side.js';
 
@@ -37,9 +37,9 @@
                     <h1>Control de Usuarios</h1>
                 </div>
                 <div class="header-right">
-                    <button class="bg-green-500 hover:bg-green-600 text-white px-4 py-2 rounded-md flex items-center" onclick="openSidebar('new_user.php')">
-                        <svg class="mr-2 h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M18 9v3m0 0v3m0-3h3m-3 0h-3m-2-5a4 4 0 11-8 0 4 4 0 018 0M3 20v1c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2v-1c0-.6-.4-1-1-1H3c-.6 0-1 .4-1 1v1c0 .6.4 1 1 1h16c.6 0 1-.4 1-1V7a4 4 0 00-8 0v13c0 .6-.4 1-1 1H3c-.6 0-1-.4-1-1V3c0-.6.4-1 1-1h16c.6 0 1 .4 1 1v1c0 .6-.4 1-1 1H3z"></path>
+                    <button class="tw-bg-green-500 hover:tw-bg-green-600 tw-text-white tw-px-4 tw-py-2 tw-rounded-md tw-flex tw-items-center" onclick="openSidebar('new_user.php')">
+                        <svg class="tw-mr-2 tw-h-4 tw-w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M18 9v3m0 0v3m0-3h3m-3 0h-3m-2-5a4 4 0 11-8 0 4 4 0 018 0M3 20v1c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2v-1c0-.6-.4-1-1-1H3c-.6 0-1 .4-1 1v1c0 .6.4 1 1 1h16c.6 0 1-.4 1-1V7a4 4 0 00-8 0v13c0 .6-.4 1-1 1H3c-.6 0-1-.4-1-1V3c0-.6.4-1 1-1h16c.6 0 1-.4 1-1v1c0 .6-.4 1-1 1H3z"></path>
                         </svg>
                         Agregar Usuario
                     </button>
@@ -78,34 +78,34 @@
 
                 <!-- Lista de usuarios -->
                 <div class="user-list-container">
-                <div class="user-list">
-                    <?php
-                    $sql = "SELECT t.nombre as tipo_usuario, t.id_tipo_usuario, u.id_usuario, u.nombre, u.apellido, u.mail, u.foto 
-                            FROM usuario u
-                            JOIN tipo_usuario t ON u.id_tipo_usuario = t.id_tipo_usuario";
-                    $result = $conn->query($sql);
+                    <div class="user-list">
+                        <?php
+                        $sql = "SELECT t.nombre as tipo_usuario, t.id_tipo_usuario, u.id_usuario, u.nombre, u.apellido, u.mail, u.foto 
+                                FROM usuario u
+                                JOIN tipo_usuario t ON u.id_tipo_usuario = t.id_tipo_usuario";
+                        $result = $conn->query($sql);
 
-                    if ($result->num_rows > 0) {
-                        while ($row = $result->fetch_assoc()) {
-                            echo '<div class="user-item" data-user-id="' . $row["id_usuario"] . '" data-user-type="' . $row["id_tipo_usuario"] . '">';
-                            echo '<img src="../../uploads/' . (empty($row["foto"]) ? '../../img/usuario.png' : $row["foto"]) . '" alt="User Image">';
-                            echo '<div class="user-details">';
-                            echo '<h2>' . $row["nombre"] . " " . $row['apellido']  . '</h2>';
-                            echo '<p>' . $row["tipo_usuario"] . '</p>';
-                            echo '<p>' . $row["mail"] . '</p>';
-                            echo '</div>';
-                            echo '<div class="user-actions">';
-                            echo '<button onclick="openSidebar(\'edit_user.php?id_usuario=' . $row["id_usuario"] . '\')" class="edit-btn">Edit</button>';
-                            echo '<button onclick="deleteUser(' . $row["id_usuario"] . ')" class="delete-btn">Delete</button>';
-                            echo '</div>';
-                            echo '</div>';
+                        if ($result->num_rows > 0) {
+                            while ($row = $result->fetch_assoc()) {
+                                echo '<div class="user-item" data-user-id="' . $row["id_usuario"] . '" data-user-type="' . $row["id_tipo_usuario"] . '">';
+                                echo '<img src="../../uploads/' . (empty($row["foto"]) ? '../../img/usuario.png' : $row["foto"]) . '" alt="User Image">';
+                                echo '<div class="user-details">';
+                                echo '<h2>' . $row["nombre"] . " " . $row['apellido']  . '</h2>';
+                                echo '<p>' . $row["tipo_usuario"] . '</p>';
+                                echo '<p>' . $row["mail"] . '</p>';
+                                echo '</div>';
+                                echo '<div class="user-actions">';
+                                echo '<button onclick="openSidebar(\'edit_user.php?id_usuario=' . $row["id_usuario"] . '\')" class="edit-btn">Edit</button>';
+                                echo '<button onclick="deleteUser(' . $row["id_usuario"] . ')" class="delete-btn">Delete</button>';
+                                echo '</div>';
+                                echo '</div>';
+                            }
+                        } else {
+                            echo "No hay usuarios.";
                         }
-                    } else {
-                        echo "No hay usuarios.";
-                    }
-                    $conn->close();
-                    ?>
-                </div>
+                        $conn->close();
+                        ?>
+                    </div>
                 </div>
             </section>
         </div>

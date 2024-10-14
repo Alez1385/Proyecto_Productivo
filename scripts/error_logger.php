@@ -10,7 +10,7 @@ $log_config = require 'log_config.php';
  * @param string $level El nivel de error (INFO, WARNING, ERROR, CRITICAL)
  * @return void
  */
-function logError($message, $level = 'ERROR') {
+function logError($message, $file = '', $level = 'ERROR') {
     global $log_config;
 
     // Verificar si el nivel de error es válido
@@ -54,6 +54,11 @@ function logError($message, $level = 'ERROR') {
     // Escribir en el archivo de log
     if (error_log($log_message, 3, $log_file) === false) {
         error_log("No se pudo escribir en el archivo de log: $log_file");
+    }
+
+    if ($file) {
+        // Registra el error en el archivo especificado
+        file_put_contents($file, "$level: $message\n", FILE_APPEND);
     }
 }
 

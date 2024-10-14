@@ -28,6 +28,7 @@ $result = $conn->query("SELECT * FROM carousel ORDER BY order_index ASC");
     <link rel="stylesheet" href="css/owl.theme.default.min.css">
     <link rel="stylesheet" href="css/magnific-popup.css">
 
+
     <link rel="stylesheet" href="css/aos.css">
 
     <link rel="stylesheet" href="css/ionicons.min.css">
@@ -36,6 +37,9 @@ $result = $conn->query("SELECT * FROM carousel ORDER BY order_index ASC");
     <link rel="stylesheet" href="css/icomoon.css">
     <link rel="stylesheet" href="css/style.css">
     <script src="js/inscripcion-handler.js"></script>
+    <link rel="stylesheet" href="./dist/css/styles.css">
+    
+    
   </head>
   <body data-spy="scroll" data-target=".site-navbar-target" data-offset="300">
 	  
@@ -319,6 +323,7 @@ if ($conn) {
   <script src="js/jquery.animateNumber.min.js"></script>
   <script src="js/scrollax.min.js"></script>
   <script src="js/main.js"></script>
+  
   <!-- JavaScript para manejar el modal y filtrar los cursos activos -->
  
     

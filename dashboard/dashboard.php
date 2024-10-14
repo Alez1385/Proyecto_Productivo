@@ -59,7 +59,9 @@ $user = getUserInfo($conn, $_SESSION['id_usuario']);
                 case 'estudiante':
                     include 'dashboard_estudiante.php';
                     echo "<script src='../js/loadCss.js'></script>";
-                    echo "<script>loadCSS('css/estudiante.css');</script>";
+                    echo "<script>
+                    loadCSS('/dist/css/styles.css');loadCSS('css/estudiante.css');
+                    </script>";
                     break;
                 case 'profesor':
                     include 'dashboard_profesor.php';

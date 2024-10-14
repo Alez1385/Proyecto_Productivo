@@ -79,7 +79,7 @@ try {
     ];
 
     // Send JSON response
-    logError("Dashboard data fetched successfully for user: $username", 'INFO');
+    logError("Dashboard data fetched successfully for user: $username", '', 'INFO');
     header('Content-Type: application/json');
     echo json_encode($response);
 
@@ -91,3 +91,5 @@ try {
         'details' => $e->getMessage()
     ]);
 }
+
+

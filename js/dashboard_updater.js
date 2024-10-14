@@ -8,6 +8,7 @@ const dashboardUpdater = {
       this.updateDashboard();
       setInterval(() => this.updateDashboard(), this.updateInterval);
       this.initModal();
+      this.addStylesDashboard();
     },
   
     escapeHtml: function (unsafe) {
@@ -275,7 +276,7 @@ const dashboardUpdater = {
         btn.addEventListener("click", (e) => {
           e.preventDefault();
           const courseId = btn.getAttribute("data-curso-id");
-          window.enrollmentHandler.showEnrollmentModal(courseId);
+          window.enrollmentApp.showEnrollmentModal(courseId);
         });
       });
     },
@@ -284,27 +285,32 @@ const dashboardUpdater = {
       // Crear HTML del modal
       const modalHtml = `
             <div id="enrollmentModal" class="modal">
-                <div class="modal-content">
-                    <span class="close" id="closeEnrollmentModal">&times;</span>
-                    <h2>Inscripción al Curso</h2>
-                    <div id="modalCourseDetails"></div>
-                    <form id="enrollmentForm" enctype="multipart/form-data">
-                        <input type="hidden" id="curso_id" name="curso_id">
-                        <div class="form-group">
-                            <label for="comprobante">Comprobante de pago:</label>
-                            <div class="file-upload">
-                                <input type="file" id="comprobante" name="comprobante" accept="image/*" required>
-                                <span class="file-upload-label">Seleccionar archivo</span>
-                            </div>
-                            <p class="file-info">Formatos aceptados: JPG, JPEG, PNG, GIF. Tamaño máximo: 500KB.</p>
-                            <div id="imagePreview" class="image-preview">
-                                <img id="previewImage" src="#" alt="Vista previa del comprobante">
-                            </div>
-                        </div>
-                        <button type="submit">Completar Inscripción</button>
-                    </form>
+    <div class="modal-content">
+        <div class="modal-header">
+            <h2 class="modal-title">Inscripción al Curso</h2>
+            <span id="closeEnrollmentModal" class="close">&times;</span>
+        </div>
+        <div class="modal-body">
+            <div id="modalCourseDetails"></div>
+            <form id="enrollmentForm" enctype="multipart/form-data">
+                <input type="hidden" id="curso_id" name="curso_id">
+                <div class="form-group">
+                    <label for="comprobante">Comprobante de pago:</label>
+                    <div class="file-upload">
+                        <input type="file" id="comprobante" name="comprobante" accept="image/*" required>
+                        <label for="comprobante" class="file-upload-label">Seleccionar archivo</label>
+                    </div>
+                    <p class="file-info">Formatos aceptados: JPG, JPEG, PNG, GIF. Tamaño máximo: 500KB.</p>
+                    <div id="imagePreview" class="image-preview">
+                        <img id="previewImage" src="#" alt="Vista previa del comprobante">
+                    </div>
                 </div>
-            </div>
+                <button type="submit">Completar Inscripción</button>
+            </form>
+        </div>
+    </div>
+</div>
+
         `;
   
       // Añadir el modal al body
@@ -315,12 +321,17 @@ const dashboardUpdater = {
       const closeBtn = document.getElementById("closeEnrollmentModal");
   
       // Cerrar el modal al hacer clic en el botón de cerrar o fuera del modal
-      closeBtn.onclick = () => (modal.style.display = "none");
-      window.onclick = (event) => {
-        if (event.target === modal) {
+      closeBtn.onclick = () => {
+        modal.style.display = "none";
+        this.removeStyles(); // Remove styles when closing the modal
+    };
+      // Modify the window click event
+    window.onclick = (event) => {
+      if (event.target === modal) {
           modal.style.display = "none";
-        }
-      };
+          this.removeStyles(); // Remove styles when closing the modal
+      }
+  };
   
       // Manejar el cambio en el input de archivo
       const fileInput = document.getElementById("comprobante");
@@ -345,6 +356,7 @@ const dashboardUpdater = {
     },
   
     showEnrollmentModal2: function (courseId) {
+      this.addStylesDashboard();
       const modal = document.getElementById("enrollmentModal");
       const courseDetails = document.getElementById("modalCourseDetails");
       const curso = this.getCursoById(courseId);
@@ -358,7 +370,7 @@ const dashboardUpdater = {
                           )}" alt="${this.escapeHtml(curso.nombre_curso)}">
                       </div>
                       <div class="course-info">
-                          <h3>${this.escapeHtml(curso.nombre_curso)}</h3>
+                          <h2>${this.escapeHtml(curso.nombre_curso)}</h2>
                           <p class="description">${this.escapeHtml(
                             curso.descripcion
                           )}</p>
@@ -402,11 +414,12 @@ const dashboardUpdater = {
             this.showMessage("success", data.message);
             document.getElementById("enrollmentModal").style.display = "none";
             this.updateDashboard();
+            this.removeStyles();
           } else {
             this.showMessage(
               "error",
               data.message || "Error al procesar la inscripción."
-            );
+          );
           }
         })
         .catch((error) => {
@@ -427,136 +440,261 @@ const dashboardUpdater = {
         messageDiv.remove();
       }, 5000);
     },
+  
+    addStylesDashboard: function() {
+      const styleId = 'dashboard-dynamic-styles';
+      let style = document.getElementById(styleId);
+  
+      if (!style) {
+          style = document.createElement("style");
+          style.id = styleId;
+          document.head.appendChild(style);
+      }
+  
+      style.textContent = `
+          #dashboard-modal, .modal {
+    display: none;
+    position: fixed;
+    z-index: 1001;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    overflow: auto;
+    background-color: rgba(0,0,0,0.6);
+    animation: fadeIn 0.3s ease-out;
+}
+
+.modal-content {
+    background-color: #fff;
+    padding: 2rem;
+    border: none;
+    width: 90%;
+    max-width: 600px;
+    border-radius: 1rem;
+    margin: 2rem auto;
+    box-shadow: 0 10px 25px rgba(0,0,0,0.1);
+    animation: slideIn 0.3s ease-out;
+}
+
+@keyframes slideIn {
+    from {
+        transform: translateY(-5%);
+        opacity: 0;
+    }
+    to {
+        transform: translateY(0);
+        opacity: 1;
+    }
+}
+
+@keyframes fadeIn {
+    from { opacity: 0; }
+    to { opacity: 1; }
+}
+
+.modal-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 1.5rem;
+}
+
+.modal-title {
+    font-size: 1.75rem;
+    font-weight: bold;
+    color: #333;
+}
+
+.modal-body {
+    margin-bottom: 1.5rem;
+}
+
+.course-image {
+    max-width: 100%;
+    height: auto;
+    display: block;
+    margin: 1.5rem auto;
+    border-radius: 0.5rem;
+    box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+}
+
+.course-info p {
+    margin-bottom: 1rem;
+    line-height: 1.6;
+    color: #555;
+}
+
+.course-info h2 {
+    margin-bottom: 1rem;
+    color: #333;
+}
+
+.close {
+    color: #888;
+    font-size: 2rem;
+    font-weight: bold;
+    cursor: pointer;
+    transition: color 0.2s, transform 0.2s;
+}
+
+.close:hover, .close:focus {
+    color: #333;
+    transform: scale(1.1);
+}
+
+.image-preview {
+    display: none;
+    margin-top: 1.5rem;
+    text-align: center;
+}
+
+.image-preview img {
+    max-width: 100%;
+    max-height: 300px;
+    border-radius: 0.5rem;
+    box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+}
+
+.file-upload {
+    position: relative;
+    overflow: hidden;
+    margin: 1.5rem 0;
+}
+
+.file-upload input[type=file] {
+    position: absolute;
+    top: 0;
+    right: 0;
+    min-width: 100%;
+    min-height: 100%;
+    font-size: 100px;
+    text-align: right;
+    filter: alpha(opacity=0);
+    opacity: 0;
+    cursor: pointer;
+}
+
+.file-upload-label {
+    display: block;
+    padding: 1rem 1.5rem;
+    background-color: #f8f9fa;
+    border: 2px dashed #ddd;
+    border-radius: 0.5rem;
+    cursor: pointer;
+    text-align: center;
+    transition: all 0.3s;
+}
+
+.file-upload-label:hover {
+    background-color: #e9ecef;
+    border-color: #adb5bd;
+}
+
+.file-info {
+    font-size: 0.9rem;
+    color: #6c757d;
+    margin-top: 0.75rem;
+}
+
+.message {
+    display: none;
+    position: fixed;
+    z-index: 1002;
+    left: 50%;
+    bottom: 2rem;
+    transform: translateX(-50%);
+    padding: 1rem 1.5rem;
+    color: white;
+    text-align: center;
+    border-radius: 0.5rem;
+    box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+    animation: slideUp 0.3s ease-out;
+}
+
+.message.error {
+    background-color: #dc3545;
+}
+
+.message.success {
+    background-color: #28a745;
+}
+
+@keyframes slideUp {
+    from { transform: translate(-50%, 1rem); opacity: 0; }
+    to { transform: translate(-50%, 0); opacity: 1; }
+}
+
+/* Estilos para el botón de envío */
+button[type="submit"] {
+    width: 100%;
+    background-color: #4a90e2;
+    color: white;
+    font-weight: bold;
+    padding: 0.75rem 1rem;
+    border: none;
+    border-radius: 0.5rem;
+    cursor: pointer;
+    transition: background-color 0.3s, transform 0.2s;
+}
+
+button[type="submit"]:hover {
+    background-color: #3a7bc8;
+    transform: translateY(-2px);
+}
+
+button[type="submit"]:active {
+    transform: translateY(0);
+}
+
+@media (max-width: 768px) {
+    .modal-content {
+        width: 95%;
+        padding: 1.5rem;
+        margin: 1rem auto;
+    }
+
+    .modal-title {
+        font-size: 1.5rem;
+    }
+
+    .file-upload-label {
+        padding: 0.75rem 1rem;
+    }
+}
+      `;
+  },
+  
+  removeStyles: function() {
+      const style = document.getElementById('dashboard-dynamic-styles');
+      if (style) {
+          style.textContent = '';
+      }
+  },
+  
   };
   
   document.addEventListener("DOMContentLoaded", function () {
     dashboardUpdater.init();
     const dashboardModal = document.getElementById("dashboard-modal");
-  
+
     // Mostrar modal del dashboard
     function showDashboardModal() {
-      dashboardModal.style.display = "block";
+        dashboardModal.style.display = "block";
     }
-  
+
     // Cerrar modal del dashboard
     function closeDashboardModal() {
-      dashboardModal.style.display = "none";
+        dashboardModal.style.display = "none";
     }
-  
+
     // Añadimos eventos específicos al modal del dashboard
     document
-      .querySelector(".dashboard-open-btn")
-      .addEventListener("click", showDashboardModal);
+        .querySelector(".dashboard-open-btn")
+        .addEventListener("click", showDashboardModal);
     document
-      .querySelector(".dashboard-close-btn")
-      .addEventListener("click", closeDashboardModal);
+        .querySelector(".dashboard-close-btn")
+        .addEventListener("click", closeDashboardModal);
+});
   
-    // Add CSS styles for the modal and messages
-    const style = document.createElement("style");
-    style.textContent = `
-          #dashboard-modal {
-              display: none !important;
-              position: fixed !important;
-              z-index: 1001 !important;
-              top: 0 !important;
-              left: 0 !important;
-              width: 100% !important;
-              height: 100vh !important;
-              overflow: auto !important;
-              background-color: rgba(0,0,0,0.4) !important;
-          }
-          .modal {
-              display: none !important;
-              position: fixed !important;
-              z-index: 1000 !important;
-              top: 0 !important;
-              left: 0 !important;
-              width: 100% !important;
-              height: 100vh !important;
-              overflow: auto !important;
-              background-color: rgba(0,0,0,0.4) !important;
-          }
-          .modal-content {
-              background-color: #fefefe !important;
-              padding: 20px !important;
-              border: 1px solid #888 !important;
-              width: 80% !important;
-              max-width: 600px !important;
-              border-radius: 5px !important;
-              margin: 20px auto !important;
-          }
-          .close {
-              color: #aaa !important;
-              float: right !important;
-              font-size: 28px !important;
-              font-weight: bold !important;
-              cursor: pointer !important;
-          }
-          .close:hover,
-          .close:focus {
-              color: black !important;
-              text-decoration: none !important;
-              cursor: pointer !important;
-          }
-          .image-preview {
-              display: none !important;
-              margin-top: 10px !important;
-          }
-          .image-preview img {
-              max-width: 100% !important;
-              max-height: 200px !important;
-              border-radius: 5px !important;
-          }
-          .file-upload {
-              position: relative !important;
-              overflow: hidden !important;
-              margin: 10px 0 !important;
-          }
-          .file-upload input[type=file] {
-              position: absolute !important;
-              top: 0 !important;
-              right: 0 !important;
-              min-width: 100% !important;
-              min-height: 100% !important;
-              font-size: 100px !important;
-              text-align: right !important;
-              filter: alpha(opacity=0) !important;
-              opacity: 0 !important;
-          }
-          .file-upload-label {
-              display: block !important;
-              padding: 10px !important;
-              background-color: #f1f1f1 !important;
-              border: 1px solid #ddd !important;
-              border-radius: 5px !important;
-              cursor: pointer !important;
-          }
-          .file-upload-label:hover {
-              background-color: #ddd !important;
-          }
-          .file-info {
-              font-size: 0.8em !important;
-              color: #666 !important;
-          }
-          .message {
-              display: none !important;
-              position: fixed !important;
-              z-index: 1000 !important;
-              left: 0 !important;
-              bottom: 0 !important;
-              width: 100% !important;
-              padding: 10px !important;
-              background-color: #4CAF50 !important;
-              color: white !important;
-              text-align: center !important;
-              border-radius: 5px !important;
-          }
-          .message.error {
-              background-color: #f44336 !important;
-          }
-          .message.success {
-              background-color: #4CAF50 !important;
-          }
-      `;
-    document.head.appendChild(style);
-  });
+      

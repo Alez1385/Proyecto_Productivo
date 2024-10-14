@@ -1,15 +1,18 @@
 <?php
 session_start();
 require_once '../../scripts/conexion.php';
+require_once '../../scripts/error_logger.php';
 
 header('Content-Type: application/json');
 
-if (!isset($_SESSION['id_usuario'])) {
+if (!isset($_SESSION['id_usuario'])) {  
+    logError("Usuario no autenticado", "ERROR");
     echo json_encode(['success' => false, 'message' => 'Usuario no autenticado']);
     exit;
 }
 
 if (!isset($_POST['id_inscripcion'])) {
+    logError("ID de inscripción no proporcionado", "ERROR");
     echo json_encode(['success' => false, 'message' => 'ID de inscripción no proporcionado']);
     exit;
 }
@@ -44,5 +47,6 @@ try {
 
     echo json_encode(['success' => true, 'message' => 'Inscripción cancelada exitosamente']);
 } catch(PDOException $e) {
+    logError("Error al cancelar la inscripción: " . $e->getMessage(), "ERROR");
     echo json_encode(['success' => false, 'message' => 'Error al cancelar la inscripción: ' . $e->getMessage()]);
 }

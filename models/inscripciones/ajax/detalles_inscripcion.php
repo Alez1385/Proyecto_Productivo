@@ -1,10 +1,11 @@
 <?php
 require_once "../../../scripts/conexion.php";
+require_once "../../../scripts/error_logger.php";
 
 $id_inscripcion = $_GET['id_inscripcion'];
 
 // Obtener detalles de la inscripción
-$sql = "SELECT i.id_inscripcion, i.fecha_inscripcion, i.estado, c.nombre_curso, u.nombre, u.apellido
+$sql = "SELECT i.id_inscripcion, i.fecha_inscripcion, i.estado, c.nombre_curso, u.nombre, u.apellido, i.comprobante_pago
         FROM inscripciones i
         JOIN cursos c ON i.id_curso = c.id_curso
         JOIN estudiante e ON i.id_estudiante = e.id_estudiante
