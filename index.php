@@ -36,6 +36,7 @@ $result = $conn->query("SELECT * FROM carousel ORDER BY order_index ASC");
     <link rel="stylesheet" href="css/icomoon.css">
     <link rel="stylesheet" href="css/style.css">
     <script src="js/inscripcion-handler.js"></script>
+    <script src="https://cdn.tailwindcss.com"></script>
   </head>
   <body data-spy="scroll" data-target=".site-navbar-target" data-offset="300">
 	  

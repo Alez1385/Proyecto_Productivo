@@ -1,15 +1,18 @@
 <?php
 session_start();
 require_once '../../scripts/conexion.php';
+require_once '../../scripts/error_logger.php';
 
 header('Content-Type: application/json');
 
 if (!isset($_SESSION['id_usuario'])) {
+    logError("Usuario no autenticado");
     echo json_encode(['success' => false, 'message' => 'Usuario no autenticado']);
     exit;
 }
 
 if (!isset($_POST['id_preinscripcion'])) {
+    logError("ID de preinscripción no proporcionado");
     echo json_encode(['success' => false, 'message' => 'ID de preinscripción no proporcionado']);
     exit;
 }
@@ -37,5 +40,6 @@ try {
 
     echo json_encode(['success' => true, 'message' => 'Preinscripción cancelada exitosamente']);
 } catch(PDOException $e) {
+    logError("Error al cancelar la preinscripción: " . $e->getMessage());
     echo json_encode(['success' => false, 'message' => 'Error al cancelar la preinscripción: ' . $e->getMessage()]);
 }

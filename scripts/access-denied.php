@@ -10,7 +10,6 @@
     <link href="https://fonts.googleapis.com/icon?family=Material+Icons+Sharp" rel="stylesheet">
     <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.9.4/Chart.js"></script>
     <script src="../js/auth-debug.js"></script>
-    <script src="https://cdn.tailwindcss.com"></script>
     <title>Acceso Denegado</title>
     <style>
         @keyframes gradientAnimation {

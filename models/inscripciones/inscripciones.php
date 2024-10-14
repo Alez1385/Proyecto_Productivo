@@ -112,7 +112,7 @@
                             <h2 class="modal-title">Nueva Inscripción</h2>
                             <span class="close">&times;</span>
                         </div>
-                        <form id="nuevaInscripcionForm" class="modal-form">
+                        <form id="nuevaInscripcionForm" class="modal-form" method="post" enctype="multipart/form-data">
                             <select name="id_estudiante" required>
                                 <option value="">Seleccione un estudiante</option>
                                 <?php foreach ($estudiantes as $estudiante): ?>
@@ -129,6 +129,13 @@
                                     </option>
                                 <?php endforeach; ?>
                             </select>
+                            <div class="file-input">
+                                <input type="file" name="comprobante_pago" id="comprobante_pago" accept="image/*" required>
+                                <label for="comprobante_pago">
+                                    <span class="file-name" id="file-name-display">Inserte Comprobante De Pago</span>
+                                    <span class="file-name-before"></span>
+                                </label>
+                            </div>
                             <input type="hidden" name="nueva_inscripcion" value="1">
                             <button type="submit" class="btn-primary">Crear Inscripción</button>
                         </form>
@@ -169,20 +176,20 @@
                 </div>
 
                 <div class="inscriptions-list">
-    <table>
-        <thead>
-            <tr>
-                <th>ID</th>
-                <th>Estudiante</th>
-                <th>Curso</th>
-                <th>Fecha</th>
-                <th>Estado</th>
-                <th>Acciones</th>
-            </tr>
-        </thead>
-        <tbody id="inscripcionesTableBody">
-            <!-- Las inscripciones se cargarán aquí dinámicamente -->
-        </tbody>
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>ID</th>
+                                <th>Estudiante</th>
+                                <th>Curso</th>
+                                <th>Fecha</th>
+                                <th>Estado</th>
+                                <th>Acciones</th>
+                            </tr>
+                        </thead>
+                        <tbody id="inscripcionesTableBody">
+                            <!-- Las inscripciones se cargarán aquí dinámicamente -->
+                        </tbody>
                     </table>
                 </div>
             </section>
@@ -191,18 +198,18 @@
 
     <script>
         // Función para cargar inscripciones
-function cargarInscripciones() {
-    var filtros = $("#filterForm").serialize();
-    $.ajax({
-        url: "ajax/get_inscripciones.php",
-        method: "GET",
-        data: filtros,
-        dataType: 'json',
-        success: function(inscripciones) {
-            var tbody = $("#inscripcionesTableBody");
-            tbody.empty();
-            inscripciones.forEach(function(inscripcion) {
-                var row = `
+        function cargarInscripciones() {
+            var filtros = $("#filterForm").serialize();
+            $.ajax({
+                url: "ajax/get_inscripciones.php",
+                method: "GET",
+                data: filtros,
+                dataType: 'json',
+                success: function(inscripciones) {
+                    var tbody = $("#inscripcionesTableBody");
+                    tbody.empty();
+                    inscripciones.forEach(function(inscripcion) {
+                        var row = `
                     <tr>
                         <td>${inscripcion.id_inscripcion}</td>
                         <td>${inscripcion.nombre} ${inscripcion.apellido}</td>
@@ -227,40 +234,40 @@ function cargarInscripciones() {
                         </td>
                     </tr>
                 `;
-                tbody.append(row);
+                        tbody.append(row);
+                    });
+                },
+                error: function(jqXHR, textStatus, errorThrown) {
+                    console.error("Error cargando inscripciones:", textStatus, errorThrown);
+                }
             });
-        },
-        error: function(jqXHR, textStatus, errorThrown) {
-            console.error("Error cargando inscripciones:", textStatus, errorThrown);
         }
-    });
-}
 
-// Función para cambiar el estado de una inscripción
-function cambiarEstado(selectElement) {
-    var form = $(selectElement).closest('form');
-    $.ajax({
-        url: "",
-        method: "POST",
-        data: form.serialize(),
-        success: function(response) {
+        // Función para cambiar el estado de una inscripción
+        function cambiarEstado(selectElement) {
+            var form = $(selectElement).closest('form');
+            $.ajax({
+                url: "",
+                method: "POST",
+                data: form.serialize(),
+                success: function(response) {
+                    cargarInscripciones();
+                },
+                error: function(jqXHR, textStatus, errorThrown) {
+                    console.error("Error cambiando estado:", textStatus, errorThrown);
+                }
+            });
+        }
+
+        // Cargar inscripciones al cargar la página
+        $(document).ready(function() {
             cargarInscripciones();
-        },
-        error: function(jqXHR, textStatus, errorThrown) {
-            console.error("Error cambiando estado:", textStatus, errorThrown);
-        }
-    });
-}
 
-// Cargar inscripciones al cargar la página
-$(document).ready(function() {
-    cargarInscripciones();
-
-    // Manejar cambios en los filtros
-    $("#filterForm select").on("change", function() {
-        cargarInscripciones();
-    });
-});
+            // Manejar cambios en los filtros
+            $("#filterForm select").on("change", function() {
+                cargarInscripciones();
+            });
+        });
         // Modal para nueva inscripción
         var modal = document.getElementById("nuevaInscripcionModal");
         var btn = document.getElementById("nuevaInscripcionBtn");
@@ -283,14 +290,20 @@ $(document).ready(function() {
             }
         }
 
-       // Enviar nueva inscripción usando Ajax
-$("#nuevaInscripcionForm").on("submit", function(event) {
+        // Enviar nueva inscripción usando Ajax
+        $("#nuevaInscripcionForm").on("submit", function(event) {
     event.preventDefault();
+
+    // Crear un objeto FormData para manejar tanto datos como archivos
+    var formData = new FormData(this);
+
     $.ajax({
         url: "ajax/insertar_inscripcion.php", // Ruta al archivo PHP que procesa el formulario
         method: "POST",
-        data: $(this).serialize(),
-        dataType: 'json', // Expect JSON response
+        data: formData, // Usar FormData para manejar archivos
+        contentType: false, // Evita que jQuery establezca el tipo de contenido incorrecto
+        processData: false, // Evita que jQuery procese los datos, ya que estamos usando FormData
+        dataType: 'json', // Esperar respuesta en formato JSON
         success: function(response) {
             if (response.success) {
                 $("#mensajeExito").text(response.message).fadeIn().delay(3000).fadeOut();
@@ -299,7 +312,7 @@ $("#nuevaInscripcionForm").on("submit", function(event) {
                 $("#nuevaInscripcionForm")[0].reset();
             } else {
                 // Manejar diferentes tipos de errores
-                switch(response.message) {
+                switch (response.message) {
                     case "Datos de entrada inválidos. Por favor, verifica los campos del formulario.":
                         $("#mensajeError").text("Por favor, verifica que todos los campos del formulario estén completos.").fadeIn().delay(5000).fadeOut();
                         break;
@@ -318,18 +331,23 @@ $("#nuevaInscripcionForm").on("submit", function(event) {
             }
         },
         error: function(jqXHR, textStatus, errorThrown) {
-            $("#mensajeError").text("Hubo un problema en el servidor. Por favor, inténtalo de nuevo más tarde. Error: " + textStatus + " - " + errorThrown).fadeIn().delay(5000).fadeOut();
-            console.error("Error AJAX:", textStatus, errorThrown);
+            // Mostrar el error exacto devuelto por el servidor o el error de la llamada AJAX
+            var errorMessage = jqXHR.responseJSON ? jqXHR.responseJSON.message : "Hubo un problema en el servidor.";
+            $("#mensajeError").text("Error específico: " + errorMessage + " (AJAX error: " + textStatus + " - " + errorThrown + ")").fadeIn().delay(5000).fadeOut();
+            console.error("Error AJAX:", textStatus, errorThrown, "Response:", jqXHR.responseText);
         }
-            });
-        });
+    });
+});
 
-                // Función para ver detalles de una inscripción
-                function verDetalles(idInscripcion) {
+
+        // Función para ver detalles de una inscripción
+        function verDetalles(idInscripcion) {
             $.ajax({
                 url: "ajax/detalles_inscripcion.php",
                 method: "GET",
-                data: { id_inscripcion: idInscripcion },
+                data: {
+                    id_inscripcion: idInscripcion
+                },
                 dataType: 'json',
                 success: function(data) {
                     var detallesModal = document.getElementById("detallesModal");
@@ -340,6 +358,9 @@ $("#nuevaInscripcionForm").on("submit", function(event) {
                                 <span class="close">&times;</span>
                             </div>
                             <div class="modal-body">
+                                <a href="${data.comprobante_pago}" target="_blank">
+                                    <img src="${data.comprobante_pago}" alt="Comprobante de Pago" style="max-width: 100%; height: auto;">
+                                </a>
                                 <p><strong>ID:</strong> ${data.id_inscripcion}</p>
                                 <p><strong>Estudiante:</strong> ${data.nombre} ${data.apellido}</p>
                                 <p><strong>Curso:</strong> ${data.nombre_curso}</p>
@@ -372,6 +393,11 @@ $("#nuevaInscripcionForm").on("submit", function(event) {
                 }
             });
         }
+
+        document.getElementById('comprobante_pago').addEventListener('change', function() {
+            var fileName = this.files[0] ? this.files[0].name : 'Inserte Comprobante De Pago';
+            document.getElementById('file-name-display').textContent = fileName;
+        });
     </script>
 
 </body>
