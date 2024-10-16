@@ -14,8 +14,6 @@ header("X-XSS-Protection: 1; mode=block");
 header("X-Content-Type-Options: nosniff");
 header("Referrer-Policy: strict-origin-when-cross-origin");
 
-
-
 // Force HTTPS
 if (!in_array($_SERVER['SERVER_NAME'], ['localhost', '127.0.0.1'])) {
     if (!isset($_SERVER['HTTPS']) || $_SERVER['HTTPS'] !== 'on') {
@@ -34,46 +32,44 @@ if (isset($_SESSION['username'])) {
 // Verificar si la cookie de "recordarme" está establecida
 if (isset($_COOKIE['remember_token'])) {
     error_log("Remember token found: " . $_COOKIE['remember_token']);
-    
+
     // Retrieve the token from the cookie
     $rememberToken = $_COOKIE['remember_token'];
-    
+
     // Get the user ID associated with the token
     $userId = getUserIdFromToken($rememberToken);
-    
+
     if ($userId) {
         // Validate the remember token
         if (validateRememberToken($userId, $rememberToken)) {
             // Get user information
             $user = getUserInfo($conn, $userId);
-            
+
             if ($user) {
                 // User found, start session
                 $_SESSION['id_usuario'] = $user['id_usuario'];
                 $_SESSION['username'] = $user['username'];
                 $_SESSION['user_role'] = $user['tipo_nombre'];
-                
+
                 // Regenerate session ID for security
                 session_regenerate_id(true);
-                
+
                 // Update last access timestamp
                 updateLastAccess($userId);
-                
+
                 // Redirect to dashboard
                 header("Location: /dashboard/dashboard.php");
                 exit();
             }
         }
     }
-    
+
     // If we reach here, the token is invalid or expired
     removeRememberToken($userId);
     error_log("Invalid or expired remember token");
 } else {
     error_log("No remember token found");
 }
-
-
 
 // CSRF Token generation
 if (empty($_SESSION['csrf_token'])) {
@@ -147,140 +143,195 @@ if (isset($_GET['error'])) {
                     <span id="emailError" class="error-message"></span>
                 </div>
 
-                <!-- Password con ojito para mostrar/ocultar -->
+                <!-- Password -->
                 <div class="input-group">
-                    <input type="password" placeholder="Password" name="clave" id="clave" required>
-                    <img src="img/eye-open.svg" alt="Toggle Lock" class="lock-icon" id="register-lock-icon" onclick="togglePassword('clave','register-lock-icon')">
-                    <span id="register-password-strength" class="password-strength"></span>
+                    <input type="password" placeholder="Password" name="password" id="password" required>
+                    <img src="./img/eye-open.svg" alt="Toggle Password Visibility" class="lock-icon" data-target="password">
+                    <span id="password-strength" class="password-strength"></span>
                 </div>
+                <!-- Segundo campo de contraseña -->
+                <div class="input-group">
+                    <input type="password" placeholder="Confirm Password" name="password2" id="password2" required>
+                    <img src="./img/eye-open.svg" alt="Toggle Password Visibility" class="lock-icon" data-target="password2">
+                    <span id="password-strength" class="password-strength"></span>
+                </div>
+
+
 
                 <button type="submit" class="btn btn-primary" id="submitBtn">Crear Cuenta</button>
             </form>
-        </div>
+    </div>
 
-        <!-- Formulario de Login -->
-        <div class="form-container sign-in">
-            <form action="scripts/login_check.php" method="POST" id="loginForm">
-                <input type="hidden" name="csrf_token" value="<?php echo $_SESSION['csrf_token']; ?>">
-                <input type="hidden" name="redirect" value="<?php echo htmlspecialchars($redirect); ?>">
-                <h2>Login</h2>
-                <span>Usa tu email o contraseña</span>
+    <!-- Formulario de Login -->
+    <div class="form-container sign-in">
+        <form action="scripts/login_check.php" method="POST" id="loginForm">
+            <input type="hidden" name="csrf_token" value="<?php echo $_SESSION['csrf_token']; ?>">
+            <input type="hidden" name="redirect" value="<?php echo htmlspecialchars($redirect); ?>">
+            <h2>Login</h2>
+            <span>Usa tu email o contraseña</span>
 
-                <!-- Username -->
-                <div class="input-group">
-                    <input type="text" placeholder="Username" name="username" required>
-                </div>
+            <!-- Username -->
+            <div class="input-group">
+                <input type="text" placeholder="Username" name="username" required>
+            </div>
 
-                <!-- Password con ojito para mostrar/ocultar -->
-                <div class="input-group">
-                    <input type="password" placeholder="Password" name="password" id="password" required>
-                    <img src="./img/eye-open.svg" alt="Toggle Lock" class="lock-icon" id="login-lock-icon" onclick="togglePassword('password', 'login-lock-icon')">
-                    <span id="login-password-strength" class="password-strength"></span>
-                </div>
+            <div class="input-group">
+                <input type="password" placeholder="Password" name="password" id="password" required>
+                <img src="./img/eye-open.svg" alt="Toggle Password Visibility" class="lock-icon" data-target="password">
+                <span id="password-strength" class="password-strength"></span>
+            </div>
 
-                <div class="options">
-                    <label>
-                        <input type="checkbox" name="remember"> Recordar Contraseña
-                    </label>
-                </div>
 
-                <a href="forgot_password.html" class="forgot-password">¿Olvidaste tu contraseña?</a>
-                <button type="submit" class="btn-login">Login</button>
-            </form>
-        </div>
+            <div class="options">
+                <label>
+                    <input type="checkbox" name="remember"> Recordar Contraseña
+                </label>
+            </div>
 
-        <!-- Contenedor de Cambios entre Formulario de Login y Registro -->
-        <div class="toggle-container">
-            <div class="toggle">
-                <div class="toggle-panel toggle-left">
-                    <h1>Bienvenido de vuelta!</h1>
-                    <p>Introduzca sus datos personales para utilizar todas las funciones del sitio</p>
-                    <button class="hidden" id="login">Login</button>
-                </div>
-                <div class="toggle-panel toggle-right">
-                    <h1>Hola, Amigo!</h1>
-                    <p>Regístrese con sus datos personales para utilizar todas las funciones del sitio</p>
-                    <button class="hidden" id="register">Crear Usuario</button>
-                </div>
+            <a href="forgot_password.html" class="forgot-password">¿Olvidaste tu contraseña?</a>
+            <button type="submit" class="btn-login">Login</button>
+        </form>
+    </div>
+
+    <!-- Contenedor de Cambios entre Formulario de Login y Registro -->
+    <div class="toggle-container">
+        <div class="toggle">
+            <div class="toggle-panel toggle-left">
+                <h1>Bienvenido de vuelta!</h1>
+                <p>Introduzca sus datos personales para utilizar todas las funciones del sitio</p>
+                <button class="hidden" id="login">Login</button>
+            </div>
+            <div class="toggle-panel toggle-right">
+                <h1>Hola, Amigo!</h1>
+                <p>Regístrese con sus datos personales para utilizar todas las funciones del sitio</p>
+                <button class="hidden" id="register">Crear Usuario</button>
             </div>
         </div>
     </div>
+    </div>
 
-    <!-- Modal y Overlay -->
-    <div id="overlay" class="overlay"></div>
-    <div id="modal" class="modal">
+
+    <!-- Modal de Error -->
+    <div id="errorModal" class="modal">
         <div class="modal-content">
-            <span class="close" onclick="closeModal()">&times;</span>
-            <div class="modal-header"></div>
-            <div class="modal-body"></div>
-            <div class="loading-bar"></div>
+            <span class="close-button" id="closeModal">&times;</span>
+            <div class="modal-icon">&#9888;</div>
+            <h2>Error</h2>
+            <p id="errorMessage"></p>
         </div>
     </div>
 
+
     <!-- Scripts -->
     <script src="../js/login.js"></script>
-    <script src="../scripts/password.js"></script>
+    <script src="scripts/password.js"></script>
     <script>
-        // Función para medir la fuerza de la contraseña
-        function checkPasswordStrength(password, strengthElementId) {
-            const result = zxcvbn(password);
-            const strength = ['Muy débil', 'Débil', 'Regular', 'Fuerte', 'Muy fuerte'];
-            const strengthElement = document.getElementById(strengthElementId);
-            strengthElement.textContent = 'Fortaleza de la contraseña: ' + strength[result.score];
+        
 
-            // Añadir clases de color basadas en la puntuación
-            strengthElement.className = 'password-strength'; // Resetear clases
-            strengthElement.classList.add('strength-' + result.score);
+
+      // Password strength check function
+      function checkPasswordStrength(password) {
+            const minLength = 12;
+            const hasUpper = /[A-Z]/.test(password);
+            const hasLower = /[a-z]/.test(password);
+            const hasNumber = /[0-9]/.test(password);
+            const hasSpecial = /[^A-Za-z0-9]/.test(password);
+            
+            const commonPasswords = ['password', '123456', 'qwerty', 'letmein'];
+            
+            const isStrong = password.length >= minLength && 
+                             hasUpper && hasLower && hasNumber && hasSpecial &&
+                             !commonPasswords.includes(password.toLowerCase());
+            
+            return isStrong;
         }
 
-        // Aplicar medidor de fuerza de contraseña para el formulario de registro
-        document.getElementById('clave').addEventListener('input', function() {
-            checkPasswordStrength(this.value, 'register-password-strength');
-        });
-
-        // Aplicar medidor de fuerza de contraseña para el formulario de login
-        document.getElementById('password').addEventListener('input', function() {
-            checkPasswordStrength(this.value, 'login-password-strength');
-        });
-
-        // Verificación de nombre de usuario
-        document.getElementById('username').addEventListener('input', function() {
-            const username = this.value;
+        document.addEventListener('DOMContentLoaded', function() {
+            const usernameInput = document.getElementById('username');
+            const emailInput = document.getElementById('email');
+            const passwordInput = document.getElementById('password');
             const usernameError = document.getElementById('usernameError');
-
-            if (username.length > 0) {
-                const xhr = new XMLHttpRequest();
-                xhr.open('POST', 'scripts/check_username.php', true);
-                xhr.setRequestHeader('Content-type', 'application/x-www-form-urlencoded');
-
-                xhr.onreadystatechange = function() {
-                    if (this.readyState === 4 && this.status === 200) {
-                        usernameError.textContent = this.responseText === 'taken' ? 'El nombre de usuario ya está en uso. Elige otro.' : 'El nombre de usuario está disponible.';
-                        usernameError.style.color = this.responseText === 'taken' ? '#c0392b' : '#27ae60';
-                    }
-                };
-                xhr.send('username=' + encodeURIComponent(username));
-            }
-        });
-
-        // Verificación de email
-        document.getElementById('email').addEventListener('input', function() {
-            const email = this.value;
             const emailError = document.getElementById('emailError');
+            const passwordStrength = document.getElementById('password-strength');
 
-            if (email.length > 0) {
-                const xhr = new XMLHttpRequest();
-                xhr.open('POST', 'scripts/check_email.php', true);
-                xhr.setRequestHeader('Content-type', 'application/x-www-form-urlencoded');
+            // Username verification
+            usernameInput.addEventListener('input', function() {
+                const username = this.value;
+                if (username.length > 0) {
+                    fetch('scripts/check_username.php', {
+                        method: 'POST',
+                        headers: {
+                            'Content-type': 'application/x-www-form-urlencoded'
+                        },
+                        body: `username=${encodeURIComponent(username)}`
+                    })
+                    .then(response => response.text())
+                    .then(text => {
+                        usernameError.textContent = text === 'taken' ? 'El nombre de usuario ya está en uso. Elige otro.' : 'El nombre de usuario está disponible.';
+                        usernameError.style.color = text === 'taken' ? '#c0392b' : '#27ae60';
+                    });
+                } else {
+                    usernameError.textContent = '';
+                }
+            });
 
-                xhr.onreadystatechange = function() {
-                    if (this.readyState === 4 && this.status === 200) {
-                        emailError.textContent = this.responseText === 'taken' ? 'El correo electrónico ya está en uso.' : 'El correo electrónico está disponible.';
-                        emailError.style.color = this.responseText === 'taken' ? '#c0392b' : '#27ae60';
+            // Email verification
+            emailInput.addEventListener('input', function() {
+                const email = this.value;
+                const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+
+                if (email.length > 0) {
+                    if (!emailPattern.test(email)) {
+                        emailError.textContent = 'Formato de correo electrónico no válido.';
+                        emailError.style.color = '#c12646';
+                    } else {
+                        fetch('scripts/check_email.php', {
+                            method: 'POST',
+                            headers: {
+                                'Content-type': 'application/x-www-form-urlencoded'
+                            },
+                            body: `email=${encodeURIComponent(email)}`
+                        })
+                        .then(response => response.text())
+                        .then(text => {
+                            if (text === 'invalid') {
+                                emailError.textContent = 'Formato de correo electrónico no válido.';
+                                emailError.style.color = '#c12646';
+                            } else if (text === 'taken') {
+                                emailError.textContent = 'El correo electrónico ya está en uso. Elige otro.';
+                                emailError.style.color = '#c12646';
+                            } else {
+                                emailError.textContent = 'El correo electrónico está disponible.';
+                                emailError.style.color = '#00bcff';
+                            }
+                        })
+                        .catch(() => {
+                            emailError.textContent = 'Error al verificar el correo electrónico. Inténtalo más tarde.';
+                            emailError.style.color = '#c12646';
+                        });
                     }
-                };
-                xhr.send('email=' + encodeURIComponent(email));
-            }
+                } else {
+                    emailError.textContent = '';
+                }
+            });
+
+            // Password strength check
+            passwordInput.addEventListener('input', function() {
+                const password = this.value;
+                const isStrong = checkPasswordStrength(password);
+                
+                if (password.length > 0) {
+                    if (isStrong) {
+                        passwordStrength.textContent = 'Strong password';
+                        passwordStrength.style.color = '#27ae60';
+                    } else {
+                        passwordStrength.textContent = 'Weak password';
+                        passwordStrength.style.color = '#c0392b';
+                    }
+                } else {
+                    passwordStrength.textContent = '';
+                }
+            });
         });
     </script>
 </body>

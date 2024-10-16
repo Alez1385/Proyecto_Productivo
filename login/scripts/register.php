@@ -1,63 +1,121 @@
 <?php
-// Configuración
-require_once '../../scripts/conexion.php';
+// register.php
+ini_set('session.cookie_httponly', 1);
+ini_set('session.cookie_secure', 1);
+session_start();
+require_once('../../scripts/conexion.php');
+require_once('../../scripts/functions.php');
+
+// Set security headers
+header("Strict-Transport-Security: max-age=31536000; includeSubDomains");
+header("Content-Security-Policy: default-src 'self'; script-src 'self' https://cdnjs.cloudflare.com; style-src 'self' https://cdnjs.cloudflare.com; img-src 'self' data:;");
+header("X-Frame-Options: DENY");
+header("X-XSS-Protection: 1; mode=block");
+header("X-Content-Type-Options: nosniff");
+header("Referrer-Policy: strict-origin-when-cross-origin");
+
+// Force HTTPS
+if (!in_array($_SERVER['SERVER_NAME'], ['localhost', '127.0.0.1'])) {
+    if (!isset($_SERVER['HTTPS']) || $_SERVER['HTTPS'] !== 'on') {
+        header("Location: https://" . $_SERVER['HTTP_HOST'] . $_SERVER['REQUEST_URI'], true, 301);
+        exit();
+    }
+}
+
+// CSRF Token validation
+if (!isset($_POST['csrf_token']) || !validateCSRFToken($_POST['csrf_token'])) {
+    logError("CSRF token validation failed");
+    redirectWithError("Invalid request. Please try again");
+}
 
 // Verificar si el formulario ha sido enviado
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
-    // Obtener datos del formulario y sanitizar
-    $mail = sanitizeInput($_POST['mail'] ?? '');
-    $id_tipo_usuario = !empty($_POST['id_tipo_usuario']) ? (int)$_POST['id_tipo_usuario'] : 1; // Valor por defecto 4
-    $login = sanitizeInput($_POST['username'] ?? '');
-    
-    // Verificar si la clave está presente
-    if (!isset($_POST['clave']) || empty($_POST['clave'])) {
-        showError("La contraseña es requerida.");
-    }
-    $clave = password_hash($_POST['clave'], PASSWORD_DEFAULT); // Hash de la contraseña
+    // Obtener y sanitizar datos del formulario
+    $mail = filter_input(INPUT_POST, 'mail', FILTER_SANITIZE_EMAIL);
+    $username = filter_input(INPUT_POST, 'username', FILTER_SANITIZE_STRING);
+    $password = $_POST['password'] ?? '';
+    $password2 = $_POST['password2'] ?? '';
+    $id_tipo_usuario = 4; // Default user type
 
-    // Verificar que los campos requeridos estén presentes
-    if (empty($mail) || empty($login)) {
-        showError("El correo electrónico y el nombre de usuario son requeridos.");
+    // Validar datos
+    if (empty($mail) || empty($username) || empty($password) || empty($password2)) {
+        redirectWithError("All fields are required");
     }
 
-    // Preparar la consulta SQL
+    if (!filter_var($mail, FILTER_VALIDATE_EMAIL)) {
+        redirectWithError("Invalid email format");
+    }
+
+    if ($password !== $password2) {
+        redirectWithError("Passwords do not match");
+    }
+
+    // Check password strength
+    if (!isPasswordStrong($password)) {
+        redirectWithError("Password is not strong enough. It should be at least 8 characters long and include uppercase, lowercase, numbers, and special characters");
+    }
+
+    // Check if email or username already exists
+    if (isEmailTaken($conn, $mail)) {
+        redirectWithError("Email is already in use.");
+    }
+
+    if (isUsernameTaken($conn, $username)) {
+        redirectWithError("Username is already taken.");
+    }
+
+    // Hash the password
+    $hashedPassword = password_hash($password, PASSWORD_DEFAULT);
+
+    // Prepare and execute the SQL query
     $sql = "INSERT INTO usuario (mail, id_tipo_usuario, username, clave) VALUES (?, ?, ?, ?)";
     $stmt = $conn->prepare($sql);
-    $stmt->bind_param('siss', $mail, $id_tipo_usuario, $login, $clave);
+    $stmt->bind_param('siss', $mail, $id_tipo_usuario, $username, $hashedPassword);
 
-    // Ejecutar la consulta
     if ($stmt->execute()) {
-        // Redirigir a la página de inicio de sesión con un mensaje de éxito
-        header("Location: ../login.php?message=success");
+        // Redirect to login page with success message
+        header("Location: ../login.php?message=" . urlencode("Registration successful. Please log in."));
         exit();
     } else {
-        $error = "Error al ejecutar la consulta: " . $stmt->error;
-        logError($error);
-        showError("Error al crear el usuario: " . $error);
+        logError("Database error: " . $stmt->error);
+        // Redirect back to the registration form with an error message
+        header("Location: ../login.php?error=" . urlencode("An error occurred during registration. Please try again later.") . "&show=register");
+        exit();
     }
+
     $stmt->close();
-    $conn->close();
 } else {
+    // If not a POST request, redirect to the registration page
     header("Location: ../login.php");
     exit();
 }
 
-// Funciones auxiliares
-function sanitizeInput($data) {
-    return htmlspecialchars(trim($data), ENT_QUOTES, 'UTF-8');
+$conn->close();
+
+// Helper functions
+
+
+function isEmailTaken($conn, $email) {
+    $stmt = $conn->prepare("SELECT id_usuario FROM usuario WHERE mail = ?");
+    $stmt->bind_param('s', $email);
+    $stmt->execute();
+    $result = $stmt->get_result();
+    return $result->num_rows > 0;
+}
+
+function isUsernameTaken($conn, $username) {
+    $stmt = $conn->prepare("SELECT id_usuario FROM usuario WHERE username = ?");
+    $stmt->bind_param('s', $username);
+    $stmt->execute();
+    $result = $stmt->get_result();
+    return $result->num_rows > 0;
+}
+
+function redirectWithError($message) {
+    header("Location: ../login.php?error=" . urlencode($message . ". Please try again.") . "&show=register");
+    exit();
 }
 
 function logError($error) {
-    $log_file = '../../logs/error.log';
-    $log_message = date('Y-m-d H:i:s') . " - " . $error . PHP_EOL;
-    error_log($log_message, 3, $log_file);
+    error_log(date('Y-m-d H:i:s') . " - " . $error . PHP_EOL, 3, '../../logs/error.log');
 }
-
-function showError($message) {
-    echo "<script>
-            alert('" . addslashes($message) . "');
-            window.location.href = '../login.php';
-          </script>";
-    exit();
-}
-?>

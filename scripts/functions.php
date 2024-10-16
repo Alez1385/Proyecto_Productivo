@@ -206,7 +206,7 @@ function recordFailedLoginAttempt($ip) {
  * @return bool True if the password is strong enough, false otherwise
  */
 function isPasswordStrong($password) {
-    $minLength = 12;
+    $minLength = 8;
     $hasUpper = preg_match('@[A-Z]@', $password);
     $hasLower = preg_match('@[a-z]@', $password);
     $hasNumber = preg_match('@[0-9]@', $password);

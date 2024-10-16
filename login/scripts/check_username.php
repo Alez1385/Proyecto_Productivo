@@ -1,23 +1,19 @@
 <?php
-require '../../scripts/conexion.php';
+require_once('../scripts/conexion.php');
 
-if (isset($_POST['username'])) {
+if ($_SERVER["REQUEST_METHOD"] == "POST") {
     $username = $_POST['username'];
-
-    $sql = "SELECT id_usuario FROM usuario WHERE username = ?";
+    
+    $sql = "SELECT COUNT(*) as count FROM usuario WHERE username = ?";
     $stmt = $conn->prepare($sql);
     $stmt->bind_param("s", $username);
     $stmt->execute();
-    $stmt->store_result();
-
-    if ($stmt->num_rows > 0) {
-        // El nombre de usuario ya existe
-        echo "taken";
-    } else {
-        // El nombre de usuario está disponible
-        echo "available";
-    }
-
+    $result = $stmt->get_result();
+    $row = $result->fetch_assoc();
+    
+    echo ($row['count'] > 0) ? 'taken' : 'available';
+    
     $stmt->close();
-    $conn->close();
 }
+$conn->close();
+?>
