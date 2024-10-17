@@ -28,7 +28,13 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
 
         switch ($tipo_destinatario) {
             case 'individual':
-                $id_destinatario = $destinatario;
+                if (empty($_POST['destinatario_email'])) {
+                    throw new Exception('El correo del destinatario es obligatorio para mensajes individuales.');
+                }
+                $id_destinatario = obtenerIdUsuarioPorEmail($_POST['destinatario_email']);
+                if ($id_destinatario === null) {
+                    throw new Exception('Usuario destinatario no encontrado');
+                }
                 break;
             case 'estudiantes':
                 $id_tipo_usuario = obtenerIdTipoUsuario('estudiante');
@@ -96,4 +102,24 @@ function obtenerIdTipoUsuario($tipo) {
         throw new Exception('No se encontró el tipo de usuario: ' . $tipo);
     }
     return $row['id_tipo_usuario'];
+}
+
+function obtenerIdUsuarioPorEmail($email) {
+    global $conn;
+    $query = "SELECT id_usuario FROM usuario WHERE mail = ?";
+    $stmt = $conn->prepare($query);
+    if (!$stmt) {
+        throw new Exception('Error al preparar la consulta para obtener id_usuario: ' . $conn->error);
+    }
+    $stmt->bind_param("s", $email);
+    if (!$stmt->execute()) {
+        throw new Exception('Error al ejecutar la consulta para obtener id_usuario: ' . $stmt->error);
+    }
+    $result = $stmt->get_result();
+    $row = $result->fetch_assoc();
+    $stmt->close();
+    if (!$row) {
+        throw new Exception('No se encontró el usuario con el email: ' . $email);
+    }
+    return $row['id_usuario'];
 }
