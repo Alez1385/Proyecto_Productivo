@@ -1,18 +1,12 @@
       /* Estilos generales para la página */
+      
       body {
-        body {
-            -webkit-user-select: none; /* Safari */
-            -moz-user-select: none;    /* Firefox */
-            -ms-user-select: none;     /* Internet Explorer/Edge */
-            user-select: none;         /* Standard */
-        }
         font-family: 'Poppins', sans-serif;
-        background-color: #f4f5f7;
+        background-color: #f5f7fa;
+        color: #333;
         margin: 0;
         padding: 0;
-        box-sizing: border-box;
     }
-
     .dashboard-container {
         display: flex;
         min-height: 100vh;
@@ -161,7 +155,7 @@
  
 
     .message-list {
-        width: 30%;
+        width: 50%;
         min-width: 200px;
         max-width: 500px;
         border-right: 1px solid #ddd;
@@ -198,7 +192,7 @@
 
     .message-list-wrapper {
         position: relative;
-        width: 30%; /* Ajusta según tus necesidades */
+        width: 3%; /* Ajusta según tus necesidades */
         min-width: 200px;
         max-width: 50%;
         overflow: hidden;
@@ -280,6 +274,7 @@
         font-weight: 600;
     }
     .search-bar {
+        padding: 15px;
         display: flex;
         justify-content: space-between;
         margin-bottom: 10px;
@@ -432,12 +427,13 @@
 
 .message-list {
     width: 30%;
-    min-width: 300px;
+    min-width: 400px;
     max-width: 400px;
     border-right: 1px solid #e0e0e0;
     overflow-y: auto;
     padding: 0;
     background-color: #ffffff;
+    padding: 5px;
 }
 
 /* Estilos para el scroll moderno */
@@ -522,6 +518,7 @@
     position: sticky;
     top: 0;
     z-index: 1;
+    border-radius: 5px 5px 0px 0px;
     color: #fff;
 }
 
@@ -529,13 +526,15 @@
     display: flex;
     align-items: center;
     padding: 15px;
-    border-bottom: 1px solid #f0f0f0;
+    border-bottom: 1px solid #dddada;
     cursor: pointer;
+    border-radius: 0px 0px 5px 5px;
     transition: background-color 0.2s ease;
 }
 
-.message-item:hover {
+.message-list-item:hover {
     background-color: #f8f9fa;
+    border-radius: 0px 0px 5px 5px;
 }
 
 .message-item.active {
@@ -693,7 +692,7 @@
     box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2);
     border-radius: 8px;
     padding: 30px;
-    width: 90%;
+    width: 100%;
     max-width: 600px;
 }
 
@@ -804,4 +803,6 @@
 .reply-button:hover {
     background-color: #357abd;
 }
+
+
 
