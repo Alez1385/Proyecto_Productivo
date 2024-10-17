@@ -42,7 +42,7 @@ function getSavedModuleOrder($conn, $userId)
     $result = $stmt->get_result();
     $row = $result->fetch_assoc();
     $stmt->close();
-    
+
     if ($row && isset($row['module_order'])) {
         $decodedOrder = json_decode($row['module_order'], true);
         return is_array($decodedOrder) ? $decodedOrder : [];
@@ -57,13 +57,13 @@ try {
 
     $user = getUserInfo($conn, $_SESSION['id_usuario']);
     $modules = getModules($conn, $user['id_tipo_usuario']);
-    
+
     // Get saved order and reorder modules
     $savedOrder = getSavedModuleOrder($conn, $_SESSION['id_usuario']);
     if (!empty($savedOrder) && is_array($savedOrder)) {
         $orderedModules = [];
         $moduleIds = array_column($modules, 'id_modulo');
-        
+
         foreach ($savedOrder as $moduleId) {
             $key = array_search($moduleId, $moduleIds);
             if ($key !== false && isset($modules[$key])) {
@@ -71,10 +71,9 @@ try {
                 unset($modules[$key]);
             }
         }
-        
+
         $modules = array_merge($orderedModules, array_values($modules));
     }
-
 } catch (Exception $e) {
     error_log('Error en la barra lateral: ' . $e->getMessage());
     echo '<script>console.error("Error en la barra lateral: ' . addslashes($e->getMessage()) . '");</script>';
@@ -106,32 +105,34 @@ try {
                 </div>
             </div>
 
-            <div id="sortable-sidebar">
-                <!-- Dashboard always first -->
-                <div class="sidebar-item" data-module-id="dashboard">
-                    <a href="/dashboard/dashboard.php">
-                        <span class="material-icons-sharp">dashboard</span>
-                        <h3>Dashboard</h3>
-                    </a>
-                </div>
+            <div class="sidebar-content">
+                <div id="sortable-sidebar">
+                    <!-- Dashboard always first -->
+                    <div class="sidebar-item" data-module-id="dashboard">
+                        <a href="/dashboard/dashboard.php">
+                            <span class="material-icons-sharp">dashboard</span>
+                            <h3>Dashboard</h3>
+                        </a>
+                    </div>
 
-                <?php if (!empty($modules)): ?>
-                    <?php foreach ($modules as $module): ?>
-                        <div class="sidebar-item" draggable="true" data-module-id="<?php echo htmlspecialchars($module['id_modulo'], ENT_QUOTES, 'UTF-8'); ?>">
-                            <a href="<?php echo BASE_URL . htmlspecialchars($module['url'], ENT_QUOTES, 'UTF-8'); ?>">
-                                <span class="material-icons-sharp"><?php echo htmlspecialchars($module['icono'], ENT_QUOTES, 'UTF-8'); ?></span>
-                                <h3><?php echo htmlspecialchars($module['nom_modulo'], ENT_QUOTES, 'UTF-8'); ?></h3>
-                            </a>
-                        </div>
-                    <?php endforeach; ?>
-                <?php else: ?>
-                    <p>No hay módulos disponibles para este tipo de usuario.</p>
-                <?php endif; ?>
+                    <?php if (!empty($modules)): ?>
+                        <?php foreach ($modules as $module): ?>
+                            <div class="sidebar-item" draggable="true" data-module-id="<?php echo htmlspecialchars($module['id_modulo'], ENT_QUOTES, 'UTF-8'); ?>">
+                                <a href="<?php echo BASE_URL . htmlspecialchars($module['url'], ENT_QUOTES, 'UTF-8'); ?>">
+                                    <span class="material-icons-sharp"><?php echo htmlspecialchars($module['icono'], ENT_QUOTES, 'UTF-8'); ?></span>
+                                    <h3><?php echo htmlspecialchars($module['nom_modulo'], ENT_QUOTES, 'UTF-8'); ?></h3>
+                                </a>
+                            </div>
+                        <?php endforeach; ?>
+                    <?php else: ?>
+                        <p>No hay módulos disponibles para este tipo de usuario.</p>
+                    <?php endif; ?>
+                </div>
             </div>
 
             <div class="sidebar-bottom">
                 <a href="<?php echo BASE_URL . 'login/logout.php'; ?>" class="logout">
-                    <span class="material-icons-sharp">logout</span>
+                    <span  class="material-icons-sharp">logout</span>
                     <h3>Salir</h3>
                 </a>
             </div>
@@ -209,24 +210,24 @@ try {
 
                 // Send the new order to the server
                 fetch('<?php echo BASE_URL; ?>scripts/update_module_order.php', {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                    },
-                    body: JSON.stringify({
-                        id_usuario: <?php echo $_SESSION['id_usuario']; ?>,
-                        module_order: order
-                    }),
-                })
-                .then(response => response.json())
-                .then(data => {
-                    if (data.success) {
-                        console.log('Order updated successfully');
-                    } else {
-                        console.error('Error al actualizar el orden:', data.error);
-                    }
-                })
-                .catch(error => console.error('Error:', error.message));
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                        },
+                        body: JSON.stringify({
+                            id_usuario: <?php echo $_SESSION['id_usuario']; ?>,
+                            module_order: order
+                        }),
+                    })
+                    .then(response => response.json())
+                    .then(data => {
+                        if (data.success) {
+                            console.log('Order updated successfully');
+                        } else {
+                            console.error('Error al actualizar el orden:', data.error);
+                        }
+                    })
+                    .catch(error => console.error('Error:', error.message));
             }
 
             Array.from(sidebar.children).forEach(addDragEvents);

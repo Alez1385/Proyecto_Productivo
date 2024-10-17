@@ -176,8 +176,8 @@ if (isset($_GET['error'])) {
             </div>
 
             <div class="input-group">
-                <input type="password" placeholder="Password" name="password" id="password" required>
-                <img src="./img/eye-open.svg" alt="Toggle Password Visibility" class="lock-icon" data-target="password">
+                <input type="password" placeholder="Password" name="password" id="password3" required>
+                <img src="./img/eye-open.svg" alt="Toggle Password Visibility" class="lock-icon" data-target="password3">
                 <span id="password-strength" class="password-strength"></span>
             </div>
 

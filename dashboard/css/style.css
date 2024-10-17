@@ -168,7 +168,13 @@ aside {
     width: var(--sidebar-width);
     transition: all 0.3s ease;
     padding: var(--sidebar-padding);
+    overflow: hidden;
+}
+
+.sidebar-content {
+    height: calc(100% - 150px); /* Ajusta este valor según sea necesario */
     overflow-y: auto;
+    padding-right: 10px; /* Espacio para la barra de desplazamiento */
 }
 
 #sortable-sidebar {
@@ -506,4 +512,18 @@ aside {
 .sidebar a:last-child .material-icons-sharp,
 .sidebar a:nth-last-child(2) .material-icons-sharp {
     font-size: 1.6rem; /* Íconos ligeramente más grandes para estos elementos */
+}
+
+/* Estilos para personalizar la apariencia de la barra de desplazamiento en WebKit */
+::-webkit-scrollbar {
+    width: 0.3rem;
+    height: 0.5rem;
+    background-clip: padding-box; /* Evita que se salga el scroll bar */
+    border-radius: inherit; /* Hereda el borde redondeado del contenedor */
+}
+
+/* Estilos para el comportamiento al hacer hover sobre la barra de desplazamiento */
+.sidebar:hover ::-webkit-scrollbar-thumb {
+    background: #8ac2e7;
+    border-radius: 0.25rem;
 }
