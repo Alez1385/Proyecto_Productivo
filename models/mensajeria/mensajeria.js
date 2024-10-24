@@ -232,56 +232,51 @@ window.onload = function() {
 // Función para buscar usuarios
 function buscarUsuarios() {
     var input = document.getElementById('destinatario');
-    var a = document.getElementById('resultadosBusqueda');
+    var resultadosContainer = document.getElementById('resultadosBusqueda');
     var valor = input.value;
 
-    // Cerrar cualquier lista ya abierta de valores autocompletados
-    cerrarTodasListas();
+    // Limpiar resultados anteriores
+    resultadosContainer.innerHTML = '';
 
     if (!valor) { return false; }
 
-    fetch('buscar_usuarios.php?q=' + valor)
+    fetch('buscar_usuarios.php?q=' + encodeURIComponent(valor))
         .then(response => response.json())
         .then(data => {
-            data.forEach(usuario => {
-                var b = document.createElement("DIV");
-                b.innerHTML = "<strong>" + usuario.mail.substr(0, valor.length) + "</strong>";
-                b.innerHTML += usuario.mail.substr(valor.length);
-                b.innerHTML += " (" + usuario.nombre + " " + usuario.apellido + ")";
-                b.addEventListener("click", function(e) {
-                    input.value = usuario.mail;
-                    cerrarTodasListas();
+            if (data.length > 0) {
+                data.forEach(usuario => {
+                    var item = document.createElement("div");
+                    item.innerHTML = `<strong>${usuario.mail.substr(0, valor.length)}</strong>${usuario.mail.substr(valor.length)} (${usuario.nombre} ${usuario.apellido})`;
+                    item.addEventListener("click", function(e) {
+                        input.value = usuario.mail;
+                        resultadosContainer.innerHTML = '';
+                    });
+                    resultadosContainer.appendChild(item);
                 });
-                a.appendChild(b);
-            });
+            } else {
+                var noResult = document.createElement("div");
+                noResult.textContent = 'No se encontraron resultados';
+                resultadosContainer.appendChild(noResult);
+            }
         })
-        .catch(error => console.error('Error:', error));
-
-    const parentElement = document.getElementById('resultadosBusqueda');
-    if (parentElement) {
-        // Crear y agregar elementos hijos
-        const newElement = document.createElement('div');
-        newElement.textContent = 'Nuevo usuario encontrado';
-        parentElement.appendChild(newElement);
-    } else {
-        console.error('El elemento contenedor de resultados no se encontró');
-    }
+        .catch(error => {
+            console.error('Error:', error);
+            var errorItem = document.createElement("div");
+            errorItem.textContent = 'Error al buscar usuarios';
+            resultadosContainer.appendChild(errorItem);
+        });
 }
 
-function cerrarTodasListas(elmnt) {
-    var x = document.getElementsByClassName("autocomplete-items");
-    for (var i = 0; i < x.length; i++) {
-        if (elmnt != x[i] && elmnt != document.getElementById('destinatario')) {
-            x[i].parentNode.removeChild(x[i]);
-        }
-    }
-}
-
-document.addEventListener("click", function (e) {
-    cerrarTodasListas(e.target);
-});
-
+// Agregar evento de input al campo de destinatario
 document.getElementById('destinatario').addEventListener('input', buscarUsuarios);
+
+// Cerrar la lista de autocompletado al hacer clic fuera de ella
+document.addEventListener("click", function (e) {
+    var resultadosContainer = document.getElementById('resultadosBusqueda');
+    if (e.target.id !== 'destinatario' && e.target.id !== 'resultadosBusqueda') {
+        resultadosContainer.innerHTML = '';
+    }
+});
 
 function createMessageElement(message) {
     const messageItem = document.createElement('div');
@@ -359,3 +354,4 @@ function sendMessage() {
         showNotification('Error en la conexión: ' + error.message, 'error');
     });
 }
+

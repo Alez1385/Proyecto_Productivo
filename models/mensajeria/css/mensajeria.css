@@ -389,6 +389,7 @@
 
 .notification.success {
     background-color: #4caf50; /* Verde para éxito */
+   
 }
 
 .autocomplete-items {
@@ -628,7 +629,7 @@
 
 .modal h2 {
     margin-top: 0;
-    color: #333;
+    color: #ffffff;
 }
 
 .modal-buttons {
