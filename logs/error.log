@@ -871,3 +871,8 @@
 [2024-10-23 22:51:54] [INFO] Dashboard data fetched successfully for user: alez123123
 [2024-10-23 22:52:24] [INFO] Dashboard data fetched successfully for user: alez123123
 [2024-10-23 22:52:54] [INFO] Dashboard data fetched successfully for user: alez123123
+[2024-10-17 23:21:12] [INFO] Dashboard data fetched successfully for user: alez123123
+[2024-10-17 23:21:17] [INFO] Dashboard data fetched successfully for user: alez123123
+[2024-10-17 23:21:43] [ERROR] Unauthorized access attempt: No username
+[2024-10-17 23:24:44] [ERROR] Unauthorized access attempt: No username
+[2024-10-17 23:24:47] [INFO] Dashboard data fetched successfully for user: alez123123

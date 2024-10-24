@@ -66,7 +66,7 @@ CREATE TABLE `asignacion_curso` (
   CONSTRAINT `asignacion_curso_ibfk_1` FOREIGN KEY (`id_curso`) REFERENCES `cursos` (`id_curso`),
   CONSTRAINT `asignacion_curso_ibfk_2` FOREIGN KEY (`id_profesor`) REFERENCES `profesor` (`id_profesor`),
   CONSTRAINT `asignacion_curso_ibfk_3` FOREIGN KEY (`id_estudiante`) REFERENCES `estudiante` (`id_estudiante`)
-) ENGINE=InnoDB AUTO_INCREMENT=20 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=23 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -75,7 +75,7 @@ CREATE TABLE `asignacion_curso` (
 
 LOCK TABLES `asignacion_curso` WRITE;
 /*!40000 ALTER TABLE `asignacion_curso` DISABLE KEYS */;
-INSERT INTO `asignacion_curso` VALUES (18,1,7,NULL,'2024-10-13',NULL,'activo'),(19,2,7,NULL,'2024-10-13',NULL,'activo');
+INSERT INTO `asignacion_curso` VALUES (21,9,9,NULL,'2024-10-23',NULL,'activo'),(22,2,9,NULL,'2024-10-23',NULL,'activo');
 /*!40000 ALTER TABLE `asignacion_curso` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -128,7 +128,7 @@ CREATE TABLE `carousel` (
   `fecha_curso_inicio` date NOT NULL,
   `fecha_curso_fin` date NOT NULL,
   PRIMARY KEY (`id_carrousel`)
-) ENGINE=InnoDB AUTO_INCREMENT=50 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=53 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -137,7 +137,7 @@ CREATE TABLE `carousel` (
 
 LOCK TABLES `carousel` WRITE;
 /*!40000 ALTER TABLE `carousel` DISABLE KEYS */;
-INSERT INTO `carousel` VALUES (40,'Curso De Natacion','El mejor curso del mundo sin palabras, me encanta cuando no hablas y te quedas mirando.','chica-sola-en-la-ciudad-ilustracion_3840x2160_xtrafondos.com.jpg',0,'2024-08-14','2024-08-20'),(42,'Curso De Natacion','El mejor curso del mundo sin palabras, me encanta cuando no hablas y te quedas mirando.','chica-sola-en-la-ciudad-ilustracion_3840x2160_xtrafondos.com.jpg',0,'2024-08-14','2024-08-20'),(43,'Curso De Natacion','El mejor curso del mundo sin palabras, me encanta cuando no hablas y te quedas mirando.','chica-sola-en-la-ciudad-ilustracion_3840x2160_xtrafondos.com.jpg',0,'2024-08-14','2024-08-20'),(47,'Curso de Aliexpress','Sabemos que esto es una cosa de locos.','jake-lofi-hora-de-aventura_3840x2160_xtrafondos.com.jpg',0,'2024-08-23','2024-08-21'),(48,'TECNICA RELLENO EN QUIZ','ESTAN DISFRUTANDO DE UNA ACTIVIDAD ACADEMICA','habitacion-lofi_3840x2160_xtrafondos.com.jpg',0,'2024-08-29','2024-09-07'),(49,'Sapo Hp','Perro Mk','pexels-anastasiya-gepp-654466-1462637.jpg',0,'2024-09-11','2024-09-18');
+INSERT INTO `carousel` VALUES (50,'Curso De Banda','Anímate a inscribirte a nuestro curso de banda, marcha con el corsaje','452083467_901651245322247_7937504907709867816_n.jpg',0,'2025-08-22','2026-08-22'),(51,'Curso de Pastoral','Anímate a incribirte a nuestro curso de pastoral y descubre tu potencial.','448172350_874612134692825_6660471295016287333_n.jpg',0,'2025-02-25','2025-02-15'),(52,'Sinfonica','Animate a inscribirte a nuestro curos de sinfónica, descubre tu nota musical','441954466_859522112868494_5875778135578260400_n.jpg',0,'2025-08-15','2025-08-15');
 /*!40000 ALTER TABLE `carousel` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -189,7 +189,7 @@ CREATE TABLE `cursos` (
   KEY `id_profesor` (`id_profesor`),
   CONSTRAINT `cursos_ibfk_1` FOREIGN KEY (`id_profesor`) REFERENCES `profesor` (`id_profesor`),
   CONSTRAINT `fk_categoria` FOREIGN KEY (`id_categoria`) REFERENCES `categoria_curso` (`id_categoria`)
-) ENGINE=InnoDB AUTO_INCREMENT=9 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=10 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -198,7 +198,7 @@ CREATE TABLE `cursos` (
 
 LOCK TABLES `cursos` WRITE;
 /*!40000 ALTER TABLE `cursos` DISABLE KEYS */;
-INSERT INTO `cursos` VALUES (1,'Danzas','Curso de danzas','primaria',3,'activo','icon_66df8b8983f491.65048104.jpg',1,NULL,NULL,NULL),(2,'Ajedrez','Curso de ajedrez','terciaria',3,'activo','icon_66df8ca659c689.92859720.jpg',2,NULL,NULL,NULL),(8,'Ajedrez','Curso de ajedrez para pequeños','primaria',3,'activo','icon_66df89588f54d8.68981697.jpg',2,NULL,NULL,NULL);
+INSERT INTO `cursos` VALUES (1,'Danzas','Curso de danzas','primaria',3,'activo','icon_66df8b8983f491.65048104.jpg',1,NULL,NULL,NULL),(2,'Ajedrez','Curso de ajedrez','terciaria',3,'activo','icon_66df8ca659c689.92859720.jpg',2,NULL,NULL,NULL),(8,'Ajedrez','Curso de ajedrez para pequeños','primaria',3,'activo','icon_66df89588f54d8.68981697.jpg',2,NULL,NULL,NULL),(9,'Baloncesto','Participa y juega','primaria',12,'activo','icon_671822322b7968.83681750.jpg',3,NULL,NULL,NULL);
 /*!40000 ALTER TABLE `cursos` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -317,7 +317,7 @@ CREATE TABLE `horarios` (
   KEY `id_profesor` (`id_profesor`),
   CONSTRAINT `horarios_ibfk_1` FOREIGN KEY (`id_curso`) REFERENCES `cursos` (`id_curso`) ON DELETE CASCADE,
   CONSTRAINT `horarios_ibfk_2` FOREIGN KEY (`id_profesor`) REFERENCES `profesor` (`id_profesor`) ON DELETE CASCADE
-) ENGINE=InnoDB AUTO_INCREMENT=28 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=30 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -326,7 +326,7 @@ CREATE TABLE `horarios` (
 
 LOCK TABLES `horarios` WRITE;
 /*!40000 ALTER TABLE `horarios` DISABLE KEYS */;
-INSERT INTO `horarios` VALUES (26,1,5,'2024-10-08 06:07:46','lunes','08:08 - 09:09','12:02 - 17:05','09:10 - 10:10',NULL,NULL,NULL,NULL,NULL),(27,2,7,'2024-10-13 20:49:41','lunes','08:08 - 09:10','10:00 - 16:50',NULL,NULL,NULL,NULL,NULL,NULL);
+INSERT INTO `horarios` VALUES (28,9,9,'2024-10-22 22:14:15','lunes','07:00 - 08:00',NULL,NULL,NULL,NULL,NULL,NULL,NULL),(29,2,9,'2024-10-22 22:18:38','lunes','08:00 - 09:00',NULL,NULL,NULL,NULL,NULL,NULL,NULL);
 /*!40000 ALTER TABLE `horarios` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -410,7 +410,7 @@ CREATE TABLE `mensajes` (
   KEY `id_destinatario` (`id_destinatario`),
   CONSTRAINT `mensajes_ibfk_1` FOREIGN KEY (`id_remitente`) REFERENCES `usuario` (`id_usuario`),
   CONSTRAINT `mensajes_ibfk_2` FOREIGN KEY (`id_destinatario`) REFERENCES `usuario` (`id_usuario`)
-) ENGINE=InnoDB AUTO_INCREMENT=51 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=59 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -419,7 +419,7 @@ CREATE TABLE `mensajes` (
 
 LOCK TABLES `mensajes` WRITE;
 /*!40000 ALTER TABLE `mensajes` DISABLE KEYS */;
-INSERT INTO `mensajes` VALUES (49,56,NULL,'individual',56,'asdasdasdasdasda','asdasd','2024-10-17 21:50:05',NULL),(50,56,NULL,'todos',NULL,'jhjh','ljkjklj','2024-10-17 22:19:30',NULL);
+INSERT INTO `mensajes` VALUES (49,56,NULL,'individual',56,'asdasdasdasdasda','asdasd','2024-10-17 21:50:05',NULL),(50,56,NULL,'todos',NULL,'jhjh','ljkjklj','2024-10-17 22:19:30',NULL),(51,56,NULL,'individual',36,'Sharif','adfadjfk','2024-10-17 23:08:39',NULL),(52,56,NULL,'todos',NULL,'gjjj','vvjvj','2024-10-17 23:09:49',NULL),(53,56,NULL,'todos',NULL,'ihhi','jhkj','2024-10-17 23:10:21',NULL),(54,56,NULL,'todos',NULL,'njlk','lnkmmn','2024-10-17 23:10:45',NULL),(55,56,NULL,'todos',NULL,'njnn','nklnkl','2024-10-17 23:10:58',NULL),(56,56,NULL,'todos',NULL,'nknln','lknnkllnk','2024-10-17 23:11:13',NULL),(57,56,NULL,'todos',NULL,'nknkl','llknlnk','2024-10-17 23:11:36',NULL),(58,56,NULL,'todos',NULL,'nnmnm','mbjkkbj','2024-10-17 23:11:59',NULL);
 /*!40000 ALTER TABLE `mensajes` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -559,7 +559,7 @@ CREATE TABLE `preinscripciones` (
   KEY `fk_preinscripciones_usuario` (`id_usuario`),
   CONSTRAINT `fk_preinscripciones_usuario` FOREIGN KEY (`id_usuario`) REFERENCES `usuario` (`id_usuario`),
   CONSTRAINT `preinscripciones_ibfk_1` FOREIGN KEY (`id_curso`) REFERENCES `cursos` (`id_curso`)
-) ENGINE=InnoDB AUTO_INCREMENT=70 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=72 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -568,7 +568,7 @@ CREATE TABLE `preinscripciones` (
 
 LOCK TABLES `preinscripciones` WRITE;
 /*!40000 ALTER TABLE `preinscripciones` DISABLE KEYS */;
-INSERT INTO `preinscripciones` VALUES (46,2,'camilo  prato','albertocamiloprato@gmail.com','3043282464','2024-10-13 21:28:44','pendiente','1a8014822dcc49abfb76578342002b11',56),(66,8,'Santiago Capon','santiagocaponf@gmail.com','32452345','2024-10-14 19:32:56','pendiente','aba82acef8452581a66dac079851ac80',36),(69,1,'Juanito Alimaña','juanit@gmail.com','5233456345123','2024-10-14 21:10:00','pendiente','e5eb3c266807de7c462e94a02629a6c2',53);
+INSERT INTO `preinscripciones` VALUES (46,2,'camilo  prato','albertocamiloprato@gmail.com','3043282464','2024-10-13 21:28:44','pendiente','1a8014822dcc49abfb76578342002b11',56),(66,8,'Santiago Capon','santiagocaponf@gmail.com','32452345','2024-10-14 19:32:56','pendiente','aba82acef8452581a66dac079851ac80',36),(69,1,'Juanito Alimaña','juanit@gmail.com','5233456345123','2024-10-14 21:10:00','pendiente','e5eb3c266807de7c462e94a02629a6c2',53),(70,1,'camilo  prato','albertocamiloprato@gmail.com','3043282464','2024-10-17 21:19:39','pendiente','17ed7989509a151b8ffd8fbc86ce223b',56),(71,8,'camilo  prato','albertocamiloprato@gmail.com','3043282464','2024-10-22 19:41:55','pendiente','36e89cb10f800bb680805e7b9a58f530',56);
 /*!40000 ALTER TABLE `preinscripciones` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -588,7 +588,7 @@ CREATE TABLE `profesor` (
   PRIMARY KEY (`id_profesor`),
   KEY `id_usuario` (`id_usuario`),
   CONSTRAINT `profesor_ibfk_1` FOREIGN KEY (`id_usuario`) REFERENCES `usuario` (`id_usuario`) ON DELETE NO ACTION ON UPDATE NO ACTION
-) ENGINE=InnoDB AUTO_INCREMENT=8 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=10 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -597,7 +597,7 @@ CREATE TABLE `profesor` (
 
 LOCK TABLES `profesor` WRITE;
 /*!40000 ALTER TABLE `profesor` DISABLE KEYS */;
-INSERT INTO `profesor` VALUES (4,58,'perro marica',12,'El le gusto mucho el hecho de masturbarse en casa sapo marica'),(5,55,'Salpiconero',12,'Un pajiso total'),(7,64,'Artes',12,'');
+INSERT INTO `profesor` VALUES (9,60,'Deportista',12,'Buen profesor');
 /*!40000 ALTER TABLE `profesor` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -643,7 +643,7 @@ CREATE TABLE `resume_cursos` (
   `lugar` varchar(255) NOT NULL,
   `descripcion` text NOT NULL,
   PRIMARY KEY (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=7 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=11 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -652,7 +652,7 @@ CREATE TABLE `resume_cursos` (
 
 LOCK TABLES `resume_cursos` WRITE;
 /*!40000 ALTER TABLE `resume_cursos` DISABLE KEYS */;
-INSERT INTO `resume_cursos` VALUES (4,'24','Curso para gerson','En la casa de gerson','Para mover la pampa, hay que ser personas de bien señores '),(5,'asdas','asdasdasd','asdasdasdas','dasdas'),(6,'33','Gersson','Su casa','Para bailar la bamba se necesita un poco de gracia');
+INSERT INTO `resume_cursos` VALUES (7,'30','Sinfonica','Colegio Sagrado Corazon De Jesus','\"Este curso de Sinfónica te ofrece la oportunidad de conocer y profundizar en el mundo de la música orquestal. A través de la teoría y práctica, aprenderás sobre los instrumentos, la interpretación en conjunto y el repertorio sinfónico, desarrollando habilidades tanto técnicas como musicales para participar en una orquesta sinfónica.\"'),(8,'48','Ajedrez','Colegio Sagrado Corazon De Jesus','\"En este curso de Ajedrez aprenderás estrategias, tácticas y técnicas para mejorar tu juego, desde los movimientos básicos hasta jugadas avanzadas. Desarrollarás habilidades de pensamiento crítico, resolución de problemas y toma de decisiones, mientras exploras el fascinante mundo de este milenario deporte mental.\"'),(9,'96','Baloncesto','Colegio Sagrado Corazon De Jesus','\"Este curso de Baloncesto está diseñado para mejorar tus habilidades en el deporte, desde fundamentos como el manejo del balón y los tiros, hasta tácticas de equipo y estrategias de juego. A través de sesiones prácticas, aprenderás a desarrollar tu resistencia, coordinación y trabajo en equipo, perfeccionando tu desempeño en la cancha.\"'),(10,'125','Natación','Colegio Sagrado Corazon De Jesus','\"En este curso de Natación aprenderás las técnicas fundamentales de los diferentes estilos de nado, mejorando tu resistencia, coordinación y técnica en el agua. Con entrenamientos prácticos y progresivos, desarrollarás confianza y habilidades para nadar de manera eficiente y segura, ya sea a nivel recreativo o competitivo.\"');
 /*!40000 ALTER TABLE `resume_cursos` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -743,7 +743,7 @@ CREATE TABLE `usuario` (
 
 LOCK TABLES `usuario` WRITE;
 /*!40000 ALTER TABLE `usuario` DISABLE KEYS */;
-INSERT INTO `usuario` VALUES (36,'Santiago','Capon','ID','12341235234','2345-03-12','WhatsApp Image 2024-07-23 at 4.49.07 PM.jpeg','santiagocaponf@gmail.com','32452345','CL 18 A NORTE 2 72',1,'alez','$2y$10$64T2Qk8yptB8y8Rk6Kq26uhnbT3Ias.JH.EXcin2d1BPQCzAvHiM6','2024-08-25 17:43:54','activo','2024-10-14 15:46:30',0,NULL),(42,'chad','sexteto','ID','523456346','3654-04-23','66d273c33d474_Recurso 9europe.jpg','luisillo@gmail.com','4563475674','CL 18 A NORTE 2 72',1,'alez23','$2y$10$FrpZXvgI3WrL22y9MxNtfuQsyQSgCJ7Jm4VPUv3Aa4qEn2HCKdxsK','2024-08-29 16:26:44','activo',NULL,0,NULL),(51,'antonela','sepulveda','ID','342352345','0005-04-23','66d23c1021bab_f7c0528d915ec3b38dd89bf7beb2a194.jpg','scflorez@corsaje.edu.co','42352345','CL 18 A NORTE 2 72',1,'mientras','$2y$10$KJU2liHj854T1T9M.6/EK.xDYy4sfLf2XEwCldj230rdreZmC.3KC','2024-08-30 16:39:28','activo',NULL,0,NULL),(53,'Juanito','Alimaña','ID','43523634','0634-06-02','66d2441faa705_pngwing.com.png','juanit@gmail.com','5233456345123','CL 18 A NORTE 2 72',3,'alez123123','$2y$10$p.bJhCL9d2VM1IjUCnC63.Edj5Pg87KZgKGTFyedUHPusUd.QSDAK','2024-08-30 17:13:51','activo','2024-10-14 15:55:59',0,NULL),(55,'Santiago','Capon','Passport','4234523456','5234-04-23','pngwing.com.png','scflorez@corsaje.edu.co3','53643563456','CL 18 A NORTE 2 72',4,'alez1234','$2y$10$pcvzMHIh1F53bR25oEpRfu5MbZB5FO6Kn3ceIKwNBtp9KWahjApMe','2024-09-03 12:35:04','activo',NULL,0,NULL),(56,'camilo ','prato','ID','1091357317','2024-09-17','67032f8d169dd_images.png','albertocamiloprato@gmail.com','3043282464','Sapo Marica',1,'camilo','$2y$10$pkH8Zi8gEArSclW4KlpcjOm0Tbx5fSF2o8f7Ukw8qUNWj8Bl7i2I.','2024-09-07 18:45:23','activo','2024-10-17 21:33:04',0,NULL),(58,'santiago',NULL,NULL,NULL,NULL,NULL,'edison_alberto@hotmail.com','52343456','',4,'edison_alberto','$2y$10$DLJSPUZnsBduhl5PFRtg6uP5aXma0xTP9FOSkKUN/g2l9MrcP7d3S','2024-09-19 12:02:34','activo',NULL,0,NULL),(59,'Santiago',NULL,NULL,NULL,NULL,NULL,'scapon@misena.edu.co','3034235435','',4,'scapon','$2y$10$yrrLCg7Fr85s6u9jOmiVMO14UhXLMOrHN6krm2bL4fCNqnnCqc4Oy','2024-09-20 20:09:22','activo',NULL,0,NULL),(60,'Santiago',NULL,NULL,NULL,NULL,NULL,'albertocamiloprato@gmail.comw','563456346','',4,'albertocamiloprato','$2y$10$3u2mhrj1Ce6x8WCnljewFOuy20NifY7kKhXbWo0Y7NqPSXH89a9qe','2024-09-20 20:50:39','activo',NULL,0,NULL),(63,NULL,NULL,NULL,NULL,NULL,NULL,'santigao@gmail.com',NULL,'',1,'alez1233','$2y$10$DSX8990wWKG04J/82ENXo.xZAJyQn/flaX2ULl1gFLB3TuZKQpMZ6','2024-09-28 20:04:00','activo',NULL,0,NULL),(64,'camilo','prato profe','ID','13450735','2000-08-14','670c345acc2a8_fondos-de-pantalla-3d-paisaje.jpg','camiloprato234@gmail.com','3043282464','Brr Atalaya',2,'camilop','$2y$10$1Djh88ty26viA.IG41s4oOFrO5NU.mrAiw.6b3VnEVTPDj0qKeg2q','2024-10-13 09:06:40','activo','2024-10-14 12:15:15',0,NULL);
+INSERT INTO `usuario` VALUES (36,'Santiago','Capon','ID','12341235234','2345-03-12','WhatsApp Image 2024-07-23 at 4.49.07 PM.jpeg','santiagocaponf@gmail.com','32452345','CL 18 A NORTE 2 72',1,'alez','$2y$10$64T2Qk8yptB8y8Rk6Kq26uhnbT3Ias.JH.EXcin2d1BPQCzAvHiM6','2024-08-25 17:43:54','activo','2024-10-14 15:46:30',0,NULL),(42,'chad','sexteto','ID','523456346','3654-04-23','66d273c33d474_Recurso 9europe.jpg','luisillo@gmail.com','4563475674','CL 18 A NORTE 2 72',2,'alez23','$2y$10$FrpZXvgI3WrL22y9MxNtfuQsyQSgCJ7Jm4VPUv3Aa4qEn2HCKdxsK','2024-08-29 16:26:44','activo',NULL,0,NULL),(51,'antonela','sepulveda','ID','342352345','0005-04-23','66d23c1021bab_f7c0528d915ec3b38dd89bf7beb2a194.jpg','scflorez@corsaje.edu.co','42352345','CL 18 A NORTE 2 72',1,'mientras','$2y$10$KJU2liHj854T1T9M.6/EK.xDYy4sfLf2XEwCldj230rdreZmC.3KC','2024-08-30 16:39:28','activo',NULL,0,NULL),(53,'Juanito','Alimaña','ID','43523634','0634-06-02','66d2441faa705_pngwing.com.png','juanit@gmail.com','5233456345123','CL 18 A NORTE 2 72',3,'alez123123','$2y$10$p.bJhCL9d2VM1IjUCnC63.Edj5Pg87KZgKGTFyedUHPusUd.QSDAK','2024-08-30 17:13:51','activo','2024-10-17 23:24:46',0,NULL),(55,'Santiago','Capon','Passport','4234523456','5234-04-23','pngwing.com.png','scflorez@corsaje.edu.co3','53643563456','CL 18 A NORTE 2 72',1,'alez1234','$2y$10$pcvzMHIh1F53bR25oEpRfu5MbZB5FO6Kn3ceIKwNBtp9KWahjApMe','2024-09-03 12:35:04','activo',NULL,0,NULL),(56,'camilo ','prato','ID','1091357317','2024-09-17','67032f8d169dd_images.png','albertocamiloprato@gmail.com','3043282464','Sapo Marica',1,'camilo','$2y$10$pkH8Zi8gEArSclW4KlpcjOm0Tbx5fSF2o8f7Ukw8qUNWj8Bl7i2I.','2024-09-07 18:45:23','activo','2024-10-23 00:17:22',0,NULL),(58,'santiago',NULL,NULL,NULL,NULL,NULL,'edison_alberto@hotmail.com','52343456','',1,'edison_alberto','$2y$10$DLJSPUZnsBduhl5PFRtg6uP5aXma0xTP9FOSkKUN/g2l9MrcP7d3S','2024-09-19 12:02:34','activo',NULL,0,NULL),(59,'Santiago',NULL,NULL,NULL,NULL,NULL,'scapon@misena.edu.co','3034235435','',1,'scapon','$2y$10$yrrLCg7Fr85s6u9jOmiVMO14UhXLMOrHN6krm2bL4fCNqnnCqc4Oy','2024-09-20 20:09:22','activo',NULL,0,NULL),(60,'Alirio','Moncada','ID','3453453346346','5234-04-23',NULL,'albertocamiloprato@gmail.comw','563456346','klerklefjkjdvjkldfj',2,'alberto','$2y$10$PPmdLYLFpZqdPujTBjE46eMTV61llgeDljmfnqdVbiGQoj3XjgbTK','2024-09-20 20:50:39','activo','2024-10-23 00:20:00',0,NULL),(63,NULL,NULL,NULL,NULL,NULL,NULL,'santigao@gmail.com',NULL,'',1,'alez1233','$2y$10$DSX8990wWKG04J/82ENXo.xZAJyQn/flaX2ULl1gFLB3TuZKQpMZ6','2024-09-28 20:04:00','activo',NULL,0,NULL),(64,'camilo','prato profe','ID','13450735','2000-08-14','670c345acc2a8_fondos-de-pantalla-3d-paisaje.jpg','camiloprato234@gmail.com','3043282464','Brr Atalaya',2,'camilop','$2y$10$1Djh88ty26viA.IG41s4oOFrO5NU.mrAiw.6b3VnEVTPDj0qKeg2q','2024-10-13 09:06:40','activo','2024-10-23 00:15:02',0,NULL);
 /*!40000 ALTER TABLE `usuario` ENABLE KEYS */;
 UNLOCK TABLES;
 /*!40103 SET TIME_ZONE=@OLD_TIME_ZONE */;
@@ -756,4 +756,4 @@ UNLOCK TABLES;
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
 /*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
 
--- Dump completed on 2024-10-17 22:33:42
+-- Dump completed on 2024-10-23 20:58:33
