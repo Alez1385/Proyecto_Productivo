@@ -104,7 +104,7 @@ if (isset($_GET['error'])) {
         // Log form submission
         document.addEventListener('DOMContentLoaded', () => {
             const form = document.querySelector('form');
-            form.addEventListener('submit', (e) => {
+            form.addEventListener('submit', (e) => {   
                 logAuthInfo('Login form submitted');
                 logAuthInfo(`Username: ${form.username.value}`);
                 logAuthInfo(`Remember me: ${form.remember.checked}`);

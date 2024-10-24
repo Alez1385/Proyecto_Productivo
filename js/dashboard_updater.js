@@ -25,14 +25,17 @@ const dashboardUpdater = {
   
     updateDashboard: function () {
       fetch("../dashboard/dashboard_data.php")
-        .then((response) => response.json())
-        .then((data) => {
+        .then(response => {
+          if (!response.ok) {
+            return response.json().then(err => { throw err; });
+          }
+          return response.json();
+        })
+        .then(data => {
           if (data.error) {
-            console.error("Error:", data.message);
-            console.error("Details:", data.details);
-            console.error("File:", data.file);
-            console.error("Line:", data.line);
-            this.displayErrorToUser(data.message);
+            console.error(`${data.type}: ${data.message}`);
+            console.error('Details:', data.details);
+            this.displayErrorToUser(`${data.message}\n\nDetalles: ${data.details}`);
             return;
           }
           this.updateInscripciones(data.inscripciones);
@@ -40,10 +43,10 @@ const dashboardUpdater = {
           this.updateCursos(data.cursos);
           this.cursos = data.cursos; // Store the courses data
         })
-        .catch((error) => {
-          console.error("Error:", error);
+        .catch(error => {
+          console.error('Error:', error);
           this.displayErrorToUser(
-            "Error de conexión. Por favor, intenta de nuevo más tarde."
+            `Error de conexión. Por favor, intenta de nuevo más tarde.\n\nDetalles: ${error.message || JSON.stringify(error)}`
           );
         });
     },
