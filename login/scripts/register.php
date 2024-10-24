@@ -74,7 +74,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 
     if ($stmt->execute()) {
         // Redirect to login page with success message
-        header("Location: ../login.php?message=" . urlencode("Registration successful. Please log in."));
+        header("Location: ../login.php?message=" . urlencode("Registro exitoso. Por favor inicia sesión.") . "&show=login");
         exit();
     } else {
         logError("Database error: " . $stmt->error);
@@ -112,6 +112,11 @@ function isUsernameTaken($conn, $username) {
 }
 
 function redirectWithError($message) {
+    // En register.php, antes de redirigir por error
+$_SESSION['old_input'] = [
+    'username' => $_POST['username'],
+    'mail' => $_POST['mail']
+];
     header("Location: ../login.php?error=" . urlencode($message . ". Please try again.") . "&show=register");
     exit();
 }

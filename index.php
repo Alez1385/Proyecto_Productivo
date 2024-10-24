@@ -80,7 +80,6 @@ $result = $conn->query("SELECT * FROM carousel ORDER BY order_index ASC");
                         <span class="subheading">Inicio: <?= $row['fecha_curso_inicio'] ?> | Fin: <?= $row['fecha_curso_fin'] ?></span>
                         <h1 class="mb-4 mt-3"><?php echo $row['title']; ?></h1>
                         <h2 class="mb-4" style="color: #fff;"><?php echo $row['description']; ?></h2>
-                        <p><a href="#" class="btn btn-primary py-3 px-4">Incribirse</a> <a href="#" class="btn btn-white btn-outline-white py-3 px-4">My works</a></p>
                     </div>
                 </div>
             </div>

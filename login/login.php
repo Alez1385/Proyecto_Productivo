@@ -76,6 +76,14 @@ if (empty($_SESSION['csrf_token'])) {
     $_SESSION['csrf_token'] = bin2hex(random_bytes(32));
 }
 
+// Cerca del inicio del archivo, después de session_start()
+$old_values = [];
+if (isset($_SESSION['old_input'])) {
+    $old_values = $_SESSION['old_input'];
+    // Limpiamos los valores antiguos después de usarlos
+    unset($_SESSION['old_input']);
+}
+
 // Redirect handling
 $redirect = filter_input(INPUT_GET, 'redirect', FILTER_SANITIZE_URL) ?? '/dashboard/dashboard.php';
 if (!isValidRedirect($redirect)) {
@@ -122,45 +130,62 @@ if (isset($_GET['error'])) {
 </head>
 
 <body>
-    <div class="container" id="container">
+    <div class="container" id="container">       <!-- Formulario de Registro -->
         <!-- Formulario de Registro -->
-        <div class="form-container sign-up">
-            <form action="scripts/register.php" method="post" id="registerForm">
-                <input type="hidden" name="csrf_token" value="<?php echo $_SESSION['csrf_token']; ?>">
-                <input type="hidden" name="redirect" value="<?php echo htmlspecialchars($redirect); ?>">
-                <h1>Register</h1>
-                <span>Usa tu email para registrarte</span>
+<div class="form-container sign-up">
+    <form action="scripts/register.php" method="post" id="registerForm">
+        <input type="hidden" name="csrf_token" value="<?php echo $_SESSION['csrf_token']; ?>">
+        <input type="hidden" name="redirect" value="<?php echo htmlspecialchars($redirect); ?>">
+        <h1>Register</h1>
+        <span>Usa tu email para registrarte</span>
 
-                <!-- Username -->
-                <div class="input-group">
-                    <input type="text" placeholder="Username" name="username" id="username" required>
-                    <span id="usernameError" class="error-message"></span>
-                </div>
+        <!-- Username -->
+        <div class="input-group">
+            <input type="text" 
+                   placeholder="Username" 
+                   name="username" 
+                   id="username" 
+                   value="<?php echo htmlspecialchars($old_values['username'] ?? ''); ?>"
+                   required>
+            <span id="usernameError" class="error-message"></span>
+        </div>
 
-                <!-- Email -->
-                <div class="input-group">
-                    <input type="email" placeholder="Email" name="mail" id="email" required>
-                    <span id="emailError" class="error-message"></span>
-                </div>
+        <!-- Email -->
+        <div class="input-group">
+            <input type="email" 
+                   placeholder="Email" 
+                   name="mail" 
+                   id="email" 
+                   value="<?php echo htmlspecialchars($old_values['mail'] ?? ''); ?>"
+                   required>
+            <span id="emailError" class="error-message"></span>
+        </div>
 
-                <!-- Password -->
-                <div class="input-group">
-                    <input type="password" placeholder="Password" name="password" id="password" required>
-                    <img src="./img/eye-open.svg" alt="Toggle Password Visibility" class="lock-icon" data-target="password">
-                    <span id="password-strength" class="password-strength"></span>
-                </div>
-                <!-- Segundo campo de contraseña -->
-                <div class="input-group">
-                    <input type="password" placeholder="Confirm Password" name="password2" id="password2" required>
-                    <img src="./img/eye-open.svg" alt="Toggle Password Visibility" class="lock-icon" data-target="password2">
-                    <span id="password-strength" class="password-strength"></span>
-                </div>
+        <!-- Password -->
+        <div class="input-group">
+            <input type="password" 
+                   placeholder="Password" 
+                   name="password" 
+                   id="password" 
+                   required>
+            <img src="./img/eye-open.svg" alt="Toggle Password Visibility" class="lock-icon" data-target="password">
+            <span id="password-strength" class="password-strength"></span>
+        </div>
 
+        <!-- Segundo campo de contraseña -->
+        <div class="input-group">
+            <input type="password" 
+                   placeholder="Confirm Password" 
+                   name="password2" 
+                   id="password2" 
+                   required>
+            <img src="./img/eye-open.svg" alt="Toggle Password Visibility" class="lock-icon" data-target="password2">
+            <span id="password-strength" class="password-strength"></span>
+        </div>
 
-
-                <button type="submit" class="btn btn-primary" id="submitBtn">Crear Cuenta</button>
-            </form>
-    </div>
+        <button type="submit" class="btn btn-primary" id="submitBtn">Crear Cuenta</button>
+    </form>
+</div>
 
     <!-- Formulario de Login -->
     <div class="form-container sign-in">

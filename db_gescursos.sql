@@ -63,7 +63,7 @@ CREATE TABLE `asignacion_curso` (
   KEY `id_curso` (`id_curso`),
   KEY `id_profesor` (`id_profesor`),
   KEY `id_estudiante` (`id_estudiante`),
-  CONSTRAINT `asignacion_curso_ibfk_1` FOREIGN KEY (`id_curso`) REFERENCES `cursos` (`id_curso`),
+  CONSTRAINT `asignacion_curso_ibfk_1` FOREIGN KEY (`id_curso`) REFERENCES `cursos` (`id_curso`) ON DELETE CASCADE,
   CONSTRAINT `asignacion_curso_ibfk_2` FOREIGN KEY (`id_profesor`) REFERENCES `profesor` (`id_profesor`),
   CONSTRAINT `asignacion_curso_ibfk_3` FOREIGN KEY (`id_estudiante`) REFERENCES `estudiante` (`id_estudiante`)
 ) ENGINE=InnoDB AUTO_INCREMENT=23 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
@@ -75,7 +75,7 @@ CREATE TABLE `asignacion_curso` (
 
 LOCK TABLES `asignacion_curso` WRITE;
 /*!40000 ALTER TABLE `asignacion_curso` DISABLE KEYS */;
-INSERT INTO `asignacion_curso` VALUES (21,9,9,NULL,'2024-10-23',NULL,'activo'),(22,2,9,NULL,'2024-10-23',NULL,'activo');
+INSERT INTO `asignacion_curso` VALUES (22,2,9,NULL,'2024-10-23',NULL,'activo');
 /*!40000 ALTER TABLE `asignacion_curso` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -198,7 +198,7 @@ CREATE TABLE `cursos` (
 
 LOCK TABLES `cursos` WRITE;
 /*!40000 ALTER TABLE `cursos` DISABLE KEYS */;
-INSERT INTO `cursos` VALUES (1,'Danzas','Curso de danzas','primaria',3,'activo','icon_66df8b8983f491.65048104.jpg',1,NULL,NULL,NULL),(2,'Ajedrez','Curso de ajedrez','terciaria',3,'activo','icon_66df8ca659c689.92859720.jpg',2,NULL,NULL,NULL),(8,'Ajedrez','Curso de ajedrez para pequeños','primaria',3,'activo','icon_66df89588f54d8.68981697.jpg',2,NULL,NULL,NULL),(9,'Baloncesto','Participa y juega','primaria',12,'activo','icon_671822322b7968.83681750.jpg',3,NULL,NULL,NULL);
+INSERT INTO `cursos` VALUES (1,'Danzas','Curso de danzas','primaria',3,'activo','icon_66df8b8983f491.65048104.jpg',1,NULL,NULL,NULL),(2,'Ajedrez','Curso de ajedrez','terciaria',3,'activo','icon_66df8ca659c689.92859720.jpg',2,NULL,NULL,NULL);
 /*!40000 ALTER TABLE `cursos` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -279,7 +279,7 @@ CREATE TABLE `historial_inscripciones` (
   KEY `historial_inscripciones_ibfk_2` (`id_usuario_cambio`),
   CONSTRAINT `historial_inscripciones_ibfk_1` FOREIGN KEY (`id_inscripcion`) REFERENCES `inscripciones` (`id_inscripcion`),
   CONSTRAINT `historial_inscripciones_ibfk_2` FOREIGN KEY (`id_usuario_cambio`) REFERENCES `usuario` (`id_usuario`) ON DELETE CASCADE ON UPDATE CASCADE
-) ENGINE=InnoDB AUTO_INCREMENT=92 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=93 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -288,6 +288,7 @@ CREATE TABLE `historial_inscripciones` (
 
 LOCK TABLES `historial_inscripciones` WRITE;
 /*!40000 ALTER TABLE `historial_inscripciones` DISABLE KEYS */;
+INSERT INTO `historial_inscripciones` VALUES (92,77,'pendiente','aprobada','2024-10-24 02:41:14',36);
 /*!40000 ALTER TABLE `historial_inscripciones` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -326,7 +327,7 @@ CREATE TABLE `horarios` (
 
 LOCK TABLES `horarios` WRITE;
 /*!40000 ALTER TABLE `horarios` DISABLE KEYS */;
-INSERT INTO `horarios` VALUES (28,9,9,'2024-10-22 22:14:15','lunes','07:00 - 08:00',NULL,NULL,NULL,NULL,NULL,NULL,NULL),(29,2,9,'2024-10-22 22:18:38','lunes','08:00 - 09:00',NULL,NULL,NULL,NULL,NULL,NULL,NULL);
+INSERT INTO `horarios` VALUES (29,2,9,'2024-10-22 22:18:38','lunes','08:00 - 09:00',NULL,NULL,NULL,NULL,NULL,NULL,NULL);
 /*!40000 ALTER TABLE `horarios` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -351,7 +352,7 @@ CREATE TABLE `inscripciones` (
   KEY `idx_inscripciones_curso_estudiante` (`id_curso`,`id_estudiante`),
   CONSTRAINT `inscripciones_ibfk_1` FOREIGN KEY (`id_curso`) REFERENCES `cursos` (`id_curso`),
   CONSTRAINT `inscripciones_ibfk_2` FOREIGN KEY (`id_estudiante`) REFERENCES `estudiante` (`id_estudiante`)
-) ENGINE=InnoDB AUTO_INCREMENT=77 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=78 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -360,6 +361,7 @@ CREATE TABLE `inscripciones` (
 
 LOCK TABLES `inscripciones` WRITE;
 /*!40000 ALTER TABLE `inscripciones` DISABLE KEYS */;
+INSERT INTO `inscripciones` VALUES (77,1,1,'2024-10-23','aprobada','2024-10-24 02:41:14','../../uploads/comprobantes/1729737647_coomadenort.jpg');
 /*!40000 ALTER TABLE `inscripciones` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -524,7 +526,7 @@ CREATE TABLE `password_resets` (
   KEY `idx_password_resets_user_id` (`id_usuario`),
   KEY `idx_password_resets_token` (`token`),
   CONSTRAINT `fk_password_resets_user` FOREIGN KEY (`id_usuario`) REFERENCES `usuario` (`id_usuario`) ON DELETE CASCADE
-) ENGINE=InnoDB AUTO_INCREMENT=49 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=50 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -533,7 +535,7 @@ CREATE TABLE `password_resets` (
 
 LOCK TABLES `password_resets` WRITE;
 /*!40000 ALTER TABLE `password_resets` DISABLE KEYS */;
-INSERT INTO `password_resets` VALUES (46,'santiagocaponf@gmail.com','ab62cf32778dfe063a7afd8c87081bebcccd15900ac0ffbb98f56b4fee6c8aca','2024-10-02 19:32:34',36),(47,'santiagocaponf@gmail.com','3a43fab6750869f508850169d66ff43bdfb0ca059381c17a99ec2f5c3a24f0e8','2024-10-02 19:40:44',36),(48,'santiagocaponf@gmail.com','bcad622b7b016e3a263de308641be51c29abc94d02709f462882eb2b0e44bb10','2024-10-02 19:40:47',36);
+INSERT INTO `password_resets` VALUES (46,'santiagocaponf@gmail.com','ab62cf32778dfe063a7afd8c87081bebcccd15900ac0ffbb98f56b4fee6c8aca','2024-10-02 19:32:34',36),(47,'santiagocaponf@gmail.com','3a43fab6750869f508850169d66ff43bdfb0ca059381c17a99ec2f5c3a24f0e8','2024-10-02 19:40:44',36),(48,'santiagocaponf@gmail.com','bcad622b7b016e3a263de308641be51c29abc94d02709f462882eb2b0e44bb10','2024-10-02 19:40:47',36),(49,'santiagocaponf@gmail.com','451b28b392d2a9ae0bd37a79e04b4814194c8d6e556087a61c9c70f0e350763b','2024-10-23 21:06:24',36);
 /*!40000 ALTER TABLE `password_resets` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -558,8 +560,8 @@ CREATE TABLE `preinscripciones` (
   KEY `id_curso` (`id_curso`),
   KEY `fk_preinscripciones_usuario` (`id_usuario`),
   CONSTRAINT `fk_preinscripciones_usuario` FOREIGN KEY (`id_usuario`) REFERENCES `usuario` (`id_usuario`),
-  CONSTRAINT `preinscripciones_ibfk_1` FOREIGN KEY (`id_curso`) REFERENCES `cursos` (`id_curso`)
-) ENGINE=InnoDB AUTO_INCREMENT=72 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+  CONSTRAINT `preinscripciones_ibfk_1` FOREIGN KEY (`id_curso`) REFERENCES `cursos` (`id_curso`) ON DELETE CASCADE
+) ENGINE=InnoDB AUTO_INCREMENT=73 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -568,7 +570,7 @@ CREATE TABLE `preinscripciones` (
 
 LOCK TABLES `preinscripciones` WRITE;
 /*!40000 ALTER TABLE `preinscripciones` DISABLE KEYS */;
-INSERT INTO `preinscripciones` VALUES (46,2,'camilo  prato','albertocamiloprato@gmail.com','3043282464','2024-10-13 21:28:44','pendiente','1a8014822dcc49abfb76578342002b11',56),(66,8,'Santiago Capon','santiagocaponf@gmail.com','32452345','2024-10-14 19:32:56','pendiente','aba82acef8452581a66dac079851ac80',36),(69,1,'Juanito Alimaña','juanit@gmail.com','5233456345123','2024-10-14 21:10:00','pendiente','e5eb3c266807de7c462e94a02629a6c2',53),(70,1,'camilo  prato','albertocamiloprato@gmail.com','3043282464','2024-10-17 21:19:39','pendiente','17ed7989509a151b8ffd8fbc86ce223b',56),(71,8,'camilo  prato','albertocamiloprato@gmail.com','3043282464','2024-10-22 19:41:55','pendiente','36e89cb10f800bb680805e7b9a58f530',56);
+INSERT INTO `preinscripciones` VALUES (46,2,'camilo  prato','albertocamiloprato@gmail.com','3043282464','2024-10-13 21:28:44','pendiente','1a8014822dcc49abfb76578342002b11',56),(70,1,'camilo  prato','albertocamiloprato@gmail.com','3043282464','2024-10-17 21:19:39','pendiente','17ed7989509a151b8ffd8fbc86ce223b',56),(72,2,'Juanito Alimaña','juanit@gmail.com','5233456345123','2024-10-24 02:40:35','pendiente','8160032ea22638cee0d04f9cd8ecbc0b',53);
 /*!40000 ALTER TABLE `preinscripciones` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -734,7 +736,7 @@ CREATE TABLE `usuario` (
   PRIMARY KEY (`id_usuario`),
   KEY `id_tipo_usuario` (`id_tipo_usuario`),
   CONSTRAINT `usuario_ibfk_1` FOREIGN KEY (`id_tipo_usuario`) REFERENCES `tipo_usuario` (`id_tipo_usuario`)
-) ENGINE=InnoDB AUTO_INCREMENT=65 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=66 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -743,7 +745,7 @@ CREATE TABLE `usuario` (
 
 LOCK TABLES `usuario` WRITE;
 /*!40000 ALTER TABLE `usuario` DISABLE KEYS */;
-INSERT INTO `usuario` VALUES (36,'Santiago','Capon','ID','12341235234','2345-03-12','WhatsApp Image 2024-07-23 at 4.49.07 PM.jpeg','santiagocaponf@gmail.com','32452345','CL 18 A NORTE 2 72',1,'alez','$2y$10$64T2Qk8yptB8y8Rk6Kq26uhnbT3Ias.JH.EXcin2d1BPQCzAvHiM6','2024-08-25 17:43:54','activo','2024-10-14 15:46:30',0,NULL),(42,'chad','sexteto','ID','523456346','3654-04-23','66d273c33d474_Recurso 9europe.jpg','luisillo@gmail.com','4563475674','CL 18 A NORTE 2 72',2,'alez23','$2y$10$FrpZXvgI3WrL22y9MxNtfuQsyQSgCJ7Jm4VPUv3Aa4qEn2HCKdxsK','2024-08-29 16:26:44','activo',NULL,0,NULL),(51,'antonela','sepulveda','ID','342352345','0005-04-23','66d23c1021bab_f7c0528d915ec3b38dd89bf7beb2a194.jpg','scflorez@corsaje.edu.co','42352345','CL 18 A NORTE 2 72',1,'mientras','$2y$10$KJU2liHj854T1T9M.6/EK.xDYy4sfLf2XEwCldj230rdreZmC.3KC','2024-08-30 16:39:28','activo',NULL,0,NULL),(53,'Juanito','Alimaña','ID','43523634','0634-06-02','66d2441faa705_pngwing.com.png','juanit@gmail.com','5233456345123','CL 18 A NORTE 2 72',3,'alez123123','$2y$10$p.bJhCL9d2VM1IjUCnC63.Edj5Pg87KZgKGTFyedUHPusUd.QSDAK','2024-08-30 17:13:51','activo','2024-10-17 23:24:46',0,NULL),(55,'Santiago','Capon','Passport','4234523456','5234-04-23','pngwing.com.png','scflorez@corsaje.edu.co3','53643563456','CL 18 A NORTE 2 72',1,'alez1234','$2y$10$pcvzMHIh1F53bR25oEpRfu5MbZB5FO6Kn3ceIKwNBtp9KWahjApMe','2024-09-03 12:35:04','activo',NULL,0,NULL),(56,'camilo ','prato','ID','1091357317','2024-09-17','67032f8d169dd_images.png','albertocamiloprato@gmail.com','3043282464','Sapo Marica',1,'camilo','$2y$10$pkH8Zi8gEArSclW4KlpcjOm0Tbx5fSF2o8f7Ukw8qUNWj8Bl7i2I.','2024-09-07 18:45:23','activo','2024-10-23 00:17:22',0,NULL),(58,'santiago',NULL,NULL,NULL,NULL,NULL,'edison_alberto@hotmail.com','52343456','',1,'edison_alberto','$2y$10$DLJSPUZnsBduhl5PFRtg6uP5aXma0xTP9FOSkKUN/g2l9MrcP7d3S','2024-09-19 12:02:34','activo',NULL,0,NULL),(59,'Santiago',NULL,NULL,NULL,NULL,NULL,'scapon@misena.edu.co','3034235435','',1,'scapon','$2y$10$yrrLCg7Fr85s6u9jOmiVMO14UhXLMOrHN6krm2bL4fCNqnnCqc4Oy','2024-09-20 20:09:22','activo',NULL,0,NULL),(60,'Alirio','Moncada','ID','3453453346346','5234-04-23',NULL,'albertocamiloprato@gmail.comw','563456346','klerklefjkjdvjkldfj',2,'alberto','$2y$10$PPmdLYLFpZqdPujTBjE46eMTV61llgeDljmfnqdVbiGQoj3XjgbTK','2024-09-20 20:50:39','activo','2024-10-23 00:20:00',0,NULL),(63,NULL,NULL,NULL,NULL,NULL,NULL,'santigao@gmail.com',NULL,'',1,'alez1233','$2y$10$DSX8990wWKG04J/82ENXo.xZAJyQn/flaX2ULl1gFLB3TuZKQpMZ6','2024-09-28 20:04:00','activo',NULL,0,NULL),(64,'camilo','prato profe','ID','13450735','2000-08-14','670c345acc2a8_fondos-de-pantalla-3d-paisaje.jpg','camiloprato234@gmail.com','3043282464','Brr Atalaya',2,'camilop','$2y$10$1Djh88ty26viA.IG41s4oOFrO5NU.mrAiw.6b3VnEVTPDj0qKeg2q','2024-10-13 09:06:40','activo','2024-10-23 00:15:02',0,NULL);
+INSERT INTO `usuario` VALUES (36,'Santiago','Capon','ID','12341235234','2345-03-12','WhatsApp Image 2024-07-23 at 4.49.07 PM.jpeg','santiagocaponf@gmail.com','32452345','CL 18 A NORTE 2 72',1,'alez','$2y$10$64T2Qk8yptB8y8Rk6Kq26uhnbT3Ias.JH.EXcin2d1BPQCzAvHiM6','2024-08-25 17:43:54','activo','2024-10-23 21:41:08',0,NULL),(42,'chad','sexteto','ID','523456346','3654-04-23','66d273c33d474_Recurso 9europe.jpg','luisillo@gmail.com','4563475674','CL 18 A NORTE 2 72',2,'alez23','$2y$10$FrpZXvgI3WrL22y9MxNtfuQsyQSgCJ7Jm4VPUv3Aa4qEn2HCKdxsK','2024-08-29 16:26:44','activo',NULL,0,NULL),(51,'antonela','sepulveda','ID','342352345','0005-04-23','66d23c1021bab_f7c0528d915ec3b38dd89bf7beb2a194.jpg','scflorez@corsaje.edu.co','42352345','CL 18 A NORTE 2 72',1,'mientras','$2y$10$KJU2liHj854T1T9M.6/EK.xDYy4sfLf2XEwCldj230rdreZmC.3KC','2024-08-30 16:39:28','activo',NULL,0,NULL),(53,'Juanito','Alimaña','ID','43523634','0634-06-02','66d2441faa705_pngwing.com.png','juanit@gmail.com','5233456345123','CL 18 A NORTE 2 72',3,'alez123123','$2y$10$p.bJhCL9d2VM1IjUCnC63.Edj5Pg87KZgKGTFyedUHPusUd.QSDAK','2024-08-30 17:13:51','activo','2024-10-23 21:40:13',0,NULL),(55,'Santiago','Capon','Passport','4234523456','5234-04-23','pngwing.com.png','scflorez@corsaje.edu.co3','53643563456','CL 18 A NORTE 2 72',1,'alez1234','$2y$10$pcvzMHIh1F53bR25oEpRfu5MbZB5FO6Kn3ceIKwNBtp9KWahjApMe','2024-09-03 12:35:04','activo',NULL,0,NULL),(56,'camilo ','prato','ID','1091357317','2024-09-17','67032f8d169dd_images.png','albertocamiloprato@gmail.com','3043282464','Sapo Marica',1,'camilo','$2y$10$pkH8Zi8gEArSclW4KlpcjOm0Tbx5fSF2o8f7Ukw8qUNWj8Bl7i2I.','2024-09-07 18:45:23','activo','2024-10-23 00:17:22',0,NULL),(58,'santiago',NULL,NULL,NULL,NULL,NULL,'edison_alberto@hotmail.com','52343456','',1,'edison_alberto','$2y$10$DLJSPUZnsBduhl5PFRtg6uP5aXma0xTP9FOSkKUN/g2l9MrcP7d3S','2024-09-19 12:02:34','activo',NULL,0,NULL),(59,'Santiago',NULL,NULL,NULL,NULL,NULL,'scapon@misena.edu.co','3034235435','',1,'scapon','$2y$10$yrrLCg7Fr85s6u9jOmiVMO14UhXLMOrHN6krm2bL4fCNqnnCqc4Oy','2024-09-20 20:09:22','activo',NULL,0,NULL),(60,'Alirio','Moncada','ID','3453453346346','5234-04-23',NULL,'albertocamiloprato@gmail.comw','563456346','klerklefjkjdvjkldfj',2,'alberto','$2y$10$PPmdLYLFpZqdPujTBjE46eMTV61llgeDljmfnqdVbiGQoj3XjgbTK','2024-09-20 20:50:39','activo','2024-10-23 00:20:00',0,NULL),(63,NULL,NULL,NULL,NULL,NULL,NULL,'santigao@gmail.com',NULL,'',1,'alez1233','$2y$10$DSX8990wWKG04J/82ENXo.xZAJyQn/flaX2ULl1gFLB3TuZKQpMZ6','2024-09-28 20:04:00','activo',NULL,0,NULL),(64,'camilo','prato profe','ID','13450735','2000-08-14','670c345acc2a8_fondos-de-pantalla-3d-paisaje.jpg','camiloprato234@gmail.com','3043282464','Brr Atalaya',2,'camilop','$2y$10$1Djh88ty26viA.IG41s4oOFrO5NU.mrAiw.6b3VnEVTPDj0qKeg2q','2024-10-13 09:06:40','activo','2024-10-23 00:15:02',0,NULL),(65,NULL,NULL,NULL,NULL,NULL,NULL,'alezio@gmail.com',NULL,'',4,'alezio','$2y$10$Aoi7mRPqFZgLA2/7VM8f0eelkVsEaH.HxAKI3IoZ/PcdARIb5koze','2024-10-23 21:43:42','activo','2024-10-23 21:44:17',0,NULL);
 /*!40000 ALTER TABLE `usuario` ENABLE KEYS */;
 UNLOCK TABLES;
 /*!40103 SET TIME_ZONE=@OLD_TIME_ZONE */;
@@ -756,4 +758,4 @@ UNLOCK TABLES;
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
 /*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
 
--- Dump completed on 2024-10-23 20:58:33
+-- Dump completed on 2024-10-23 21:44:37

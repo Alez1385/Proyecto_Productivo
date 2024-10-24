@@ -1,6 +1,6 @@
 function deleteCourse(courseId) {
   if (confirm("¿Estás seguro de que deseas eliminar este curso?")) {
-      fetch('delete_course.php', {
+      fetch('scripts/delete_courses.php', {
               method: 'POST',
               headers: {
                   'Content-Type': 'application/x-www-form-urlencoded',

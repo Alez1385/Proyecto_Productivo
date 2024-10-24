@@ -153,7 +153,7 @@ $cursos = $conn->query("SELECT * FROM resume_cursos");
     <div class="modal-content">
         <span class="btn-close" onclick="closeModal()">&times;</span>
         <div class="modal-header">Mensaje</div>
-        <div class="modal-body" id="modalMessage"> Se ha editado con exito, felicidades </div>
+        <div class="modal-body" id="modalMessage"> Se ha editado con éxito, felicidades </div>
         <div class="modal-footer">
             <button onclick="closeModal()">Aceptar</button>
         </div>

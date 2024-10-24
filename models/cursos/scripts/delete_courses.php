@@ -1,11 +1,8 @@
 <?php
 // Include database connection
 require_once '../../../scripts/conexion.php';
-
+require_once '../../../scripts/error_logger.php';
 // Function to log errors
-function logError($message) {
-    error_log(date('[Y-m-d H:i:s] ') . $message . "\n", 3, '../../logs/error.log');
-}
 
 // Set header to return JSON
 header('Content-Type: application/json');
@@ -31,9 +28,9 @@ try {
     
     if ($stmt->execute()) {
         if ($stmt->affected_rows > 0) {
-            echo json_encode(['success' => true, 'message' => 'Course deleted successfully']);
+            echo json_encode(['success' => true, 'message' => 'Curso eliminado correctamente']);
         } else {
-            echo json_encode(['success' => false, 'message' => 'No course found with the given ID']);
+            echo json_encode(['success' => false, 'message' => 'No se encontro el curso']);
         }
     } else {
         throw new Exception("Error executing delete query: " . $stmt->error);
@@ -41,8 +38,8 @@ try {
     
     $stmt->close();
 } catch (Exception $e) {
-    logError("Error deleting course: " . $e->getMessage());
-    echo json_encode(['success' => false, 'message' => 'An error occurred while deleting the course']);
+    logException($e);
+    echo json_encode(['success' => false, 'message' => 'Ocurrio un error al eliminar el curso: ' . $e->getMessage()]);
 }
 
 $conn->close();
