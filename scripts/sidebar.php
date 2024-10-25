@@ -101,7 +101,11 @@ try {
                     <small class="text-muted"><?php echo htmlspecialchars($user['tipo_nombre']); ?></small>
                 </div>
                 <div class="profile-photo">
-                    <img src="<?php echo BASE_URL . 'uploads/' . htmlspecialchars($user['foto']); ?>" alt="User Image">
+                    <?php
+                    $default_icon = BASE_URL . 'uploads\salir guapo en fotos-605380757.webp'; // Asegúrate de que esta ruta sea correcta
+                    $user_image = !empty($user['foto']) ? BASE_URL . 'uploads/' . htmlspecialchars($user['foto']) : $default_icon;
+                    ?>
+                    <img src="<?php echo $user_image; ?>" alt="User Image">
                 </div>
             </div>
 

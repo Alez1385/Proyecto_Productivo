@@ -35,7 +35,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     $username = filter_input(INPUT_POST, 'username', FILTER_SANITIZE_STRING);
     $password = $_POST['password'] ?? '';
     $password2 = $_POST['password2'] ?? '';
-    $id_tipo_usuario = 4; // Default user type
+    $id_tipo_usuario = 3; // Default user type
 
     // Validar datos
     if (empty($mail) || empty($username) || empty($password) || empty($password2)) {
@@ -72,15 +72,35 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     $stmt = $conn->prepare($sql);
     $stmt->bind_param('siss', $mail, $id_tipo_usuario, $username, $hashedPassword);
 
+    
+
+
     if ($stmt->execute()) {
-        // Redirect to login page with success message
+        $id_usuario = $conn->insert_id;
+        
+        // Si el tipo de usuario es 3 (estudiante), crear un registro en la tabla estudiante
+        if ($id_tipo_usuario == 3) {
+            $sql_estudiante = "INSERT INTO estudiante (id_usuario) VALUES (?)";
+            $stmt_estudiante = $conn->prepare($sql_estudiante);
+            if ($stmt_estudiante) {
+                $stmt_estudiante->bind_param('i', $id_usuario);
+                if (!$stmt_estudiante->execute()) {
+                    logError("Error al crear registro de estudiante: " . $stmt_estudiante->error);
+                    showError("Error al crear el registro de estudiante. Por favor, inténtelo de nuevo.");
+                }
+                $stmt_estudiante->close();
+            } else {
+                logError("Error en la preparación de la consulta de estudiante: " . $conn->error);
+                showError("Error al crear el registro de estudiante. Por favor, inténtelo de nuevo.");
+            }
+        }
+        
+        // Redirigir a la página de usuarios con un mensaje de éxito
         header("Location: ../login.php?message=" . urlencode("Registro exitoso. Por favor inicia sesión.") . "&show=login");
         exit();
     } else {
-        logError("Database error: " . $stmt->error);
-        // Redirect back to the registration form with an error message
-        header("Location: ../login.php?error=" . urlencode("An error occurred during registration. Please try again later.") . "&show=register");
-        exit();
+        logError($stmt->error);
+        showError("Error al crear el usuario. Por favor, inténtelo de nuevo.");
     }
 
     $stmt->close();

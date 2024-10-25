@@ -41,11 +41,33 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     if ($stmt = $conn->prepare($sql)) {
         $stmt->bind_param('ssssssssssssi', $nombre, $apellido, $tipo_doc, $documento, $fecha_nac, $foto, $mail, $telefono, $direccion, $id_tipo_usuario, $username, $clave, $id_usuario);
         if ($stmt->execute()) {
+            // Verificar si el tipo de usuario ha cambiado a profesor
+            if ($id_tipo_usuario == 2) { // Asumiendo que 2 es el ID para profesor
+                // Verificar si ya existe un registro en la tabla profesor para este usuario
+                $check_profesor = $conn->prepare("SELECT id_profesor FROM profesor WHERE id_usuario = ?");
+                $check_profesor->bind_param("i", $id_usuario);
+                $check_profesor->execute();
+                $result = $check_profesor->get_result();
+                
+                if ($result->num_rows == 0) {
+                    // Si no existe, crear un nuevo registro en la tabla profesor
+                    $insert_profesor = $conn->prepare("INSERT INTO profesor (id_usuario, especialidad, experiencia, descripcion) VALUES (?, '', 0, '')");
+                    $insert_profesor->bind_param("i", $id_usuario);
+                    if (!$insert_profesor->execute()) {
+                        logError("Error al crear registro de profesor: " . $insert_profesor->error);
+                        showError("Error al actualizar el usuario como profesor. Por favor, inténtelo de nuevo.");
+                    }
+                    $insert_profesor->close();
+                }
+                $check_profesor->close();
+            }
+            // Aquí puedes agregar lógica similar para otros tipos de usuario y sus tablas correspondientes
+
             // Redirigir a la página de usuarios con un mensaje de éxito
             header("Location: ../users.php");
             exit();
         } else {
-            logError($stmt->error); // Función para registrar errores en un archivo de log
+            logError($stmt->error);
             showError("Error al actualizar el usuario. Por favor, inténtelo de nuevo.");
         }
         $stmt->close();
