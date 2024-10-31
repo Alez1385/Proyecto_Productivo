@@ -11,9 +11,9 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
             WHERE id_profesor = ? 
             AND $dia IS NOT NULL 
             AND (
-                (SUBSTRING_INDEX($dia, ' - ', 1) < ? AND SUBSTRING_INDEX($dia, ' - ', -1) > ?)
-                OR (SUBSTRING_INDEX($dia, ' - ', 1) >= ? AND SUBSTRING_INDEX($dia, ' - ', 1) < ?)
-                OR (? >= SUBSTRING_INDEX($dia, ' - ', 1) AND ? < SUBSTRING_INDEX($dia, ' - ', -1))
+                (STR_TO_DATE($dia, '%H:%i') < ? AND STR_TO_DATE($dia, '%H:%i') > ?)
+                OR (STR_TO_DATE($dia, '%H:%i') >= ? AND STR_TO_DATE($dia, '%H:%i') < ?)
+                OR (? >= STR_TO_DATE($dia, '%H:%i') AND ? < STR_TO_DATE($dia, '%H:%i'))
             )";
 
     $stmt = $conn->prepare($sql);

@@ -502,7 +502,7 @@ aside {
 .sidebar a {
     margin-top: auto; /* Empuja estos elementos hacia abajo */
     padding: 0.5rem;
-    border-top: 1px solid var(--color-light);
+   
 }
 
 .sidebar a:last-child {

@@ -66,7 +66,7 @@ CREATE TABLE `asignacion_curso` (
   CONSTRAINT `asignacion_curso_ibfk_1` FOREIGN KEY (`id_curso`) REFERENCES `cursos` (`id_curso`) ON DELETE CASCADE,
   CONSTRAINT `asignacion_curso_ibfk_2` FOREIGN KEY (`id_profesor`) REFERENCES `profesor` (`id_profesor`),
   CONSTRAINT `asignacion_curso_ibfk_3` FOREIGN KEY (`id_estudiante`) REFERENCES `estudiante` (`id_estudiante`)
-) ENGINE=InnoDB AUTO_INCREMENT=23 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=24 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -75,7 +75,7 @@ CREATE TABLE `asignacion_curso` (
 
 LOCK TABLES `asignacion_curso` WRITE;
 /*!40000 ALTER TABLE `asignacion_curso` DISABLE KEYS */;
-INSERT INTO `asignacion_curso` VALUES (22,2,9,NULL,'2024-10-23',NULL,'activo');
+INSERT INTO `asignacion_curso` VALUES (22,2,9,NULL,'2024-10-23',NULL,'activo'),(23,10,9,NULL,'2024-10-29',NULL,'activo');
 /*!40000 ALTER TABLE `asignacion_curso` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -99,7 +99,7 @@ CREATE TABLE `asistencia` (
   KEY `id_curso` (`id_curso`),
   CONSTRAINT `asistencia_ibfk_1` FOREIGN KEY (`id_estudiante`) REFERENCES `estudiante` (`id_estudiante`),
   CONSTRAINT `asistencia_ibfk_2` FOREIGN KEY (`id_curso`) REFERENCES `cursos` (`id_curso`)
-) ENGINE=InnoDB AUTO_INCREMENT=8 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=9 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -108,7 +108,7 @@ CREATE TABLE `asistencia` (
 
 LOCK TABLES `asistencia` WRITE;
 /*!40000 ALTER TABLE `asistencia` DISABLE KEYS */;
-INSERT INTO `asistencia` VALUES (4,1,1,'2024-10-13','si',NULL,'ausente'),(5,1,1,'2024-10-13','no',NULL,'ausente'),(6,1,1,'2024-10-13',NULL,NULL,'presente'),(7,1,1,'2024-12-04',NULL,NULL,'ausente');
+INSERT INTO `asistencia` VALUES (4,1,1,'2024-10-13','si',NULL,'ausente'),(5,1,1,'2024-10-13','no',NULL,'ausente'),(6,1,1,'2024-10-13',NULL,NULL,'presente'),(7,1,1,'2024-12-04',NULL,NULL,'ausente'),(8,1,10,'2024-10-30',NULL,NULL,'ausente');
 /*!40000 ALTER TABLE `asistencia` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -216,7 +216,7 @@ CREATE TABLE `db_gescursoslecturas_mensajes` (
   `fecha_lectura` timestamp NOT NULL DEFAULT current_timestamp() ON UPDATE current_timestamp(),
   PRIMARY KEY (`id`),
   UNIQUE KEY `id_mensaje` (`id_mensaje`,`id_usuario`)
-) ENGINE=InnoDB AUTO_INCREMENT=756 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=761 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -225,7 +225,7 @@ CREATE TABLE `db_gescursoslecturas_mensajes` (
 
 LOCK TABLES `db_gescursoslecturas_mensajes` WRITE;
 /*!40000 ALTER TABLE `db_gescursoslecturas_mensajes` DISABLE KEYS */;
-INSERT INTO `db_gescursoslecturas_mensajes` VALUES (1,1,56,'2024-10-06 23:44:10'),(2,4,56,'2024-10-09 19:16:08'),(3,5,56,'2024-10-09 19:16:08'),(4,6,56,'2024-10-09 19:16:07'),(5,7,56,'2024-10-09 19:16:06'),(6,9,56,'2024-10-06 18:46:24'),(14,10,56,'2024-10-07 00:06:58'),(15,12,56,'2024-10-07 00:07:01'),(23,13,56,'2024-10-06 18:34:53'),(28,14,56,'2024-10-06 18:22:01'),(30,15,56,'2024-10-06 18:36:18'),(31,16,56,'2024-10-06 18:22:03'),(32,17,56,'2024-10-06 18:22:03'),(45,11,56,'2024-10-06 18:37:59'),(101,18,56,'2024-10-06 18:34:24'),(162,19,56,'2024-10-07 00:07:00'),(165,20,56,'2024-10-06 23:51:51'),(227,22,56,'2024-10-07 00:07:00'),(418,26,56,'2024-10-07 00:05:24'),(419,26,53,'2024-10-06 23:28:43'),(420,24,53,'2024-10-06 23:28:43'),(421,22,53,'2024-10-06 23:28:25'),(426,20,53,'2024-10-06 23:27:43'),(427,6,53,'2024-10-06 23:27:47'),(428,4,53,'2024-10-06 23:27:48'),(429,5,53,'2024-10-06 23:27:39'),(434,19,53,'2024-10-06 23:27:43'),(435,7,53,'2024-10-06 23:27:47'),(436,12,53,'2024-10-06 23:27:44'),(437,10,53,'2024-10-06 23:28:26'),(441,1,53,'2024-10-06 23:27:48'),(463,37,56,'2024-10-09 19:16:05'),(466,38,56,'2024-10-09 19:16:04'),(467,38,53,'2024-10-08 04:36:41'),(469,39,53,'2024-10-08 19:56:46'),(471,40,56,'2024-10-06 23:37:19'),(474,39,56,'2024-10-09 19:16:04'),(481,40,53,'2024-10-08 19:56:47'),(484,41,56,'2024-10-09 19:16:03'),(495,42,53,'2024-10-06 23:37:41'),(496,42,56,'2024-10-09 19:16:09'),(501,24,56,'2024-10-07 00:05:25'),(514,8,56,'2024-10-09 19:16:07'),(679,41,53,'2024-10-08 19:56:47'),(685,37,53,'2024-10-07 19:57:02'),(687,41,36,'2024-10-07 19:57:48'),(688,42,36,'2024-10-07 19:57:49'),(732,49,56,'2024-10-17 20:33:27'),(742,50,56,'2024-10-17 20:33:27'),(754,59,36,'2024-10-24 15:02:32'),(755,61,36,'2024-10-24 15:23:38');
+INSERT INTO `db_gescursoslecturas_mensajes` VALUES (1,1,56,'2024-10-06 23:44:10'),(2,4,56,'2024-10-09 19:16:08'),(3,5,56,'2024-10-09 19:16:08'),(4,6,56,'2024-10-09 19:16:07'),(5,7,56,'2024-10-09 19:16:06'),(6,9,56,'2024-10-06 18:46:24'),(14,10,56,'2024-10-07 00:06:58'),(15,12,56,'2024-10-07 00:07:01'),(23,13,56,'2024-10-06 18:34:53'),(28,14,56,'2024-10-06 18:22:01'),(30,15,56,'2024-10-06 18:36:18'),(31,16,56,'2024-10-06 18:22:03'),(32,17,56,'2024-10-06 18:22:03'),(45,11,56,'2024-10-06 18:37:59'),(101,18,56,'2024-10-06 18:34:24'),(162,19,56,'2024-10-07 00:07:00'),(165,20,56,'2024-10-06 23:51:51'),(227,22,56,'2024-10-07 00:07:00'),(418,26,56,'2024-10-07 00:05:24'),(419,26,53,'2024-10-06 23:28:43'),(420,24,53,'2024-10-06 23:28:43'),(421,22,53,'2024-10-06 23:28:25'),(426,20,53,'2024-10-06 23:27:43'),(427,6,53,'2024-10-06 23:27:47'),(428,4,53,'2024-10-06 23:27:48'),(429,5,53,'2024-10-06 23:27:39'),(434,19,53,'2024-10-06 23:27:43'),(435,7,53,'2024-10-06 23:27:47'),(436,12,53,'2024-10-06 23:27:44'),(437,10,53,'2024-10-06 23:28:26'),(441,1,53,'2024-10-06 23:27:48'),(463,37,56,'2024-10-09 19:16:05'),(466,38,56,'2024-10-09 19:16:04'),(467,38,53,'2024-10-08 04:36:41'),(469,39,53,'2024-10-08 19:56:46'),(471,40,56,'2024-10-06 23:37:19'),(474,39,56,'2024-10-09 19:16:04'),(481,40,53,'2024-10-08 19:56:47'),(484,41,56,'2024-10-09 19:16:03'),(495,42,53,'2024-10-06 23:37:41'),(496,42,56,'2024-10-09 19:16:09'),(501,24,56,'2024-10-07 00:05:25'),(514,8,56,'2024-10-09 19:16:07'),(679,41,53,'2024-10-08 19:56:47'),(685,37,53,'2024-10-07 19:57:02'),(687,41,36,'2024-10-07 19:57:48'),(688,42,36,'2024-10-07 19:57:49'),(732,49,56,'2024-10-17 20:33:27'),(742,50,56,'2024-10-17 20:33:27'),(754,59,36,'2024-10-24 15:02:32'),(755,61,36,'2024-10-24 15:23:38'),(756,61,56,'2024-10-30 03:25:45'),(757,60,56,'2024-10-30 03:25:50'),(758,58,56,'2024-10-30 03:25:51'),(760,57,56,'2024-10-30 03:25:52');
 /*!40000 ALTER TABLE `db_gescursoslecturas_mensajes` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -279,7 +279,7 @@ CREATE TABLE `historial_inscripciones` (
   KEY `historial_inscripciones_ibfk_2` (`id_usuario_cambio`),
   CONSTRAINT `historial_inscripciones_ibfk_1` FOREIGN KEY (`id_inscripcion`) REFERENCES `inscripciones` (`id_inscripcion`),
   CONSTRAINT `historial_inscripciones_ibfk_2` FOREIGN KEY (`id_usuario_cambio`) REFERENCES `usuario` (`id_usuario`) ON DELETE CASCADE ON UPDATE CASCADE
-) ENGINE=InnoDB AUTO_INCREMENT=96 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=97 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -288,7 +288,7 @@ CREATE TABLE `historial_inscripciones` (
 
 LOCK TABLES `historial_inscripciones` WRITE;
 /*!40000 ALTER TABLE `historial_inscripciones` DISABLE KEYS */;
-INSERT INTO `historial_inscripciones` VALUES (92,77,'pendiente','aprobada','2024-10-24 02:41:14',36),(93,77,'aprobada','pendiente','2024-10-24 15:00:26',36),(94,77,'pendiente','aprobada','2024-10-24 15:13:03',36),(95,77,'aprobada','rechazada','2024-10-24 15:18:58',36);
+INSERT INTO `historial_inscripciones` VALUES (92,77,'pendiente','aprobada','2024-10-24 02:41:14',36),(93,77,'aprobada','pendiente','2024-10-24 15:00:26',36),(94,77,'pendiente','aprobada','2024-10-24 15:13:03',36),(95,77,'aprobada','rechazada','2024-10-24 15:18:58',36),(96,78,'pendiente','aprobada','2024-10-30 03:27:17',56);
 /*!40000 ALTER TABLE `historial_inscripciones` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -318,7 +318,7 @@ CREATE TABLE `horarios` (
   KEY `id_profesor` (`id_profesor`),
   CONSTRAINT `horarios_ibfk_1` FOREIGN KEY (`id_curso`) REFERENCES `cursos` (`id_curso`) ON DELETE CASCADE,
   CONSTRAINT `horarios_ibfk_2` FOREIGN KEY (`id_profesor`) REFERENCES `profesor` (`id_profesor`) ON DELETE CASCADE
-) ENGINE=InnoDB AUTO_INCREMENT=30 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=33 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -327,7 +327,7 @@ CREATE TABLE `horarios` (
 
 LOCK TABLES `horarios` WRITE;
 /*!40000 ALTER TABLE `horarios` DISABLE KEYS */;
-INSERT INTO `horarios` VALUES (29,2,10,'2024-10-22 22:18:38','lunes','09:00 - 18:00',NULL,NULL,NULL,NULL,NULL,NULL,NULL);
+INSERT INTO `horarios` VALUES (30,10,9,'2024-10-30 03:29:51','lunes','06:00 - 07:00','07:00 - 08:00','14:00 - 15:00','16:00 - 17:00','17:30 - 19:07','18:30 - 20:00',NULL,NULL);
 /*!40000 ALTER TABLE `horarios` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -352,7 +352,7 @@ CREATE TABLE `inscripciones` (
   KEY `idx_inscripciones_curso_estudiante` (`id_curso`,`id_estudiante`),
   CONSTRAINT `inscripciones_ibfk_1` FOREIGN KEY (`id_curso`) REFERENCES `cursos` (`id_curso`),
   CONSTRAINT `inscripciones_ibfk_2` FOREIGN KEY (`id_estudiante`) REFERENCES `estudiante` (`id_estudiante`)
-) ENGINE=InnoDB AUTO_INCREMENT=78 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=79 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -361,7 +361,7 @@ CREATE TABLE `inscripciones` (
 
 LOCK TABLES `inscripciones` WRITE;
 /*!40000 ALTER TABLE `inscripciones` DISABLE KEYS */;
-INSERT INTO `inscripciones` VALUES (77,1,1,'2024-10-23','rechazada','2024-10-24 15:18:58','../../uploads/comprobantes/1729737647_coomadenort.jpg');
+INSERT INTO `inscripciones` VALUES (77,1,1,'2024-10-23','rechazada','2024-10-24 15:18:58','../../uploads/comprobantes/1729737647_coomadenort.jpg'),(78,10,1,'2024-10-29','aprobada','2024-10-30 03:27:17','../uploads/comprobantes/1730258810_BASKET11.jpg');
 /*!40000 ALTER TABLE `inscripciones` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -745,7 +745,7 @@ CREATE TABLE `usuario` (
 
 LOCK TABLES `usuario` WRITE;
 /*!40000 ALTER TABLE `usuario` DISABLE KEYS */;
-INSERT INTO `usuario` VALUES (36,'Santiago','Capone','ID','12341235234','2345-03-12','WhatsApp Image 2024-07-23 at 4.49.07 PM.jpeg','santiagocaponf@gmail.com','32452345','CL 18 A NORTE 2 72',1,'alez','$2y$10$64T2Qk8yptB8y8Rk6Kq26uhnbT3Ias.JH.EXcin2d1BPQCzAvHiM6','2024-08-25 17:43:54','activo','2024-10-24 10:22:21',0,NULL),(42,'chad','sexteto','ID','523456346','3654-04-23','66d273c33d474_Recurso 9europe.jpg','luisillo@gmail.com','4563475674','CL 18 A NORTE 2 72',2,'alez23','$2y$10$FrpZXvgI3WrL22y9MxNtfuQsyQSgCJ7Jm4VPUv3Aa4qEn2HCKdxsK','2024-08-29 16:26:44','activo',NULL,0,NULL),(51,'antonela','sepulveda','ID','342352345','0005-04-23','66d23c1021bab_f7c0528d915ec3b38dd89bf7beb2a194.jpg','scflorez@corsaje.edu.co','42352345','CL 18 A NORTE 2 72',1,'mientras','$2y$10$KJU2liHj854T1T9M.6/EK.xDYy4sfLf2XEwCldj230rdreZmC.3KC','2024-08-30 16:39:28','activo',NULL,0,NULL),(53,'Juanitos','Alimaña','ID','43523634','0634-06-02','66d2441faa705_pngwing.com.png','juanit@gmail.com','5233456345123','CL 18 A NORTE 2 72',3,'alez123123','$2y$10$p.bJhCL9d2VM1IjUCnC63.Edj5Pg87KZgKGTFyedUHPusUd.QSDAK','2024-08-30 17:13:51','activo','2024-10-24 10:17:35',0,NULL),(55,'Santiago','Capon','Passport','4234523456','5234-04-23','pngwing.com.png','scflorez@corsaje.edu.co3','53643563456','CL 18 A NORTE 2 72',1,'alez1234','$2y$10$pcvzMHIh1F53bR25oEpRfu5MbZB5FO6Kn3ceIKwNBtp9KWahjApMe','2024-09-03 12:35:04','activo',NULL,0,NULL),(56,'camilo ','prato','ID','1091357317','2024-09-17','67032f8d169dd_images.png','albertocamiloprato@gmail.com','3043282464','Sapo Marica',1,'camilo','$2y$10$pkH8Zi8gEArSclW4KlpcjOm0Tbx5fSF2o8f7Ukw8qUNWj8Bl7i2I.','2024-09-07 18:45:23','activo','2024-10-24 08:47:47',0,NULL),(58,'santiago',NULL,NULL,NULL,NULL,NULL,'edison_alberto@hotmail.com','52343456','',1,'edison_alberto','$2y$10$DLJSPUZnsBduhl5PFRtg6uP5aXma0xTP9FOSkKUN/g2l9MrcP7d3S','2024-09-19 12:02:34','activo',NULL,0,NULL),(59,'Santiago',NULL,NULL,NULL,NULL,NULL,'scapon@misena.edu.co','3034235435','',1,'scapon','$2y$10$yrrLCg7Fr85s6u9jOmiVMO14UhXLMOrHN6krm2bL4fCNqnnCqc4Oy','2024-09-20 20:09:22','activo',NULL,0,NULL),(60,'Alirio','Moncada','ID','3453453346346','5234-04-23','671a4e6e8c19d_jkjhh.png','albertocamiloprato@gmail.comw','563456346','klerklefjkjdvjkldfj',2,'alberto','$2y$10$PPmdLYLFpZqdPujTBjE46eMTV61llgeDljmfnqdVbiGQoj3XjgbTK','2024-09-20 20:50:39','activo','2024-10-24 08:40:54',0,NULL),(63,NULL,NULL,NULL,NULL,NULL,NULL,'santigao@gmail.com',NULL,'',1,'alez1233','$2y$10$DSX8990wWKG04J/82ENXo.xZAJyQn/flaX2ULl1gFLB3TuZKQpMZ6','2024-09-28 20:04:00','activo',NULL,0,NULL),(64,'camilo','prato profe','ID','13450735','2000-08-14','670c345acc2a8_fondos-de-pantalla-3d-paisaje.jpg','camiloprato234@gmail.com','3043282464','Brr Atalaya',2,'camilop','$2y$10$1Djh88ty26viA.IG41s4oOFrO5NU.mrAiw.6b3VnEVTPDj0qKeg2q','2024-10-13 09:06:40','activo','2024-10-23 00:15:02',0,NULL),(65,NULL,NULL,NULL,NULL,NULL,NULL,'alezio@gmail.com',NULL,'',4,'alezio','$2y$10$Aoi7mRPqFZgLA2/7VM8f0eelkVsEaH.HxAKI3IoZ/PcdARIb5koze','2024-10-23 21:43:42','activo','2024-10-23 21:44:17',0,NULL),(66,NULL,NULL,NULL,NULL,NULL,NULL,'abortopacamodda@gmail.com',NULL,'',3,'camilo peñaranda','$2y$10$PprcAWUiflXNx7PWvt5jKe8b1efpTANoZS3uiClCBOrCnbSDapCaC','2024-10-24 08:46:37','activo','2024-10-24 08:48:29',0,NULL),(67,'Sinfonica',NULL,NULL,NULL,NULL,NULL,'michel.camilo.566@co.co','3222','',4,'michel.camilo.566','$argon2id$v=19$m=65536,t=4,p=1$RThQc3BZRUpxWGNUMkFCcA$irxitnqgibgqolUHW8tbl4Sizq+HMMHgdqyn/TRhhJo','2024-10-24 09:32:38','activo',NULL,0,NULL),(68,NULL,NULL,NULL,NULL,NULL,NULL,'lklkalaf@gmail.com',NULL,'',3,'camilokis','$2y$10$Q5FEcR8qnPvWGuP2Izc0y.si/Fs8bQ6VPbAJgOEY2d2qGuirOxGhq','2024-10-24 09:34:45','activo','2024-10-24 09:35:39',0,NULL),(69,NULL,NULL,NULL,NULL,NULL,NULL,'ldasdfklkalaf@gmail.com',NULL,'',3,'camilokisa','$2y$10$3eU8k37qwB5pYAWFwAm/xusZUeRQ/9KNQSrcc64wNkU5.mQxv9Ic2','2024-10-24 09:43:40','activo',NULL,0,NULL),(70,NULL,NULL,NULL,NULL,NULL,NULL,'santiagoca@gmail.comd',NULL,'',3,'camilokisalo','$2y$10$91rsTlSGxc3LUeGwuj6xu.HEb0bcoJzkKP3L3kBBYKT4OCO3n/iX.','2024-10-24 09:51:43','activo','2024-10-24 09:51:52',0,NULL);
+INSERT INTO `usuario` VALUES (36,'Santiago','Capone','ID','12341235234','2345-03-12','WhatsApp Image 2024-07-23 at 4.49.07 PM.jpeg','santiagocaponf@gmail.com','32452345','CL 18 A NORTE 2 72',1,'alez','$2y$10$64T2Qk8yptB8y8Rk6Kq26uhnbT3Ias.JH.EXcin2d1BPQCzAvHiM6','2024-08-25 17:43:54','activo','2024-10-24 10:22:21',0,NULL),(42,'chad','sexteto','ID','523456346','3654-04-23','66d273c33d474_Recurso 9europe.jpg','luisillo@gmail.com','4563475674','CL 18 A NORTE 2 72',2,'alez23','$2y$10$FrpZXvgI3WrL22y9MxNtfuQsyQSgCJ7Jm4VPUv3Aa4qEn2HCKdxsK','2024-08-29 16:26:44','activo',NULL,0,NULL),(51,'antonela','sepulveda','ID','342352345','0005-04-23','66d23c1021bab_f7c0528d915ec3b38dd89bf7beb2a194.jpg','scflorez@corsaje.edu.co','42352345','CL 18 A NORTE 2 72',1,'mientras','$2y$10$KJU2liHj854T1T9M.6/EK.xDYy4sfLf2XEwCldj230rdreZmC.3KC','2024-08-30 16:39:28','activo',NULL,0,NULL),(53,'Juanitos','Alimaña','ID','43523634','0634-06-02','66d2441faa705_pngwing.com.png','juanit@gmail.com','5233456345123','CL 18 A NORTE 2 72',3,'alez123123','$2y$10$p.bJhCL9d2VM1IjUCnC63.Edj5Pg87KZgKGTFyedUHPusUd.QSDAK','2024-08-30 17:13:51','activo','2024-10-29 22:26:36',0,NULL),(55,'Santiago','Capon','Passport','4234523456','5234-04-23','pngwing.com.png','scflorez@corsaje.edu.co3','53643563456','CL 18 A NORTE 2 72',1,'alez1234','$2y$10$pcvzMHIh1F53bR25oEpRfu5MbZB5FO6Kn3ceIKwNBtp9KWahjApMe','2024-09-03 12:35:04','activo',NULL,0,NULL),(56,'camilo ','prato','ID','1091357317','2024-09-17','67032f8d169dd_images.png','albertocamiloprato@gmail.com','3043282464','Sapo Marica',1,'camilo','$2y$10$pkH8Zi8gEArSclW4KlpcjOm0Tbx5fSF2o8f7Ukw8qUNWj8Bl7i2I.','2024-09-07 18:45:23','activo','2024-10-30 20:14:14',0,NULL),(58,'santiago',NULL,NULL,NULL,NULL,NULL,'edison_alberto@hotmail.com','52343456','',1,'edison_alberto','$2y$10$DLJSPUZnsBduhl5PFRtg6uP5aXma0xTP9FOSkKUN/g2l9MrcP7d3S','2024-09-19 12:02:34','activo',NULL,0,NULL),(59,'Santiago',NULL,NULL,NULL,NULL,NULL,'scapon@misena.edu.co','3034235435','',1,'scapon','$2y$10$yrrLCg7Fr85s6u9jOmiVMO14UhXLMOrHN6krm2bL4fCNqnnCqc4Oy','2024-09-20 20:09:22','activo',NULL,0,NULL),(60,'Alirio','Moncada','ID','3453453346346','5234-04-23','671a4e6e8c19d_jkjhh.png','albertocamiloprato@gmail.comw','563456346','klerklefjkjdvjkldfj',2,'alberto','$2y$10$PPmdLYLFpZqdPujTBjE46eMTV61llgeDljmfnqdVbiGQoj3XjgbTK','2024-09-20 20:50:39','activo','2024-10-29 22:23:50',0,NULL),(63,NULL,NULL,NULL,NULL,NULL,NULL,'santigao@gmail.com',NULL,'',1,'alez1233','$2y$10$DSX8990wWKG04J/82ENXo.xZAJyQn/flaX2ULl1gFLB3TuZKQpMZ6','2024-09-28 20:04:00','activo',NULL,0,NULL),(64,'camilo','prato profe','ID','13450735','2000-08-14','670c345acc2a8_fondos-de-pantalla-3d-paisaje.jpg','camiloprato234@gmail.com','3043282464','Brr Atalaya',2,'camilop','$2y$10$1Djh88ty26viA.IG41s4oOFrO5NU.mrAiw.6b3VnEVTPDj0qKeg2q','2024-10-13 09:06:40','activo','2024-10-23 00:15:02',0,NULL),(65,NULL,NULL,NULL,NULL,NULL,NULL,'alezio@gmail.com',NULL,'',4,'alezio','$2y$10$Aoi7mRPqFZgLA2/7VM8f0eelkVsEaH.HxAKI3IoZ/PcdARIb5koze','2024-10-23 21:43:42','activo','2024-10-23 21:44:17',0,NULL),(66,NULL,NULL,NULL,NULL,NULL,NULL,'abortopacamodda@gmail.com',NULL,'',3,'camilo peñaranda','$2y$10$PprcAWUiflXNx7PWvt5jKe8b1efpTANoZS3uiClCBOrCnbSDapCaC','2024-10-24 08:46:37','activo','2024-10-24 08:48:29',0,NULL),(67,'Sinfonica',NULL,NULL,NULL,NULL,NULL,'michel.camilo.566@co.co','3222','',4,'michel.camilo.566','$argon2id$v=19$m=65536,t=4,p=1$RThQc3BZRUpxWGNUMkFCcA$irxitnqgibgqolUHW8tbl4Sizq+HMMHgdqyn/TRhhJo','2024-10-24 09:32:38','activo',NULL,0,NULL),(68,NULL,NULL,NULL,NULL,NULL,NULL,'lklkalaf@gmail.com',NULL,'',3,'camilokis','$2y$10$Q5FEcR8qnPvWGuP2Izc0y.si/Fs8bQ6VPbAJgOEY2d2qGuirOxGhq','2024-10-24 09:34:45','activo','2024-10-24 09:35:39',0,NULL),(69,NULL,NULL,NULL,NULL,NULL,NULL,'ldasdfklkalaf@gmail.com',NULL,'',3,'camilokisa','$2y$10$3eU8k37qwB5pYAWFwAm/xusZUeRQ/9KNQSrcc64wNkU5.mQxv9Ic2','2024-10-24 09:43:40','activo',NULL,0,NULL),(70,NULL,NULL,NULL,NULL,NULL,NULL,'santiagoca@gmail.comd',NULL,'',3,'camilokisalo','$2y$10$91rsTlSGxc3LUeGwuj6xu.HEb0bcoJzkKP3L3kBBYKT4OCO3n/iX.','2024-10-24 09:51:43','activo','2024-10-24 09:51:52',0,NULL);
 /*!40000 ALTER TABLE `usuario` ENABLE KEYS */;
 UNLOCK TABLES;
 /*!40103 SET TIME_ZONE=@OLD_TIME_ZONE */;
@@ -758,4 +758,4 @@ UNLOCK TABLES;
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
 /*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
 
--- Dump completed on 2024-10-24 19:50:23
+-- Dump completed on 2024-10-30 20:32:02

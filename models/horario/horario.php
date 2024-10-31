@@ -163,125 +163,50 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
 
     <script>
     document.addEventListener('DOMContentLoaded', function() {
-        const form = document.getElementById('horarioForm');
-        form.addEventListener('submit', function(event) {
-            const inputs = form.querySelectorAll('input[type="time"]');
-            let isValid = true;
+        const profesorSelect = document.getElementById('profesor');
+        const dias = ['lunes', 'martes', 'miercoles', 'jueves', 'viernes', 'sabado'];
+        const submitButton = document.getElementById('submitButton');
+        let formValido = true;
 
-            inputs.forEach(function(input) {
-                if (input.value) {
-                    const time = input.value;
-                    if (time < "06:00" || time > "20:00") {
-                        isValid = false;
-                        input.setCustomValidity('Las horas deben estar entre las 6:00 AM y las 8:00 PM.');
-                    } else {
-                        input.setCustomValidity('');
-                    }
+        function verificarDisponibilidad() {
+            const idProfesor = profesorSelect.value;
+            const promesas = dias.map(dia => {
+                const horaInicio = document.querySelector(`input[name="hora_inicio[${dia}]"]`).value;
+                const horaFin = document.querySelector(`input[name="hora_fin[${dia}]"]`).value;
+                const errorElement = document.getElementById(`error_${dia}`);
+
+                if (horaInicio && horaFin) {
+                    return fetch('verificar_disponibilidad.php', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/x-www-form-urlencoded',
+                        },
+                        body: `id_profesor=${idProfesor}&dia=${dia}&hora_inicio=${horaInicio}&hora_fin=${horaFin}`
+                    })
+                    .then(response => response.json())
+                    .then(data => {
+                        if (data.disponible) {
+                            errorElement.textContent = '';
+                            errorElement.style.display = 'none';
+                        } else {
+                            errorElement.textContent = 'El profesor ya tiene un horario asignado que se superpone en este período.';
+                            errorElement.style.display = 'block';
+                            formValido = false;
+                        }
+                    });
                 }
+                return Promise.resolve();
             });
 
-            if (!isValid) {
-                event.preventDefault();
-            }
-            const dias = ['lunes', 'martes', 'miercoles', 'jueves', 'viernes', 'sabado'];
-        dias.forEach(function(dia) {
-            const inicioInput = document.querySelector(`input[name="hora_inicio[${dia}]"]`);
-            const finInput = document.querySelector(`input[name="hora_fin[${dia}]"]`);
-        });
-
-            function verificarDisponibilidad() {
-                const idProfesor = profesorSelect.value;
-                if (!idProfesor) return;
-
-                if (!verificarHorarios()) {
-                    submitButton.disabled = true;
-                    return;
-                }
-
-                const promesas = dias.map(dia => {
-                    const horaInicio = document.getElementById(`hora_inicio_${dia}`).value;
-                    const horaFin = document.getElementById(`hora_fin_${dia}`).value;
-                    if (horaInicio && horaFin) {
-                        return fetch('verificar_disponibilidad.php', {
-                            method: 'POST',
-                            headers: {
-                                'Content-Type': 'application/x-www-form-urlencoded',
-                            },
-                            body: `id_profesor=${idProfesor}&dia=${dia}&hora_inicio=${horaInicio}&hora_fin=${horaFin}`
-                        })
-                        .then(response => response.json())
-                        .then(data => {
-                            const errorElement = document.getElementById(`error_${dia}`);
-                            if (data.disponible) {
-                                errorElement.textContent = '';
-                                errorElement.style.display = 'none';
-                            } else {
-                                errorElement.textContent = 'El profesor ya tiene un horario asignado que se superpone en este período.';
-                                errorElement.style.display = 'block';
-                                formValido = false;
-                            }
-                        });
-                    }
-                    return Promise.resolve();
-                });
-
-                Promise.all(promesas).then(() => {
-                    submitButton.disabled = !formValido;
-                });
-            }
-
-            profesorSelect.addEventListener('change', verificarDisponibilidad);
-            dias.forEach(dia => {
-                document.getElementById(`hora_inicio_${dia}`).addEventListener('change', verificarDisponibilidad);
-                document.getElementById(`hora_fin_${dia}`).addEventListener('change', verificarDisponibilidad);
+            Promise.all(promesas).then(() => {
+                submitButton.disabled = !formValido;
             });
+        }
 
-            // Verificar disponibilidad inicial
-            verificarDisponibilidad();
-
-            // Prevenir envío del formulario si no es válido
-            document.getElementById('horarioForm').addEventListener('submit', function(event) {
-                if (!verificarHorarios() || !formValido) {
-                    event.preventDefault();
-                    alert('Por favor, corrija los errores en los horarios antes de guardar.');
-                }
-            });
-        });
-
-        // Agregar validación de rango de horas
-        document.getElementById('horarioForm').addEventListener('submit', function(event) {
-            var inputs = this.getElementsByTagName('input');
-            for (var i = 0; i < inputs.length; i++) {
-                if (inputs[i].type === 'time') {
-                    var time = inputs[i].value;
-                    if (time < "06:00" || time > "20:00") {
-                        alert('Las horas deben estar entre las 6:00 AM y las 8:00 PM.');
-                        event.preventDefault();
-                        return;
-                    }
-                }
-            }
-        });
-
-        // Agregar validación adicional para verificar si el curso ya tiene horario
-        document.getElementById('horarioForm').addEventListener('submit', function(event) {
-            const cursoSelect = document.getElementById('curso');
-            if (cursoSelect.options.length === 0) {
-                alert('No hay cursos disponibles para asignar horario.');
-                event.preventDefault();
-                return;
-            }
-        });
-
-        finInput.addEventListener('change', function() {
-                if (inicioInput.value && finInput.value) {
-                    if (inicioInput.value >= finInput.value) {
-                        finInput.setCustomValidity('La hora de fin debe ser mayor que la hora de inicio.');
-                    } else {
-                        finInput.setCustomValidity('');
-                    }
-                }
-            });
+        profesorSelect.addEventListener('change', verificarDisponibilidad);
+        dias.forEach(dia => {
+            document.querySelector(`input[name="hora_inicio[${dia}]"]`).addEventListener('change', verificarDisponibilidad);
+            document.querySelector(`input[name="hora_fin[${dia}]"]`).addEventListener('change', verificarDisponibilidad);
         });
     });
     </script>

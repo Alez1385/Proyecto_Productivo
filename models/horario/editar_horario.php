@@ -158,8 +158,8 @@ if (!$horario) {
             const submitButton = document.getElementById('submitButton');
             let formValido = true;
 
-          
-
+            function verificarDisponibilidad() {
+                const idProfesor = profesorSelect.value;
                 const promesas = dias.map(dia => {
                     const horaInicio = document.querySelector(`input[name="hora_inicio[${dia}]"]`).value;
                     const horaFin = document.querySelector(`input[name="hora_fin[${dia}]"]`).value;
