@@ -59,7 +59,8 @@ try {
         SELECT i.*, c.nombre_curso
         FROM inscripciones i
         INNER JOIN cursos c ON i.id_curso = c.id_curso
-        WHERE i.id_estudiante = ?
+        WHERE i.id_estudiante = ? AND i.estado = 'aprobada'
+        ORDER BY i.id_inscripcion DESC
     ", [$id_estudiante]);
 
     // Fetch pre-enrollments

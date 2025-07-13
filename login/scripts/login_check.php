@@ -46,7 +46,7 @@ if (empty($username) || empty($password)) {
 }
 
 // Prepare SQL query
-$sql = "SELECT u.id_usuario, u.username, u.clave, u.mail, u.is_locked, u.lock_timestamp, t.nombre AS tipo_nombre
+$sql = "SELECT u.id_usuario, u.username, u.clave, u.mail, u.is_locked, u.lock_timestamp, u.id_tipo_usuario, t.nombre AS tipo_nombre
         FROM usuario u
         JOIN tipo_usuario t ON u.id_tipo_usuario = t.id_tipo_usuario
         WHERE u.username = ? OR u.mail = ?";
@@ -83,14 +83,15 @@ if ($result->num_rows > 0) {
         error_log("Password verified successfully");
         // Successful authentication, create sessions
         if (isset($user['id_usuario'])) {
-            $_SESSION['id_usuario'] = $user['id_usuario'];
-            error_log("Session ID set successfully");
-        } else {
-            error_log("Error: User ID not found in database.");
-            redirectWithError('invalid_user');
-        }
-        $_SESSION['username'] = $user['username'];
-        $_SESSION['user_role'] = $user['tipo_nombre'];  // Using tipo_nombre as user_role
+                    $_SESSION['id_usuario'] = $user['id_usuario'];
+        error_log("Session ID set successfully");
+    } else {
+        error_log("Error: User ID not found in database.");
+        redirectWithError('invalid_user');
+    }
+    $_SESSION['username'] = $user['username'];
+    $_SESSION['user_role'] = $user['tipo_nombre'];  // Using tipo_nombre as user_role
+    $_SESSION['id_tipo_usuario'] = $user['id_tipo_usuario'];  // Store the numeric user type ID
         updateLastAccess($user['id_usuario']);
         error_log("Session data set: " . print_r($_SESSION, true));
         

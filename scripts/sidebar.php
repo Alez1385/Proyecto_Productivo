@@ -58,6 +58,7 @@ try {
     $user = getUserInfo($conn, $_SESSION['id_usuario']);
     $modules = getModules($conn, $user['id_tipo_usuario']);
     $isUserTypeUser = ($user['tipo_nombre'] === 'user');
+    $id_tipo_usuario = $_SESSION['id_tipo_usuario'] ?? null;
 
     // Get saved order and reorder modules
     $savedOrder = getSavedModuleOrder($conn, $_SESSION['id_usuario']);
@@ -119,24 +120,15 @@ try {
                         </a>
                     </div>
 
-                    <?php if ($isUserTypeUser): ?>
-                        <!-- Solo Perfil para usuarios tipo user -->
-                        <div class="sidebar-item">
-                            <a href="/models/perfil/perfil.php">
-                                <span class="material-icons-sharp">person</span>
-                                <h3>Perfil</h3>
+                    <!-- Módulos dinámicos para todos los usuarios -->
+                    <?php foreach ($modules as $module): ?>
+                        <div class="sidebar-item" draggable="true" data-module-id="<?php echo htmlspecialchars($module['id_modulo'], ENT_QUOTES, 'UTF-8'); ?>">
+                            <a href="<?php echo BASE_URL . htmlspecialchars($module['url'], ENT_QUOTES, 'UTF-8'); ?>">
+                                <span class="material-icons-sharp"><?php echo htmlspecialchars($module['icono'], ENT_QUOTES, 'UTF-8'); ?></span>
+                                <h3><?php echo htmlspecialchars($module['nom_modulo'], ENT_QUOTES, 'UTF-8'); ?></h3>
                             </a>
                         </div>
-                    <?php else: ?>
-                        <?php foreach ($modules as $module): ?>
-                            <div class="sidebar-item" draggable="true" data-module-id="<?php echo htmlspecialchars($module['id_modulo'], ENT_QUOTES, 'UTF-8'); ?>">
-                                <a href="<?php echo BASE_URL . htmlspecialchars($module['url'], ENT_QUOTES, 'UTF-8'); ?>">
-                                    <span class="material-icons-sharp"><?php echo htmlspecialchars($module['icono'], ENT_QUOTES, 'UTF-8'); ?></span>
-                                    <h3><?php echo htmlspecialchars($module['nom_modulo'], ENT_QUOTES, 'UTF-8'); ?></h3>
-                                </a>
-                            </div>
-                        <?php endforeach; ?>
-                    <?php endif; ?>
+                    <?php endforeach; ?>
                 </div>
             </div>
 

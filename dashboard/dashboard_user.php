@@ -71,6 +71,26 @@ if (!empty($user['fecha_registro'])) {
     $diferencia = $hoy->diff($fecha_registro);
     $dias_registrado = $diferencia->days;
 }
+
+// Restaurar sección de notificaciones de usuario de forma segura
+$notificaciones = [];
+$id_usuario = $_SESSION['id_usuario'] ?? null;
+if ($id_usuario && isset($conn)) {
+    // Verificar si la tabla existe antes de consultar
+    $check = $conn->query("SHOW TABLES LIKE 'notificaciones_user'");
+    if ($check && $check->num_rows > 0) {
+        $sql_notif = "SELECT * FROM notificaciones_user WHERE id_usuario = ? ORDER BY fecha DESC LIMIT 20";
+        $stmt_notif = $conn->prepare($sql_notif);
+        if ($stmt_notif) {
+            $stmt_notif->bind_param("i", $id_usuario);
+            $stmt_notif->execute();
+            $res_notif = $stmt_notif->get_result();
+            while ($row = $res_notif->fetch_assoc()) {
+                $notificaciones[] = $row;
+            }
+        }
+    }
+}
 ?>
 <link rel="stylesheet" href="../dashboard/css/estudiante.css">
 <style>
@@ -295,6 +315,34 @@ if (!empty($user['fecha_registro'])) {
             <p><?php echo $dias_registrado; ?></p>
         </div>
     </div>
+
+    <?php if (count($notificaciones) > 0): ?>
+<div class="notificaciones-user" style="margin-bottom:30px;">
+    <h2 style="font-size:1.3em;color:#2176ae;margin-bottom:10px;">Notificaciones</h2>
+    <table style="width:100%;background:#f8fbff;border-radius:8px;box-shadow:0 2px 8px #eaf6fb;font-size:15px;">
+        <thead>
+            <tr style="background:#eaf6fb;color:#2176ae;">
+                <th style="padding:8px 6px;">Título</th>
+                <th style="padding:8px 6px;">Mensaje</th>
+                <th style="padding:8px 6px;">Fecha</th>
+                <th style="padding:8px 6px;">Estado</th>
+            </tr>
+        </thead>
+        <tbody>
+            <?php foreach ($notificaciones as $notif): ?>
+            <tr style="background:<?= $notif['leido'] ? '#f8fbff' : '#d4edfa' ?>;">
+                <td style="padding:8px 6px;"><strong><?= htmlspecialchars($notif['titulo']) ?></strong></td>
+                <td style="padding:8px 6px;"><?= nl2br(htmlspecialchars($notif['mensaje'])) ?></td>
+                <td style="padding:8px 6px;"><?= date('d/m/Y H:i', strtotime($notif['fecha'])) ?></td>
+                <td style="padding:8px 6px; color:<?= $notif['leido'] ? '#888' : '#2176ae' ?>;">
+                    <?= $notif['leido'] ? 'Leído' : 'No leído' ?>
+                </td>
+            </tr>
+            <?php endforeach; ?>
+        </tbody>
+    </table>
+</div>
+<?php endif; ?>
 
     <h2 id="inscripciones-section" style="margin-top:32px;">Inscripciones Disponibles</h2>
     <div class="course-list">

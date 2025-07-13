@@ -10,14 +10,16 @@ if (!$id_curso) {
     die("ID de curso no válido.");
 }
 
-// Consulta SQL para obtener los horarios
+// Consulta SQL simplificada para obtener un solo registro de horario por curso
 $sql = "SELECT c.nombre_curso, h.lunes, h.martes, h.miercoles, h.jueves, h.viernes, h.sabado, 
                CONCAT(u.nombre, ' ', u.apellido) as nombre_profesor
         FROM cursos c
         LEFT JOIN horarios h ON c.id_curso = h.id_curso
         LEFT JOIN profesor p ON h.id_profesor = p.id_profesor
         LEFT JOIN usuario u ON p.id_usuario = u.id_usuario
-        WHERE c.id_curso = ?";
+        WHERE c.id_curso = ?
+        ORDER BY h.id_horario DESC
+        LIMIT 1";
 
 $stmt = $conn->prepare($sql);
 $stmt->bind_param("i", $id_curso);

@@ -25,7 +25,7 @@ function getInscripciones(mysqli $conn, array $filtros = []): array
         $sql .= " WHERE " . implode(" AND ", $whereConditions);
     }
 
-    $sql .= " ORDER BY i.fecha_inscripcion DESC";
+    $sql .= " ORDER BY i.id_inscripcion DESC";
 
     // Log para debugging
     error_log("SQL Query: " . $sql);

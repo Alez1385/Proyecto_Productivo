@@ -59,6 +59,7 @@ function authenticateUser() {
                 $_SESSION['id_usuario'] = $user['id_usuario'];
                 $_SESSION['username'] = $user['username'];
                 $_SESSION['user_role'] = $user['role'];
+                $_SESSION['id_tipo_usuario'] = $user['id_tipo_usuario'];
 
                 error_log("Session data set: " . print_r($_SESSION, true));
 

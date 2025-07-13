@@ -42,11 +42,12 @@ $id_usuario = $_SESSION['id_usuario'];
                 <div class="curso-list">
                     <?php
                     if ($es_estudiante) {
-                        $sql = "SELECT c.id_curso, c.nombre_curso, c.descripcion, c.nivel_educativo, c.duracion, cc.nombre_categoria 
+                        $sql = "SELECT DISTINCT c.id_curso, c.nombre_curso, c.descripcion, c.nivel_educativo, c.duracion, cc.nombre_categoria 
                                 FROM cursos c 
                                 LEFT JOIN categoria_curso cc ON c.id_categoria = cc.id_categoria
                                 JOIN inscripciones i ON c.id_curso = i.id_curso
                                 WHERE i.id_estudiante = (SELECT id_estudiante FROM estudiante WHERE id_usuario = ?)
+                                GROUP BY c.id_curso
                                 ORDER BY c.nombre_curso ASC";
                     } elseif ($es_profesor) {
                         $sql = "SELECT DISTINCT c.id_curso, c.nombre_curso, c.descripcion, c.nivel_educativo, c.duracion, cc.nombre_categoria 
@@ -55,6 +56,7 @@ $id_usuario = $_SESSION['id_usuario'];
                                 LEFT JOIN horarios h ON c.id_curso = h.id_curso
                                 LEFT JOIN profesor p ON h.id_profesor = p.id_profesor OR c.id_profesor = p.id_profesor
                                 WHERE p.id_usuario = ?
+                                GROUP BY c.id_curso
                                 ORDER BY c.nombre_curso ASC";
                     }
 

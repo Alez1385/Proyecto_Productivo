@@ -546,7 +546,16 @@ function getDatabaseData($conn, $query, $params = [])
     }
     
     if (!empty($params)) {
-        $types = str_repeat('s', count($params)); // Asume que todos los parámetros son strings
+        $types = '';
+        foreach ($params as $param) {
+            if (is_int($param)) {
+                $types .= 'i';
+            } elseif (is_double($param)) {
+                $types .= 'd';
+            } else {
+                $types .= 's';
+            }
+        }
         $stmt->bind_param($types, ...$params);
     }
     
