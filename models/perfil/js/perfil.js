@@ -45,25 +45,45 @@ document.addEventListener('DOMContentLoaded', function() {
 
     function updateProfile() {
         const formData = new FormData(profileForm);
+        
+        // Log de los datos que se van a enviar
+        console.log('Enviando datos del formulario:');
+        for (let [key, value] of formData.entries()) {
+            console.log(key + ': ' + value);
+        }
 
         fetch('update_profile.php', {
             method: 'POST',
             body: formData
         })
-        .then(response => response.json())
+        .then(response => {
+            console.log('Response status:', response.status);
+            console.log('Response headers:', response.headers);
+            return response.text().then(text => {
+                console.log('Response text:', text);
+                try {
+                    return JSON.parse(text);
+                } catch (e) {
+                    console.error('Error parsing JSON:', e);
+                    throw new Error('Respuesta no válida del servidor: ' + text);
+                }
+            });
+        })
         .then(data => {
+            console.log('Response data:', data);
             if (data.success) {
-                showNotification();
+                showNotification(data.message || 'Perfil actualizado correctamente');
                 setTimeout(() => {
                     window.location.reload();
                 }, 2000);
             } else {
+                console.error('Error en la respuesta:', data.message);
                 alert('Error al actualizar el perfil: ' + data.message);
             }
         })
         .catch(error => {
-            console.error('Error:', error);
-            alert('Ocurrió un error al actualizar el perfil');
+            console.error('Error en la petición:', error);
+            alert('Ocurrió un error al actualizar el perfil: ' + error.message);
         });
     }
 

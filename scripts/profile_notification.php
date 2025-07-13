@@ -1,44 +1,9 @@
 <?php
-// Include necessary files and perform initial checks
-require_once '../scripts/conexion.php';
-require_once '../scripts/functions.php';
-
-// Start session if not already started
-if (session_status() == PHP_SESSION_NONE) {
-    session_start();
+if (!function_exists('getProfileIncompleteInfo')) {
+    require_once __DIR__ . '/functions.php';
 }
-
-// Check if the user is logged in and is a student
-if (!isset($_SESSION['username']) || !checkPermission('estudiante')) {
-    echo '<h2 class="no-tienes-permiso">No tienes permiso para acceder a esta página.</h2>';
-    exit;
-}
-
-// Obtener información básica del usuario
-$id_usuario = $_SESSION['id_usuario'];
-$sql_user = "SELECT * FROM usuario WHERE id_usuario = ?";
-$stmt_user = $conn->prepare($sql_user);
-$stmt_user->bind_param("i", $id_usuario);
-$stmt_user->execute();
-$result_user = $stmt_user->get_result();
-$user = $result_user->fetch_assoc();
-
-// Mostrar notificación de perfil incompleto universal
-include '../scripts/profile_notification.php';
-
-// Verificar si el usuario necesita completar sus datos
-$datos_incompletos = false;
-$campos_faltantes = [];
-if (isset($user['perfil_incompleto']) && $user['perfil_incompleto'] == 1) {
-    $datos_incompletos = true;
-    if (empty($user['nombre'])) $campos_faltantes[] = 'nombre';
-    if (empty($user['apellido'])) $campos_faltantes[] = 'apellido';
-    if (empty($user['telefono'])) $campos_faltantes[] = 'teléfono';
-    if (empty($user['direccion'])) $campos_faltantes[] = 'dirección';
-    if (empty($user['fecha_nac'])) $campos_faltantes[] = 'fecha de nacimiento';
-    if (empty($campos_faltantes)) $campos_faltantes[] = 'información personal';
-}
-?>
+$profileInfo = getProfileIncompleteInfo($user);
+if ($profileInfo['incompleto']): ?>
 <style>
 .profile-notification {
     background: linear-gradient(135deg, #ff6b6b 0%, #ee5a52 100%);
@@ -59,12 +24,11 @@ if (isset($user['perfil_incompleto']) && $user['perfil_incompleto'] == 1) {
 .profile-notification .close-notification {position:absolute;top:15px;right:15px;background:none;border:none;color:white;font-size:20px;cursor:pointer;opacity:0.7;transition:opacity 0.3s ease;}
 .profile-notification .close-notification:hover {opacity:1;}
 </style>
-<?php if ($datos_incompletos): ?>
 <div class="profile-notification" id="profile-notification">
     <button class="close-notification" onclick="closeNotification()">&times;</button>
     <h3><i class="fas fa-exclamation-triangle"></i> ¡Completa tu perfil!</h3>
     <p>Para una mejor experiencia, necesitamos que completes algunos datos de tu perfil:</p>
-    <div class="missing-fields"><strong>Campos faltantes:</strong> <?php echo implode(', ', $campos_faltantes); ?></div>
+    <div class="missing-fields"><strong>Campos faltantes:</strong> <?php echo implode(', ', $profileInfo['campos_faltantes']); ?></div>
     <a href="../models/perfil/perfil.php" class="btn-complete-profile"><i class="fas fa-user-edit"></i>Completar Perfil</a>
 </div>
 <script>
@@ -84,26 +48,4 @@ document.addEventListener('DOMContentLoaded', function() {
     }
 });
 </script>
-<?php endif; ?>
-<section class="student-dashboard">
-    <!-- Div para mostrar errores -->
-    <div id="error-message" style="display:none;"></div>
-    <h2>Mis Inscripciones</h2>
-    <div id="inscripciones-list" class="inscripciones-list">
-        <!-- Inscripciones will be dynamically inserted here -->
-    </div>
-
-    <h2>Mis Preinscripciones</h2>
-    <div id="preinscripciones-list" class="preinscripciones-list">
-        <!-- Preinscripciones will be dynamically inserted here -->
-    </div>
-
-    <h2>Cursos Disponibles</h2>
-    <div id="course-list" class="course-list">
-        <!-- Available courses will be dynamically inserted here -->
-    </div>
-</section>
-
-<script src="../js/inscripcion-handler.js"></script>
-<script src="../js/dashboard_updater.js"></script>
-
+<?php endif; ?> 

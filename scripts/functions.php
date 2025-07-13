@@ -566,3 +566,32 @@ function getDatabaseData($conn, $query, $params = [])
     
     return $data;
 }
+
+/**
+ * Devuelve información sobre si el perfil está incompleto y qué campos faltan
+ * @param array $user
+ * @return array ['incompleto'=>bool, 'campos_faltantes'=>array]
+ */
+function getProfileIncompleteInfo($user) {
+    $campos_faltantes = [];
+    $campos = [
+        'nombre' => 'nombre',
+        'apellido' => 'apellido',
+        'telefono' => 'teléfono',
+        'direccion' => 'dirección',
+        'fecha_nac' => 'fecha de nacimiento',
+    ];
+    foreach ($campos as $campo => $label) {
+        if (empty($user[$campo])) {
+            $campos_faltantes[] = $label;
+        }
+    }
+    $incompleto = !empty($campos_faltantes) || (isset($user['perfil_incompleto']) && $user['perfil_incompleto'] == 1);
+    if ($incompleto && empty($campos_faltantes)) {
+        $campos_faltantes[] = 'información personal';
+    }
+    return [
+        'incompleto' => $incompleto,
+        'campos_faltantes' => $campos_faltantes
+    ];
+}

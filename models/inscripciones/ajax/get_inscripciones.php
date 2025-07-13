@@ -4,48 +4,56 @@ include_once "../../../scripts/conexion.php";
 function getInscripciones(mysqli $conn, array $filtros = []): array
 {
     $sql = "SELECT i.id_inscripcion, i.fecha_inscripcion, i.estado,
-                    c.nombre_curso, e.id_estudiante, u.nombre, u.apellido
+                    c.nombre_curso, e.id_estudiante, u.nombre, u.apellido, u.username, tu.nombre as tipo_usuario
                     FROM inscripciones i
                     JOIN cursos c ON i.id_curso = c.id_curso
                     JOIN estudiante e ON i.id_estudiante = e.id_estudiante
-                    JOIN usuario u ON e.id_usuario = u.id_usuario";
+                    JOIN usuario u ON e.id_usuario = u.id_usuario
+                    JOIN tipo_usuario tu ON u.id_tipo_usuario = tu.id_tipo_usuario";
 
-            $whereConditions = [];
-            $params = [];
-            $types = '';
+    $whereConditions = [];
+    $params = [];
+    $types = '';
 
-            foreach ($filtros as $key => $value) {
-                $whereConditions[] = "$key = ?";
-                $params[] = $value;
-                $types .= getParamType($value);
-            }
+    foreach ($filtros as $key => $value) {
+        $whereConditions[] = "$key = ?";
+        $params[] = $value;
+        $types .= getParamType($value);
+    }
 
-            if (!empty($whereConditions)) {
-                $sql .= " WHERE " . implode(" AND ", $whereConditions);
-            }
+    if (!empty($whereConditions)) {
+        $sql .= " WHERE " . implode(" AND ", $whereConditions);
+    }
 
-            $sql .= " ORDER BY i.fecha_inscripcion DESC";
+    $sql .= " ORDER BY i.fecha_inscripcion DESC";
 
-            $stmt = $conn->prepare($sql);
-            if (!$stmt) {
-                throw new Exception("Error preparing query: " . $conn->error);
-            }
+    // Log para debugging
+    error_log("SQL Query: " . $sql);
+    error_log("Params: " . print_r($params, true));
 
-            if (!empty($params)) {
-                $stmt->bind_param($types, ...$params);
-            }
+    $stmt = $conn->prepare($sql);
+    if (!$stmt) {
+        throw new Exception("Error preparing query: " . $conn->error);
+    }
 
-            if (!$stmt->execute()) {
-                throw new Exception("Error executing query: " . $stmt->error);
-            }
+    if (!empty($params)) {
+        $stmt->bind_param($types, ...$params);
+    }
 
-            $result = $stmt->get_result();
-            $inscripciones = $result->fetch_all(MYSQLI_ASSOC);
+    if (!$stmt->execute()) {
+        throw new Exception("Error executing query: " . $stmt->error);
+    }
 
-            $stmt->close();
+    $result = $stmt->get_result();
+    $inscripciones = $result->fetch_all(MYSQLI_ASSOC);
 
-            return $inscripciones;
-        }
+    // Log para debugging
+    error_log("Inscripciones encontradas: " . count($inscripciones));
+
+    $stmt->close();
+
+    return $inscripciones;
+}
 
         function getParamType($value): string
         {

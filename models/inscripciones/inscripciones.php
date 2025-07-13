@@ -16,6 +16,111 @@
         require_once "../../scripts/conexion.php";
         require_once "../../scripts/config.php";
 
+        // Procesar aprobación de preinscripción rápida
+        if (isset($_POST['aprobar_preinscripcion']) && isset($_POST['id_preinscripcion'])) {
+            $id_preinscripcion = intval($_POST['id_preinscripcion']);
+            
+            // Obtener datos de la preinscripción
+            $sql = "SELECT p.*, c.nombre_curso, u.id_usuario, u.id_tipo_usuario, u.username 
+                    FROM preinscripciones p 
+                    INNER JOIN cursos c ON p.id_curso = c.id_curso 
+                    LEFT JOIN usuario u ON p.id_usuario = u.id_usuario
+                    WHERE p.id_preinscripcion = ?";
+            $stmt = $conn->prepare($sql);
+            $stmt->bind_param("i", $id_preinscripcion);
+            $stmt->execute();
+            $result = $stmt->get_result();
+            $pre = $result->fetch_assoc();
+            
+            if ($pre) {
+                $conn->begin_transaction();
+                
+                try {
+                    // Si el usuario existe y es tipo "user", convertirlo a "estudiante"
+                    if ($pre['id_usuario'] && $pre['id_tipo_usuario'] == 4) { // 4 = user
+                        // Cambiar tipo de usuario a estudiante (3)
+                        $update_user = "UPDATE usuario SET id_tipo_usuario = 3 WHERE id_usuario = ?";
+                        $stmt_user = $conn->prepare($update_user);
+                        $stmt_user->bind_param("i", $pre['id_usuario']);
+                        $stmt_user->execute();
+                        
+                        // Verificar si ya existe un registro en la tabla estudiante
+                        $check_estudiante = "SELECT id_estudiante FROM estudiante WHERE id_usuario = ?";
+                        $stmt_check = $conn->prepare($check_estudiante);
+                        $stmt_check->bind_param("i", $pre['id_usuario']);
+                        $stmt_check->execute();
+                        $result_check = $stmt_check->get_result();
+                        
+                        if ($result_check->num_rows == 0) {
+                            // Crear registro en la tabla estudiante
+                            $insert_estudiante = "INSERT INTO estudiante (id_usuario, fecha_registro, estado) VALUES (?, CURDATE(), 'activo')";
+                            $stmt_estudiante = $conn->prepare($insert_estudiante);
+                            $stmt_estudiante->bind_param("i", $pre['id_usuario']);
+                            $stmt_estudiante->execute();
+                            $id_estudiante = $conn->insert_id;
+                        } else {
+                            $estudiante = $result_check->fetch_assoc();
+                            $id_estudiante = $estudiante['id_estudiante'];
+                        }
+                    } else {
+                        // Si no hay usuario asociado, crear uno nuevo
+                        $id_usuario = null;
+                        $id_estudiante = null;
+                        
+                        // Crear usuario nuevo
+                        $insert_usuario = "INSERT INTO usuario (nombre, apellido, mail, telefono, id_tipo_usuario, username, clave, fecha_registro) 
+                                         VALUES (?, ?, ?, ?, 3, ?, ?, NOW())";
+                        $username = strtolower(str_replace(' ', '', $pre['nombre'])) . rand(100, 999);
+                        $password_hash = password_hash('123456', PASSWORD_DEFAULT); // Contraseña por defecto
+                        
+                        $stmt_usuario = $conn->prepare($insert_usuario);
+                        $stmt_usuario->bind_param("ssssss", $pre['nombre'], $pre['apellido'] ?? '', $pre['email'], $pre['telefono'], $username, $password_hash);
+                        $stmt_usuario->execute();
+                        $id_usuario = $conn->insert_id;
+                        
+                        // Crear estudiante
+                        $insert_estudiante = "INSERT INTO estudiante (id_usuario, fecha_registro, estado) VALUES (?, CURDATE(), 'activo')";
+                        $stmt_estudiante = $conn->prepare($insert_estudiante);
+                        $stmt_estudiante->bind_param("i", $id_usuario);
+                        $stmt_estudiante->execute();
+                        $id_estudiante = $conn->insert_id;
+                    }
+                    
+                    // Crear la inscripción formal
+                    $insert_inscripcion = "INSERT INTO inscripciones (id_curso, id_estudiante, fecha_inscripcion, estado) 
+                                         VALUES (?, ?, CURDATE(), 'aprobada')";
+                    $stmt_inscripcion = $conn->prepare($insert_inscripcion);
+                    $stmt_inscripcion->bind_param("ii", $pre['id_curso'], $id_estudiante);
+                    $stmt_inscripcion->execute();
+                    
+                    // Eliminar la preinscripción
+                    $delete_preinscripcion = "DELETE FROM preinscripciones WHERE id_preinscripcion = ?";
+                    $stmt_delete = $conn->prepare($delete_preinscripcion);
+                    $stmt_delete->bind_param("i", $id_preinscripcion);
+                    $stmt_delete->execute();
+                    
+                    $conn->commit();
+                    
+                    echo "<div class='alert alert-success' style='background:#d4edda;color:#155724;padding:15px;border-radius:5px;margin:20px 0;'>
+                            <i class='fas fa-check-circle'></i> 
+                            Preinscripción aprobada exitosamente. El usuario ha sido convertido a estudiante y se ha creado la inscripción formal.
+                          </div>";
+                    
+                } catch (Exception $e) {
+                    $conn->rollback();
+                    echo "<div class='alert alert-danger' style='background:#f8d7da;color:#721c24;padding:15px;border-radius:5px;margin:20px 0;'>
+                            <i class='fas fa-exclamation-triangle'></i> 
+                            Error al procesar la preinscripción: " . $e->getMessage() . "
+                          </div>";
+                }
+            } else {
+                echo "<div class='alert alert-danger' style='background:#f8d7da;color:#721c24;padding:15px;border-radius:5px;margin:20px 0;'>
+                        <i class='fas fa-exclamation-triangle'></i> 
+                        No se encontró la preinscripción especificada.
+                      </div>";
+            }
+        }
+
         // Process state changes
         if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['id_inscripcion']) && isset($_POST['nuevo_estado'])) {
             $id_inscripcion = $_POST['id_inscripcion'];
@@ -181,6 +286,8 @@
                             <tr>
                                 <th>ID</th>
                                 <th>Estudiante</th>
+                                <th>Username</th>
+                                <th>Tipo Usuario</th>
                                 <th>Curso</th>
                                 <th>Fecha</th>
                                 <th>Estado</th>
@@ -193,19 +300,104 @@
                     </table>
                 </div>
             </section>
+            <!-- SECCIÓN DE PREINSCRIPCIONES RÁPIDAS -->
+            <section class="content" style="margin-top:40px;">
+                <h2 style="color:#333;margin-bottom:25px;font-size:1.8em;border-bottom:3px solid #3498db;padding-bottom:10px;">
+                    <i class="fas fa-clock" style="color:#3498db;margin-right:10px;"></i>
+                    Preinscripciones Rápidas Pendientes
+                </h2>
+                <div class="inscriptions-list">
+                    <div class="preinscripciones-container">
+                        <table class="preinscripciones-table">
+                            <thead>
+                                <tr>
+                                    <th>ID</th>
+                                    <th>Nombre</th>
+                                    <th>Email</th>
+                                    <th>Teléfono</th>
+                                    <th>Curso</th>
+                                    <th>Fecha</th>
+                                    <th>Estado</th>
+                                    <th>Acciones</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <?php
+                                // Obtener preinscripciones pendientes
+                                $sql_preinscripciones = "SELECT p.*, c.nombre_curso, u.username, u.id_tipo_usuario 
+                                                        FROM preinscripciones p 
+                                                        INNER JOIN cursos c ON p.id_curso = c.id_curso 
+                                                        LEFT JOIN usuario u ON p.id_usuario = u.id_usuario
+                                                        WHERE p.estado = 'pendiente' 
+                                                        ORDER BY p.fecha_preinscripcion DESC";
+                                $result_preinscripciones = $conn->query($sql_preinscripciones);
+                                
+                                if ($result_preinscripciones && $result_preinscripciones->num_rows > 0):
+                                    while ($pre = $result_preinscripciones->fetch_assoc()):
+                                ?>
+                                    <tr class="preinscripcion-row">
+                                        <td><?php echo $pre['id_preinscripcion']; ?></td>
+                                        <td>
+                                            <strong><?php echo htmlspecialchars($pre['nombre']); ?></strong>
+                                            <?php if ($pre['username']): ?>
+                                                <br><small style="color:#666;">Usuario: <?php echo htmlspecialchars($pre['username']); ?></small>
+                                            <?php endif; ?>
+                                        </td>
+                                        <td><?php echo htmlspecialchars($pre['email']); ?></td>
+                                        <td><?php echo htmlspecialchars($pre['telefono']); ?></td>
+                                        <td>
+                                            <span class="curso-badge"><?php echo htmlspecialchars($pre['nombre_curso']); ?></span>
+                                        </td>
+                                        <td><?php echo date('d/m/Y H:i', strtotime($pre['fecha_preinscripcion'])); ?></td>
+                                        <td>
+                                            <span class="status-badge pendiente">Pendiente</span>
+                                        </td>
+                                        <td>
+                                            <form action="" method="POST" style="display:inline;">
+                                                <input type="hidden" name="id_preinscripcion" value="<?php echo $pre['id_preinscripcion']; ?>">
+                                                <button type="submit" name="aprobar_preinscripcion" class="btn-aprobar" 
+                                                        onclick="return confirm('¿Estás seguro de que quieres aprobar esta preinscripción?')">
+                                                    <i class="fas fa-check"></i> Aprobar
+                                                </button>
+                                            </form>
+                                        </td>
+                                    </tr>
+                                <?php 
+                                    endwhile;
+                                else:
+                                ?>
+                                    <tr>
+                                        <td colspan="8" style="text-align:center;padding:30px;color:#666;">
+                                            <i class="fas fa-inbox" style="font-size:2em;color:#ddd;margin-bottom:10px;"></i>
+                                            <br>No hay preinscripciones rápidas pendientes
+                                        </td>
+                                    </tr>
+                                <?php endif; ?>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </section>
         </div>
     </div>
 
     <script>
-        // Función para cargar inscripciones
+        // Función para cargar inscripciones usando Ajax
         function cargarInscripciones() {
-            var filtros = $("#filterForm").serialize();
+            var filtros = {
+                estado: $("#filterEstado").val(),
+                curso: $("#filterCurso").val()
+            };
+            
+            console.log('Filtros aplicados:', filtros);
+            
             $.ajax({
                 url: "ajax/get_inscripciones.php",
                 method: "GET",
                 data: filtros,
                 dataType: 'json',
                 success: function(inscripciones) {
+                    console.log('Inscripciones recibidas:', inscripciones);
                     var tbody = $("#inscripcionesTableBody");
                     tbody.empty();
                     inscripciones.forEach(function(inscripcion) {
@@ -213,6 +405,8 @@
                     <tr>
                         <td>${inscripcion.id_inscripcion}</td>
                         <td>${inscripcion.nombre} ${inscripcion.apellido}</td>
+                        <td>${inscripcion.username}</td>
+                        <td>${inscripcion.tipo_usuario}</td>
                         <td>${inscripcion.nombre_curso}</td>
                         <td>${inscripcion.fecha_inscripcion}</td>
                         <td>
@@ -239,6 +433,7 @@
                 },
                 error: function(jqXHR, textStatus, errorThrown) {
                     console.error("Error cargando inscripciones:", textStatus, errorThrown);
+                    console.error("Response:", jqXHR.responseText);
                 }
             });
         }
@@ -261,6 +456,7 @@
 
         // Cargar inscripciones al cargar la página
         $(document).ready(function() {
+            console.log('Cargando inscripciones...');
             cargarInscripciones();
 
             // Manejar cambios en los filtros
@@ -399,6 +595,88 @@
             document.getElementById('file-name-display').textContent = fileName;
         });
     </script>
+
+    <style>
+    /* Estilos modernos y minimalistas en blanco y azul para inscripciones */
+    .inscriptions-list {
+        background: #fff;
+        border-radius: 14px;
+        box-shadow: 0 4px 24px rgba(52, 152, 219, 0.07);
+        overflow: hidden;
+        margin-top: 20px;
+    }
+    .inscriptions-list table {
+        width: 100%;
+        border-collapse: collapse;
+        font-size: 15px;
+        background: #fff;
+    }
+    .inscriptions-list th {
+        background: #eaf6fb;
+        color: #2176ae;
+        padding: 16px 10px;
+        text-align: left;
+        font-weight: 700;
+        font-size: 13px;
+        text-transform: uppercase;
+        border-bottom: 2px solid #d0e6f7;
+    }
+    .inscriptions-list td {
+        padding: 14px 10px;
+        border-bottom: 1px solid #f0f4f8;
+        vertical-align: middle;
+        color: #222;
+    }
+    .inscriptions-list tr:hover {
+        background: #f4faff;
+        transition: background 0.2s;
+    }
+    .status-badge {
+        border-radius: 12px;
+        padding: 5px 14px;
+        font-size: 12px;
+        font-weight: 600;
+        display: inline-block;
+        background: #eaf6fb;
+        color: #2176ae;
+        border: 1px solid #d0e6f7;
+    }
+    .status-badge.pendiente { background: #eaf6fb; color: #2176ae; }
+    .status-badge.aprobada { background: #d4f8e8; color: #1e824c; }
+    .status-badge.rechazada { background: #ffe5e5; color: #c0392b; }
+    .status-badge.cancelada { background: #f7f7f7; color: #888; }
+    .btn-view {
+        background: #2176ae;
+        color: #fff;
+        border: none;
+        padding: 7px 16px;
+        border-radius: 6px;
+        font-size: 13px;
+        font-weight: 600;
+        cursor: pointer;
+        transition: background 0.2s;
+        margin-left: 8px;
+    }
+    .btn-view:hover {
+        background: #145a8a;
+    }
+    .status-select {
+        border: 1px solid #d0e6f7;
+        border-radius: 6px;
+        padding: 5px 10px;
+        font-size: 13px;
+        color: #2176ae;
+        background: #f4faff;
+        margin-right: 6px;
+    }
+    @media (max-width: 768px) {
+        .inscriptions-list table, .inscriptions-list th, .inscriptions-list td {
+            font-size: 12px;
+            padding: 8px 4px;
+        }
+        .btn-view, .status-select { font-size: 11px; padding: 5px 8px; }
+    }
+    </style>
 
 </body>
 

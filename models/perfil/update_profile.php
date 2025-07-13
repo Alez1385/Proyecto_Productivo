@@ -13,12 +13,25 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     $direccion = $_POST['direccion'];
     $fecha_nac = $_POST['fecha_nac']; // Cambiado de 'fecha_nacimiento' a 'fecha_nac'
 
-    $query = "UPDATE usuario SET nombre = ?, apellido = ?, mail = ?, telefono = ?, direccion = ?, fecha_nac = ? WHERE id_usuario = ?";
+    // Verificar si todos los campos requeridos están completos
+    $perfil_completo = !empty($nombre) && !empty($apellido) && !empty($telefono) && 
+                       !empty($direccion) && !empty($fecha_nac);
+
+    $query = "UPDATE usuario SET nombre = ?, apellido = ?, mail = ?, telefono = ?, direccion = ?, fecha_nac = ?, perfil_incompleto = ? WHERE id_usuario = ?";
     $stmt = $conn->prepare($query);
-    $stmt->bind_param("ssssssi", $nombre, $apellido, $mail, $telefono, $direccion, $fecha_nac, $id_usuario);
+    $perfil_incompleto = $perfil_completo ? 0 : 1; // 0 si está completo, 1 si está incompleto
+    $stmt->bind_param("ssssssii", $nombre, $apellido, $mail, $telefono, $direccion, $fecha_nac, $perfil_incompleto, $id_usuario);
 
     if ($stmt->execute()) {
-        echo json_encode(['success' => true, 'message' => 'Perfil actualizado correctamente']);
+        $message = $perfil_completo ? 
+            'Perfil actualizado correctamente. ¡Tu perfil está completo!' : 
+            'Perfil actualizado correctamente';
+        
+        echo json_encode([
+            'success' => true, 
+            'message' => $message,
+            'profile_complete' => $perfil_completo
+        ]);
     } else {
         echo json_encode(['success' => false, 'message' => 'Error al actualizar el perfil: ' . $stmt->error]);
     }

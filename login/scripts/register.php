@@ -35,7 +35,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     $username = filter_input(INPUT_POST, 'username', FILTER_SANITIZE_STRING);
     $password = $_POST['password'] ?? '';
     $password2 = $_POST['password2'] ?? '';
-    $id_tipo_usuario = 3; // Default user type
+    $id_tipo_usuario = 4; // Default user type
 
     // Validar datos
     if (empty($mail) || empty($username) || empty($password) || empty($password2)) {
@@ -52,16 +52,16 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 
     // Check password strength
     if (!isPasswordStrong($password)) {
-        redirectWithError("Password is not strong enough. It should be at least 8 characters long and include uppercase, lowercase, numbers, and special characters");
+        redirectWithError("La contraseña no es lo suficientemente segura. Debe tener al menos 8 caracteres e incluir mayúsculas, minúsculas, números y caracteres especiales.");
     }
 
     // Check if email or username already exists
     if (isEmailTaken($conn, $mail)) {
-        redirectWithError("Email is already in use.");
+        redirectWithError("El correo electrónico ya está en uso.");
     }
 
     if (isUsernameTaken($conn, $username)) {
-        redirectWithError("Username is already taken.");
+        redirectWithError("El nombre de usuario ya está tomado.");
     }
 
     // Hash the password

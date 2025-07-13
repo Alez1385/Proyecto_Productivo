@@ -57,6 +57,7 @@ try {
 
     $user = getUserInfo($conn, $_SESSION['id_usuario']);
     $modules = getModules($conn, $user['id_tipo_usuario']);
+    $isUserTypeUser = ($user['tipo_nombre'] === 'user');
 
     // Get saved order and reorder modules
     $savedOrder = getSavedModuleOrder($conn, $_SESSION['id_usuario']);
@@ -97,15 +98,14 @@ try {
         <div class="sidebar">
             <div class="profile">
                 <div class="info">
-                    <p><b><?php echo htmlspecialchars($user['nombre']); ?></b></p>
-                    <small class="text-muted"><?php echo htmlspecialchars($user['tipo_nombre']); ?></small>
+                    <p><b><?php echo htmlspecialchars($user['nombre'] ?: $user['username']); ?></b></p>
                 </div>
                 <div class="profile-photo">
-                    <?php
-                    $default_icon = BASE_URL . 'uploads\salir guapo en fotos-605380757.webp'; // Asegúrate de que esta ruta sea correcta
-                    $user_image = !empty($user['foto']) ? BASE_URL . 'uploads/' . htmlspecialchars($user['foto']) : $default_icon;
-                    ?>
-                    <img src="<?php echo $user_image; ?>" alt="User Image">
+                    <?php if (!empty($user['foto']) && file_exists(__DIR__ . '/../uploads/' . $user['foto'])): ?>
+                        <img src="<?php echo BASE_URL . 'uploads/' . htmlspecialchars($user['foto']); ?>" alt="User Image">
+                    <?php else: ?>
+                        <i class="fas fa-user-circle user-icon" style="font-size: 60px; color: #ccc;"></i>
+                    <?php endif; ?>
                 </div>
             </div>
 
@@ -119,7 +119,15 @@ try {
                         </a>
                     </div>
 
-                    <?php if (!empty($modules)): ?>
+                    <?php if ($isUserTypeUser): ?>
+                        <!-- Solo Perfil para usuarios tipo user -->
+                        <div class="sidebar-item">
+                            <a href="/models/perfil/perfil.php">
+                                <span class="material-icons-sharp">person</span>
+                                <h3>Perfil</h3>
+                            </a>
+                        </div>
+                    <?php else: ?>
                         <?php foreach ($modules as $module): ?>
                             <div class="sidebar-item" draggable="true" data-module-id="<?php echo htmlspecialchars($module['id_modulo'], ENT_QUOTES, 'UTF-8'); ?>">
                                 <a href="<?php echo BASE_URL . htmlspecialchars($module['url'], ENT_QUOTES, 'UTF-8'); ?>">
@@ -128,8 +136,6 @@ try {
                                 </a>
                             </div>
                         <?php endforeach; ?>
-                    <?php else: ?>
-                        <p>No hay módulos disponibles para este tipo de usuario.</p>
                     <?php endif; ?>
                 </div>
             </div>
@@ -176,13 +182,16 @@ try {
                     e.stopPropagation();
                 }
 
-                if (draggedItem !== this && draggedItem.dataset.moduleId !== 'dashboard') {
-                    if (this.dataset.moduleId === 'dashboard') {
-                        sidebar.insertBefore(draggedItem, this.nextSibling);
+                if (draggedItem !== this) {
+                    const allItems = [...this.parentNode.querySelectorAll('.sidebar-item')];
+                    const draggedIndex = allItems.indexOf(draggedItem);
+                    const droppedIndex = allItems.indexOf(this);
+
+                    if (draggedIndex < droppedIndex) {
+                        this.parentNode.insertBefore(draggedItem, this.nextSibling);
                     } else {
-                        sidebar.insertBefore(draggedItem, this);
+                        this.parentNode.insertBefore(draggedItem, this);
                     }
-                    updateOrder();
                 }
 
                 return false;
@@ -190,53 +199,32 @@ try {
 
             function handleDragEnd(e) {
                 this.classList.remove('dragging');
-                Array.from(sidebar.children).forEach(child => {
-                    child.classList.remove('over');
-                });
-            }
-
-            function addDragEvents(item) {
-                if (item.dataset.moduleId !== 'dashboard') {
-                    item.addEventListener('dragstart', handleDragStart);
-                    item.addEventListener('dragover', handleDragOver);
-                    item.addEventListener('dragenter', handleDragEnter);
-                    item.addEventListener('dragleave', handleDragLeave);
-                    item.addEventListener('drop', handleDrop);
-                    item.addEventListener('dragend', handleDragEnd);
-                }
-            }
-
-            function updateOrder() {
-                const items = Array.from(sidebar.children);
-                const order = items
-                    .filter(item => item.dataset.moduleId !== 'dashboard')
-                    .map(item => item.dataset.moduleId);
-
-                // Send the new order to the server
+                const items = [...this.parentNode.querySelectorAll('.sidebar-item')];
+                const moduleOrder = items.map(item => item.getAttribute('data-module-id')).filter(id => id !== 'dashboard');
+                
+                // Save the new order
                 fetch('<?php echo BASE_URL; ?>scripts/update_module_order.php', {
-                        method: 'POST',
-                        headers: {
-                            'Content-Type': 'application/json',
-                        },
-                        body: JSON.stringify({
-                            id_usuario: <?php echo $_SESSION['id_usuario']; ?>,
-                            module_order: order
-                        }),
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({
+                        module_order: moduleOrder
                     })
-                    .then(response => response.json())
-                    .then(data => {
-                        if (data.success) {
-                            console.log('Order updated successfully');
-                        } else {
-                            console.error('Error al actualizar el orden:', data.error);
-                        }
-                    })
-                    .catch(error => console.error('Error:', error.message));
+                }).catch(error => console.error('Error saving module order:', error));
             }
 
-            Array.from(sidebar.children).forEach(addDragEvents);
+            // Add event listeners to draggable items
+            const draggableItems = sidebar.querySelectorAll('.sidebar-item[draggable="true"]');
+            draggableItems.forEach(item => {
+                item.addEventListener('dragstart', handleDragStart);
+                item.addEventListener('dragover', handleDragOver);
+                item.addEventListener('dragenter', handleDragEnter);
+                item.addEventListener('dragleave', handleDragLeave);
+                item.addEventListener('drop', handleDrop);
+                item.addEventListener('dragend', handleDragEnd);
+            });
         });
     </script>
 </body>
-
 </html>

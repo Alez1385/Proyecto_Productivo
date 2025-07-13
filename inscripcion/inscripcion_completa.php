@@ -44,8 +44,13 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
     if ($uploadOk) {
         if (move_uploaded_file($_FILES["comprobante"]["tmp_name"], $target_file)) {
-            if (processInscripcion($conn, $curso_id, $id_usuario, $target_file)) {
+            $result = processInscripcion($conn, $curso_id, $id_usuario, $target_file);
+            if ($result === true) {
                 $success_message = "Inscripción completada con éxito.";
+            } elseif ($result === 'duplicate') {
+                $error_message = "Ya existe una inscripción para este curso y usuario.";
+            } elseif ($result === 'pre_duplicate') {
+                $error_message = "Ya existe una preinscripción pendiente para este curso y usuario.";
             } else {
                 $error_message = "Error al procesar la inscripción.";
             }
@@ -76,14 +81,38 @@ function validateFile($file, $fileType) {
 }
 
 function processInscripcion($conn, $curso_id, $id_usuario, $comprobante) {
-    // First, check if the estudiante exists
+    // Verificar si ya existe inscripción para este usuario y curso
+    $stmt = $conn->prepare("SELECT e.id_estudiante, i.id_inscripcion FROM estudiante e LEFT JOIN inscripciones i ON e.id_estudiante = i.id_estudiante AND i.id_curso = ? WHERE e.id_usuario = ?");
+    $stmt->bind_param("ii", $curso_id, $id_usuario);
+    $stmt->execute();
+    $result = $stmt->get_result();
+    $row = $result->fetch_assoc();
+    if ($row && $row['id_inscripcion']) {
+        // Ya existe inscripción
+        return 'duplicate';
+    }
+    // Verificar si hay preinscripción pendiente
+    $stmt = $conn->prepare("SELECT id_preinscripcion FROM preinscripciones WHERE id_usuario = ? AND id_curso = ? AND estado = 'pendiente'");
+    $stmt->bind_param("ii", $id_usuario, $curso_id);
+    $stmt->execute();
+    $result = $stmt->get_result();
+    if ($result->num_rows > 0) {
+        // Ya existe preinscripción pendiente
+        return 'pre_duplicate';
+    }
+    // Si el usuario es tipo user, convertirlo a estudiante
+    $user = getUserInfo($conn, $id_usuario);
+    if ($user['id_tipo_usuario'] == 4) {
+        $stmt = $conn->prepare("UPDATE usuario SET id_tipo_usuario = 3 WHERE id_usuario = ?");
+        $stmt->bind_param("i", $id_usuario);
+        $stmt->execute();
+    }
+    // Crear estudiante si no existe
     $stmt = $conn->prepare("SELECT id_estudiante FROM estudiante WHERE id_usuario = ?");
     $stmt->bind_param("i", $id_usuario);
     $stmt->execute();
     $result = $stmt->get_result();
-    
     if ($result->num_rows === 0) {
-        // If the estudiante doesn't exist, create one
         $stmt = $conn->prepare("INSERT INTO estudiante (id_usuario) VALUES (?)");
         $stmt->bind_param("i", $id_usuario);
         if (!$stmt->execute()) {
@@ -94,25 +123,15 @@ function processInscripcion($conn, $curso_id, $id_usuario, $comprobante) {
         $row = $result->fetch_assoc();
         $id_estudiante = $row['id_estudiante'];
     }
-    
-    // Check if there's a preinscripcion for this student and course
-    $stmt = $conn->prepare("SELECT id_preinscripcion FROM preinscripciones WHERE id_usuario = ? AND id_curso = ?");
+    // Eliminar preinscripción si existe
+    $stmt = $conn->prepare("DELETE FROM preinscripciones WHERE id_usuario = ? AND id_curso = ?");
     $stmt->bind_param("ii", $id_usuario, $curso_id);
     $stmt->execute();
-    $result = $stmt->get_result();
-    $id_preinscripcion = null;
-    if ($result->num_rows > 0) {
-        $row = $result->fetch_assoc();
-        $stmt = $conn->prepare("delete from preinscripciones where id_preinscripcion = ?");
-        $stmt->bind_param("i", $row['id_preinscripcion']);
-        $stmt->execute();
-    }
-
-    // Now proceed with the inscription
+    // Crear inscripción formal
     $stmt = $conn->prepare("INSERT INTO inscripciones (id_curso, id_estudiante, fecha_inscripcion, estado, fecha_actualizacion, comprobante_pago) VALUES (?, ?, NOW(), 'pendiente', NOW(), ?)");
     $stmt->bind_param("iis", $curso_id, $id_estudiante, $comprobante);
-    return $stmt->execute();
-    
+    $success = $stmt->execute();
+    return $success;
 }
 
 ?>

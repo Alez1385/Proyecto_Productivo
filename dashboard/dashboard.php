@@ -7,6 +7,11 @@ requireLogin();
 // Obtener el tipo de usuario
 $user = getUserInfo($conn, $_SESSION['id_usuario']);
 
+// Debug: Log user information
+error_log("Dashboard - User ID: " . $_SESSION['id_usuario']);
+error_log("Dashboard - User Role from Session: " . ($_SESSION['user_role'] ?? 'Not set'));
+error_log("Dashboard - User Type from DB: " . ($user['tipo_nombre'] ?? 'Not set'));
+
 // Contenido HTML común
 ?>
 <!DOCTYPE html>
@@ -50,13 +55,17 @@ $user = getUserInfo($conn, $_SESSION['id_usuario']);
 
             <?php
             // Contenido específico según el tipo de usuario
+            error_log("Dashboard - Processing user type: " . $user["tipo_nombre"]);
+            
             switch ($user["tipo_nombre"]) {
                 case 'admin':
+                    error_log("Dashboard - Including admin dashboard");
                     include 'dashboard_admin.php';
                     echo "<script src='../js/loadCss.js'></script>";
                     echo "<script>loadCSS('css/dash.css');</script>";
                     break;
                 case 'estudiante':
+                    error_log("Dashboard - Including student dashboard");
                     include 'dashboard_estudiante.php';
                     echo "<script src='../js/loadCss.js'></script>";
                     echo "<script>
@@ -64,12 +73,20 @@ $user = getUserInfo($conn, $_SESSION['id_usuario']);
                     </script>";
                     break;
                 case 'profesor':
+                    error_log("Dashboard - Including professor dashboard");
                     include 'dashboard_profesor.php';
                     echo "<script src='../js/loadCss.js'></script>";
                     echo "<script>loadCSS('css/dash.css');</script>";
                     break;
+                case 'user':
+                    error_log("Dashboard - Including user dashboard");
+                    include 'dashboard_user.php';
+                    echo "<script src='../js/loadCss.js'></script>";
+                    echo "<script>loadCSS('css/user.css');</script>";
+                    break;
                 default:
-                    echo "<p>Tipo de usuario no reconocido.</p>";
+                    error_log("Dashboard - Unknown user type: " . $user["tipo_nombre"]);
+                    echo "<p>Tipo de usuario no reconocido: " . htmlspecialchars($user["tipo_nombre"]) . "</p>";
             }
             ?>
 
